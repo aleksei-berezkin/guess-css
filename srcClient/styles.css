@@ -1,0 +1,38 @@
+iframe.puzzler-choice {
+    width: 240px;
+    height: 200px;
+    border: 1px solid #a0a0a0;
+    border-radius: .25em;
+}
+
+.choice {
+    display: inline-block;
+}
+
+.choice>pre {
+    margin: 0;
+}
+
+.choice .tag {
+    color: #881280;
+}
+
+.choice .attr-name {
+    color: #994600;
+}
+
+.choice .attr-value {
+    color: #191aa7;
+}
+
+.choice .operator {
+    color: #a894a6;
+}
+
+.choice .decl-name {
+    color: #c80000;
+}
+
+.choice .differing {
+    font-weight: bold;
+}
