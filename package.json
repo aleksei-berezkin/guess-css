@@ -12,7 +12,7 @@
     "stage": "NODE_ENV=production ts-node srcServer/runProdServer.ts 3000",
     "prod": "NODE_ENV=production ts-node srcServer/runProdServer.ts 80"
   },
-  "author": "Alexey Berezkin",
+  "author": "Aleksei Berezkin",
   "license": "ISC",
   "repository": "https://github.com/aleksei-berezkin/css-puzzler",
   "devDependencies": {
