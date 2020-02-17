@@ -2,15 +2,15 @@
   "name": "css-puzzler",
   "version": "0.0.0",
   "description": "CSS puzzler game",
-  "main": "srcClient/index.js",
+  "main": "src/client/index.js",
   "scripts": {
     "start": "npm-run-all --parallel dev:server dev:client",
-    "dev:server": "ts-node-dev --no-notify srcServer/runDevApiServer.ts",
+    "dev:server": "ts-node-dev --no-notify src/server/runDevApiServer.ts",
     "dev:client": "NODE_ENV=development webpack-dev-server --config webpack.config.dev.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "NODE_ENV=production webpack --config webpack.config.prod.js",
-    "stage": "NODE_ENV=production ts-node srcServer/runProdServer.ts 3000",
-    "prod": "NODE_ENV=production ts-node srcServer/runProdServer.ts 80"
+    "stage": "NODE_ENV=production ts-node src/server/runProdServer.ts 3000",
+    "prod": "NODE_ENV=production ts-node src/server/runProdServer.ts 80"
   },
   "author": "Aleksei Berezkin",
   "license": "ISC",

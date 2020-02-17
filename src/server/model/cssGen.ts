@@ -1,5 +1,5 @@
 import * as R from 'ramda';
-import { nRandom, randomItem, shuffled, twoElementVariationsInOrder } from '../../srcCommon/util';
+import { nRandom, randomItem, shuffled, twoElementVariationsInOrder } from '../../shared/util';
 import { TagNode } from './nodes';
 import {
     ChildCombinator,

@@ -7,13 +7,8 @@
     "downlevelIteration": true,
 
     "noImplicitAny": false,
-    "preserveConstEnums": true,
     "sourceMap": true
   },
-  "include": [
-    "srcServer/**/*",
-    "srcClient/**/*"
-  ],
   "exclude": [
     "node_modules"
    ]

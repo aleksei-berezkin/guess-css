@@ -1,7 +1,7 @@
 import { Node, TagNode, TextNode } from './nodes';
 import { genCssRulesChoices } from './cssGen';
 import * as R from 'ramda';
-import { randomItem } from '../../srcCommon/util';
+import { randomItem } from '../../shared/util';
 import { Rule } from './cssRules';
 
 export function genPuzzler(): {body: TagNode, rulesChoices: Rule[][]} {

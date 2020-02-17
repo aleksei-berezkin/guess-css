@@ -7,7 +7,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
     mode: process.env.NODE_ENV,
-    entry: './srcClient/index.ts',
+    entry: './src/client/index.ts',
     plugins: [
         new HtmlWebpackPlugin({
             title: 'CSS Puzzler',

@@ -1,7 +1,7 @@
 import { genPuzzler } from './model/bodyGen';
 import { Puzzler, Registry } from './puzzlerRegistry';
 import * as R from 'ramda';
-import { GenPuzzlerResponse, Region } from '../srcCommon/beans';
+import { GenPuzzlerResponse, Region } from '../shared/beans';
 import { Node, TagNode } from './model/nodes';
 import { Indent } from './model/indent';
 import { Rule } from './model/cssRules';

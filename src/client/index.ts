@@ -1,7 +1,7 @@
 import './styles.css';
-import { GenPuzzlerResponse, Region } from '../srcCommon/beans';
+import { GenPuzzlerResponse, Region } from '../shared/beans';
 import * as R from 'ramda';
-import { randomBounded } from '../srcCommon/util';
+import { randomBounded } from '../shared/util';
 
 console.log('Hi there');
 
