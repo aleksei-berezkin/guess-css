@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Express } from 'express';
 import path from 'path';
 import addApi from './api';
 
@@ -7,7 +7,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 const port = process.argv[process.argv.length - 1];
-const app = express();
+const app: Express = express();
 
 app.use(express.static(path.resolve(__dirname, '..', '..', 'dist')));
 

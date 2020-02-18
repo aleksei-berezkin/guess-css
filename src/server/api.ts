@@ -5,11 +5,12 @@ import { GenPuzzlerResponse, Region } from '../shared/beans';
 import { Node, TagNode } from './model/nodes';
 import { Indent } from './model/indent';
 import { Rule } from './model/cssRules';
+import { Express, Request, Response } from 'express';
 
-export default function addApi(app) {
+export default function addApi(app: Express) {
     const registry = new Registry();
 
-    app.post('/genPuzzler', (req, res) => {
+    app.post('/genPuzzler', (req: Request, res: Response) => {
         const puzzler: Puzzler = genPuzzler();
         const id = registry.putPuzzler(puzzler);
         const responseBean: GenPuzzlerResponse = {
@@ -20,7 +21,7 @@ export default function addApi(app) {
         res.send(JSON.stringify(responseBean));
     });
 
-    app.get('/puzzler', (req, res) => {
+    app.get('/puzzler', (req: Request, res: Response) => {
         const id: string = req.query['id'];
         const choice: number = Number.parseInt(req.query['choice']);
 
@@ -39,7 +40,7 @@ export default function addApi(app) {
         res.send(`<html><head><style>${styleText}</style></head>${puzzlerChoice.body.toString()}</html>`);
     });
 
-    app.get('/puzzlerFormatted', (req, res) => {
+    app.get('/puzzlerFormatted', (req: Request, res: Response) => {
         const id: string = req.query['id'];
         const choice: number = Number.parseInt(req.query['choice']);
 
