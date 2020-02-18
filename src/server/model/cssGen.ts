@@ -58,16 +58,13 @@ function getDeepestSingleChildSubtree(root: TagNode): NodeAndDepth {
         return {root, depth: 1};
     }
 
-    const oneOfDeepestChildren = randomItem(
-        R.pipe(
-            R.map(getDeepestSingleChildSubtree),
-            R.sortBy(nd => nd.depth),
-            R.groupWith((l, r) => l.depth === r.depth),
-            R.reduce((_: NodeAndDepth[], deeper: NodeAndDepth[]) => deeper, [])
-        )(
-            root.tagChildren
-        )
-    );
+    const oneOfDeepestChildren = R.pipe(
+        R.map(getDeepestSingleChildSubtree),
+        R.sortBy(nd => nd.depth),
+        R.groupWith((l, r) => l.depth === r.depth),
+        R.reduce((_: NodeAndDepth[], deeper: NodeAndDepth[]) => deeper, []),
+        randomItem
+    )(root.tagChildren);
 
     return {
         root: root.copyWithChild(oneOfDeepestChildren.root),
