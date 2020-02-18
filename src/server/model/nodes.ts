@@ -4,7 +4,7 @@ import { Indent } from './indent';
 
 export interface Node {
     readonly children: Node[];
-    copyWithChild(child: Node);
+    copyWithChild(child: Node): Node;
     toRegions(indent: Indent): Region[][];
     toString(): string;
 }
@@ -74,7 +74,7 @@ export class TagNode implements Node {
         return {kind: RegionKind.Tag, text: `</${this.name}>`};
     }
 
-    private childrenToRegions(indent): Region[][] {
+    private childrenToRegions(indent: Indent): Region[][] {
         return R.pipe(
             R.map((child: Node): Region[][] => child.toRegions(indent)),
             R.unnest

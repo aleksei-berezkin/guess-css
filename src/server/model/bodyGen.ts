@@ -90,7 +90,7 @@ class CssClasses {
 
 class Texts {
     private counter = 1;
-    constructor(private readonly quota) {
+    constructor(private readonly quota: number) {
     }
     hasNext(): boolean {
         return this.counter <= this.quota;

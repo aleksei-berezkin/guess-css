@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "strict": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "downlevelIteration": true,
 
     "sourceMap": true,
@@ -13,5 +13,5 @@
   },
   "exclude": [
     "node_modules"
-   ]
+  ]
 }
