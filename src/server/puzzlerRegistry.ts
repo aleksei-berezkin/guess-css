@@ -42,7 +42,7 @@ export class Registry {
         return key;
     }
 
-    getPuzzlerChoice(id: string, choice: number): {body: TagNode, rules: Rule[]} {
+    getPuzzlerChoice(id: string, choice: number): {body: TagNode, rules: Rule[]} | null {
         const puzzler = this.storage[id];
         if (!puzzler || choice >= puzzler.rulesChoices.length) {
             return null;

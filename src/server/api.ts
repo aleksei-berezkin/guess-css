@@ -31,7 +31,7 @@ export default function addApi(app) {
         }
 
         const styleText: string = R.pipe(
-            R.map(r => r.toString()),
+            R.map((r: Rule) => r.toString()),
             R.join(''),
         )(puzzlerChoice.rules);
 

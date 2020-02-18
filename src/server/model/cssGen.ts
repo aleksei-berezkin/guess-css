@@ -17,7 +17,7 @@ const RULES_CHOICES = 3;
 
 const colors = ['pink', 'lightgreen', 'lightblue', 'cyan', 'magenta', 'yellow', 'lightgrey'];
 
-export function genCssRulesChoices(body: TagNode): Rule[][] {
+export function genCssRulesChoices(body: TagNode): Rule[][] | null {
     const styles: {[k: string]: string}[] = R.pipe(
         nRandom<string>(2),
         R.map((color: string) => ({'background-color': color})),
@@ -63,7 +63,7 @@ function getDeepestSingleChildSubtree(root: TagNode): NodeAndDepth {
             R.map(getDeepestSingleChildSubtree),
             R.sortBy(nd => nd.depth),
             R.groupWith((l, r) => l.depth === r.depth),
-            R.reduce((_: NodeAndDepth[], deeper: NodeAndDepth[]) => deeper, null)
+            R.reduce((_: NodeAndDepth[], deeper: NodeAndDepth[]) => deeper, [])
         )(
             root.tagChildren
         )
@@ -75,7 +75,7 @@ function getDeepestSingleChildSubtree(root: TagNode): NodeAndDepth {
     };
 }
 
-function getSiblingsSubtree(root: TagNode): TagNode {
+function getSiblingsSubtree(root: TagNode): TagNode | null {
     if (!root.tagChildren.length) {
         return null;
     }
@@ -83,7 +83,7 @@ function getSiblingsSubtree(root: TagNode): TagNode {
     const childrenSubtrees = R.pipe(
         R.map(getSiblingsSubtree),
         R.reject(R.isNil)
-    )(root.tagChildren);
+    )(root.tagChildren) as TagNode[];
 
     if (childrenSubtrees.length) {
         return root.copyWithChild(randomItem(childrenSubtrees))
@@ -97,7 +97,7 @@ function getSiblingsSubtree(root: TagNode): TagNode {
 }
 
 function unfoldSingleChildren(root: TagNode): TagNode[] {
-    return R.unfold((n: TagNode) => {
+    return R.unfold((n: TagNode | null) => {
         if (!n) {
             return false;
         }
@@ -112,7 +112,7 @@ function unfoldSingleChildren(root: TagNode): TagNode[] {
 }
 
 function unfoldToSiblings(root: TagNode): {path: TagNode[], siblings: TagNode[]} {
-    const path = R.unfold((n: TagNode) => {
+    const path = R.unfold((n: TagNode | null) => {
         if (!n) {
             return false;
         }
@@ -121,7 +121,7 @@ function unfoldToSiblings(root: TagNode): {path: TagNode[], siblings: TagNode[]}
         }
         return [n, n.tagChildren[0]];
     })(root);
-    return {path, siblings: R.last(path).tagChildren};
+    return {path, siblings: R.last(path)!.tagChildren};
 }
 
 function genDeepChildRules(childrenUnfold: TagNode[], style: {[k: string]: string}): Rule[] {
@@ -170,7 +170,7 @@ function *genSiblingsRules(path: TagNode[], siblings: TagNode[], style: {[k: str
     if (path.length) {
         yield *R.map(
             (selector: Selector) => new Rule(new ChildCombinator(selector, new TypeSelector('*')), style, true)
-        )(genAllPossibleSelectors(R.last(path)));
+        )(genAllPossibleSelectors(R.last(path)!));
     }
 
     yield *R.pipe(

@@ -23,7 +23,7 @@ export function twoElementVariationsInOrder<T>(items: T[]): [T, T][] {
     )(R.range(0, items.length - 1));
 }
 
-export function nRandom<T>(n: number): <T>(items: T[]) => T[] {
+export function nRandom<T>(n: number): (items: T[]) => T[] {
     return <T>(items: T[]) => R.take(
         Math.min(n, items.length),
         shuffled(items),

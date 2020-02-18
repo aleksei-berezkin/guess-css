@@ -51,10 +51,9 @@ interface Context {
 }
 
 class CssClasses {
-    readonly classes: string[];
+    readonly classes: string[] = ['a', 'b', 'c'];
 
     constructor() {
-        this.classes = ['a', 'b', 'c'];
     }
 
     genClasses(): string[] {
@@ -81,7 +80,7 @@ class CssClasses {
             return;
         }
 
-        this.classes.push(String.fromCharCode(R.last(this.classes).charCodeAt(0) + 1));
+        this.classes.push(String.fromCharCode(R.last(this.classes)!.charCodeAt(0) + 1));
     }
 
     private randomClass(): string {

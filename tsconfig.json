@@ -1,13 +1,15 @@
 {
   "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": false,
+    "downlevelIteration": true,
+
+    "sourceMap": true,
+
     "target": "es5",
     "module": "commonjs",
     "moduleResolution": "node",
-    "esModuleInterop": true,
-    "downlevelIteration": true,
-
-    "noImplicitAny": false,
-    "sourceMap": true
+    "esModuleInterop": true
   },
   "exclude": [
     "node_modules"

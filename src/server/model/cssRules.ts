@@ -38,7 +38,7 @@ export class Rule {
 
     private declarationsToRegions(indent: Indent): Region[][] {
         return R.map(
-        ([name, value]): Region[] =>
+        ([name, value]: [string, string]): Region[] =>
                 [
                     indent,
                     {kind: RegionKind.DeclName, text: name},
@@ -51,6 +51,7 @@ export class Rule {
 }
 
 export abstract class Selector {
+    // @ts-ignore
     // noinspection JSUnusedLocalSymbols
     private readonly _nominal: void;
     abstract toString(): string;
@@ -84,6 +85,7 @@ export class PseudoClassSelector extends Selector {
 }
 
 export abstract class Combinator {
+    // @ts-ignore
     // noinspection JSUnusedLocalSymbols
     private readonly _nominal: void;
     abstract toString(): string;

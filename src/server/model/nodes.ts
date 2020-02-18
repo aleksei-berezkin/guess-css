@@ -14,7 +14,7 @@ export class TagNode implements Node {
     classList: string[] = [];
     children: Node[] = [];
 
-    private _tagChildren = null;
+    private _tagChildren: TagNode[] | null = null;
 
     constructor(name: string, classes: string[], children: Node[]) {
         this.name = name;

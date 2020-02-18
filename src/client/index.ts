@@ -17,8 +17,8 @@ fetch(apiBase + '/genPuzzler', {method: 'post'})
         const {id, choicesCount} = genPuzzlerResponse;
         const rootDiv = document.getElementById('app-root-div');
         const correctChoice = randomBounded(choicesCount);
-        rootDiv.innerHTML = `<div><iframe class='puzzler-choice' src='${ getChoiceUrl(id, correctChoice) }'></iframe></div>`;
-        rootDiv.innerHTML += R.pipe(
+        rootDiv!.innerHTML = `<div><iframe class='puzzler-choice' src='${ getChoiceUrl(id, correctChoice) }'></iframe></div>`;
+        rootDiv!.innerHTML += R.pipe(
             R.range(0),
             R.map((choice: number) => getPuzzlerChoiceElement(id, choice, choice === correctChoice)),
             R.join(''),
@@ -34,7 +34,7 @@ function getPuzzlerChoiceElement(id: string, choice: number, correct: boolean) {
         .then(response => response.json())
         .then(obj => {
             const regions: Region[][] = obj as Region[][];
-            document.getElementById(codeId).append(...toHtmlLines(regions));
+            document.getElementById(codeId)!.append(...toHtmlLines(regions));
         });
     return div;
 }
