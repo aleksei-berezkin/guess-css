@@ -9,7 +9,7 @@ if (process.env.NODE_ENV !== 'production') {
 const port = process.argv[process.argv.length - 1];
 const app = express();
 
-app.use(express.static(path.resolve(__dirname, '..', 'dist')));
+app.use(express.static(path.resolve(__dirname, '..', '..', 'dist')));
 
 addApi(app);
 
