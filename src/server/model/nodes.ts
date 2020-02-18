@@ -6,7 +6,7 @@ export interface Node {
     readonly children: Node[];
     copyWithChild(child: Node): Node;
     toRegions(indent: Indent): Region[][];
-    toString(): string;
+    toUnformattedCode(): string;
 }
 
 export class TagNode implements Node {
@@ -81,17 +81,23 @@ export class TagNode implements Node {
         )(this.children);
     }
 
-    toString(): string {
-        let str = `<${this.name}`;
-        if (this.classList && this.classList.length) {
-            str += ` class="${this.classList.join(' ')}"`;
+    toUnformattedCode(): string {
+        return `<${this.name}${this.classesAttrToString()}>${this.childrenToUnformattedCode()}</${this.name}>`;
+    }
+
+    private classesAttrToString(): string {
+        if (!this.classList.length) {
+            return '';
         }
-        str += '>';
-        for (const child of this.children) {
-            str += child.toString();
-        }
-        str += `</${this.name}>`;
-        return str;
+
+        return ` class="${R.join(' ')(this.classList)}"`;
+    }
+
+    private childrenToUnformattedCode(): string {
+        return R.pipe(
+            R.map((child: Node) => child.toUnformattedCode()),
+            R.join(''),
+        )(this.children);
     }
 }
 
@@ -105,7 +111,7 @@ export class TextNode implements Node {
         return new TextNode(this.text);
     }
 
-    toString(): string {
+    toUnformattedCode(): string {
         return this.text;
     }
 

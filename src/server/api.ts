@@ -32,12 +32,12 @@ export default function addApi(app: Express) {
         }
 
         const styleText: string = R.pipe(
-            R.map((r: Rule) => r.toString()),
+            R.map((r: Rule) => r.toUnformattedCode()),
             R.join(''),
         )(puzzlerChoice.rules);
 
         // noinspection HtmlRequiredLangAttribute,HtmlRequiredTitleElement
-        res.send(`<html><head><style>${styleText}</style></head>${puzzlerChoice.body.toString()}</html>`);
+        res.send(`<html><head><style>${styleText}</style></head>${puzzlerChoice.body.toUnformattedCode()}</html>`);
     });
 
     app.get('/puzzlerFormatted', (req: Request, res: Response) => {
@@ -80,5 +80,9 @@ class StylesNode implements Node {
             R.map((rule: Rule) => rule.toRegions(indent)),
             R.unnest,
         )(this.rules);
+    }
+
+    toUnformattedCode(): string {
+        throw new Error('Unsupported');
     }
 }

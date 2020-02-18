@@ -9,7 +9,7 @@ export class Rule {
         private readonly selectorsDiffering: boolean = false) {
     }
 
-    toString() {
+    toUnformattedCode() {
         return this.selectorsGroup.toString() + '{' + this.declarationsToString() + '}';
     }
 
@@ -51,9 +51,8 @@ export class Rule {
 }
 
 export abstract class Selector {
-    // @ts-ignore
     // noinspection JSUnusedLocalSymbols
-    private readonly _nominal: void;
+    private readonly _nominal: any;
     abstract toString(): string;
 }
 
@@ -85,9 +84,8 @@ export class PseudoClassSelector extends Selector {
 }
 
 export abstract class Combinator {
-    // @ts-ignore
     // noinspection JSUnusedLocalSymbols
-    private readonly _nominal: void;
+    private readonly _nominal: any;
     abstract toString(): string;
 }
 
