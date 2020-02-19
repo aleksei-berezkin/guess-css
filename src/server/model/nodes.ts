@@ -4,7 +4,7 @@ import { Indent } from './indent';
 
 export interface Node {
     readonly children: Node[];
-    copyWithChild(child: Node): Node;
+    copyWithSingleChild(child: Node): Node;
     toRegions(indent: Indent): Region[][];
     toUnformattedCode(): string;
 }
@@ -29,7 +29,7 @@ export class TagNode implements Node {
         return this._tagChildren;
     }
 
-    copyWithChild(child: Node): TagNode {
+    copyWithSingleChild(child: Node): TagNode {
         return new TagNode(this.name, this.classList, [child]);
     }
 
@@ -107,8 +107,8 @@ export class TextNode implements Node {
     constructor(public text: string) {
     }
 
-    copyWithChild(child: Node) {
-        return new TextNode(this.text);
+    copyWithSingleChild(child: Node): Node {
+        throw new Error('Not supported');
     }
 
     toUnformattedCode(): string {

@@ -71,7 +71,7 @@ class StylesNode implements Node {
     constructor(private readonly rules: Rule[]) {
     }
 
-    copyWithChild(child: Node): Node {
+    copyWithSingleChild(child: Node): Node {
         throw new Error('Unsupported');
     }
 
