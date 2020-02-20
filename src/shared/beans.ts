@@ -1,6 +1,7 @@
 export interface GenPuzzlerResponse {
     id: string,
     choicesCount: number,
+    token: string,
 }
 
 export interface Region {

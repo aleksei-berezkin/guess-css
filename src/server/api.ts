@@ -12,22 +12,23 @@ export default function addApi(app: Express) {
 
     app.post('/genPuzzler', (req: Request, res: Response) => {
         const puzzler: Puzzler = genPuzzler();
-        const id = registry.putPuzzler(puzzler);
+        const {id, token} = registry.putPuzzler(puzzler);
         const responseBean: GenPuzzlerResponse = {
             id,
             choicesCount: puzzler.rulesChoices.length,
+            token,
         };
 
         res.send(JSON.stringify(responseBean));
     });
 
     app.get('/puzzler', (req: Request, res: Response) => {
-        const id: string = req.query['id'];
-        const choice: number = Number.parseInt(req.query['choice']);
+        const {id, choice, token} = parseChoice(req);
 
-        const puzzlerChoice = registry.getPuzzlerChoice(id, choice);
+        const puzzlerChoice = registry.getPuzzlerChoice(id, choice, token);
         if (!puzzlerChoice) {
             res.status(404);
+            res.send();
             return;
         }
 
@@ -41,10 +42,9 @@ export default function addApi(app: Express) {
     });
 
     app.get('/puzzlerFormatted', (req: Request, res: Response) => {
-        const id: string = req.query['id'];
-        const choice: number = Number.parseInt(req.query['choice']);
+        const {id, choice, token} = parseChoice(req);
 
-        const puzzlerChoice = registry.getPuzzlerChoice(id, choice);
+        const puzzlerChoice = registry.getPuzzlerChoice(id, choice, token);
         if (!puzzlerChoice) {
             res.status(404);
             return;
@@ -63,6 +63,13 @@ export default function addApi(app: Express) {
             )
         );
     });
+
+    function parseChoice(req: Request): {id: string, choice: number, token: string} {
+        const id: string = req.query['id'];
+        const choice: number = Number.parseInt(req.query['choice']);
+        const token: string = req.query['token'];
+        return {id, choice, token};
+    }
 }
 
 class StylesNode implements Node {

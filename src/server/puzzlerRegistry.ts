@@ -1,9 +1,10 @@
 import * as R from 'ramda';
 import { TagNode } from './model/nodes';
 import { Rule } from './model/cssRules';
+import { randomBounded } from '../shared/util';
 
 interface Storage {
-    [k: string]: Puzzler;
+    [k: string]: {puzzler: Puzzler, token: string};
 }
 
 export interface Puzzler {
@@ -35,16 +36,21 @@ export class Registry {
         console.log(`Puzzler registry: cleared ${ itemsToClear } entries`);
     }
 
-    putPuzzler(puzzler: Puzzler): string {
-        const key = this.counter.toString(10);
-        this.storage[key] = puzzler;
+    putPuzzler(puzzler: Puzzler): {id: string, token: string} {
+        const id = this.counter.toString(10);
+        const token = randomBounded(Number.MAX_SAFE_INTEGER).toString(10);
+        this.storage[id] = {puzzler, token};
         this.counter++;
-        return key;
+        return {id, token};
     }
 
-    getPuzzlerChoice(id: string, choice: number): {body: TagNode, rules: Rule[]} | null {
-        const puzzler = this.storage[id];
-        if (!puzzler || choice >= puzzler.rulesChoices.length) {
+    getPuzzlerChoice(id: string, choice: number, token: string): {body: TagNode, rules: Rule[]} | null {
+        if (!this.storage.hasOwnProperty(id)) {
+            return null;
+        }
+
+        const {puzzler, token: actualToken} = this.storage[id];
+        if (choice >= puzzler.rulesChoices.length || actualToken !== token) {
             return null;
         }
 

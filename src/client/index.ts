@@ -14,33 +14,38 @@ const apiBase = global.API_BASE_URL;
 fetch(apiBase + '/genPuzzler', {method: 'post'})
     .then(response => response.json())
     .then((genPuzzlerResponse: GenPuzzlerResponse) => {
-        const {id, choicesCount} = genPuzzlerResponse;
+        const {id, choicesCount, token} = genPuzzlerResponse;
         const rootDiv = document.getElementById('app-root-div');
         const correctChoice = randomBounded(choicesCount);
-        rootDiv!.innerHTML = `<div><iframe class='puzzler-choice' src='${ getChoiceUrl(id, correctChoice) }'></iframe></div>`;
+        rootDiv!.innerHTML = `<div><iframe class='puzzler-choice' src='${ getChoiceSrcUrl(id, correctChoice, token) }'></iframe></div>`;
         rootDiv!.innerHTML += R.pipe(
             R.range(0),
-            R.map((choice: number) => getPuzzlerChoiceElement(id, choice, choice === correctChoice)),
+            R.map((choice: number) => getPuzzlerChoiceElement(id, choice, token, choice === correctChoice)),
             R.join(''),
         )(choicesCount);
     });
 
-function getPuzzlerChoiceElement(id: string, choice: number, correct: boolean) {
-    const url = `${ apiBase }/puzzlerFormatted?id=${ id }&choice=${ choice }`;
+function getPuzzlerChoiceElement(id: string, choice: number, token: string, correct: boolean) {
+    const url = getChoiceFormattedUrl(id, choice, token);
     const codeId = `code-${id}-${choice}`;
     const correctText = correct ? 'Correct!' : 'Incorrect!';
     const div = `<div id='${ codeId }' class='choice' onclick='alert("${correctText}");'></div>`;
     fetch(url)
         .then(response => response.json())
-        .then(obj => {
-            const regions: Region[][] = obj as Region[][];
-            document.getElementById(codeId)!.append(...toHtmlLines(regions));
-        });
+        .then((regions: Region[][]) => document.getElementById(codeId)!.append(...toHtmlLines(regions)));
     return div;
 }
 
-function getChoiceUrl(id: string, choice: number) {
-    return `${ apiBase }/puzzler?id=${ id }&choice=${ choice }`;
+function getChoiceSrcUrl(id: string, choice: number, token: string) {
+    return getChoiceUrl('puzzler', id, choice, token);
+}
+
+function getChoiceFormattedUrl(id: string, choice: number, token: string) {
+    return getChoiceUrl('puzzlerFormatted', id, choice, token);
+}
+
+function getChoiceUrl(path: string, id: string, choice: number, token: string) {
+    return `${ apiBase }/${ path }?id=${ id }&choice=${ choice }&token=${ token }`;
 }
 
 function toHtmlLines(regions: Region[][]): HTMLElement[] {
