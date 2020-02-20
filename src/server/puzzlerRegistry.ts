@@ -48,15 +48,15 @@ export class Registry {
         if (!this.storage.hasOwnProperty(id)) {
             return null;
         }
-
         const {puzzler, token: actualToken} = this.storage[id];
-        if (choice >= puzzler.rulesChoices.length || actualToken !== token) {
-            return null;
+
+        if (0 <= choice && choice < puzzler.rulesChoices.length && actualToken === token) {
+            return {
+                body: puzzler.body,
+                rules: puzzler.rulesChoices[choice],
+            }
         }
 
-        return {
-            body: puzzler.body,
-            rules: puzzler.rulesChoices[choice],
-        }
+        return null;
     }
 }

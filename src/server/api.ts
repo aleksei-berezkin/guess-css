@@ -23,7 +23,7 @@ export default function addApi(app: Express) {
     });
 
     app.get('/puzzler', (req: Request, res: Response) => {
-        const {id, choice, token} = parseChoice(req);
+        const {id, choice, token} = parse(req);
 
         const puzzlerChoice = registry.getPuzzlerChoice(id, choice, token);
         if (!puzzlerChoice) {
@@ -42,11 +42,12 @@ export default function addApi(app: Express) {
     });
 
     app.get('/puzzlerFormatted', (req: Request, res: Response) => {
-        const {id, choice, token} = parseChoice(req);
+        const {id, choice, token} = parse(req);
 
         const puzzlerChoice = registry.getPuzzlerChoice(id, choice, token);
         if (!puzzlerChoice) {
             res.status(404);
+            res.send();
             return;
         }
 
@@ -64,7 +65,7 @@ export default function addApi(app: Express) {
         );
     });
 
-    function parseChoice(req: Request): {id: string, choice: number, token: string} {
+    function parse(req: Request): {id: string, choice: number, token: string} {
         const id: string = req.query['id'];
         const choice: number = Number.parseInt(req.query['choice']);
         const token: string = req.query['token'];
