@@ -11,12 +11,17 @@ interface State {
 }
 export function Puzzler(): ReactElement {
     const [state, setState] = useState<State | null>(null);
+    const [diffHint, setDiffHint] = useState<boolean>(true);
 
     useEffect(() => {
         if (state) {
             return;
         }
 
+        loadNextPuzzler();
+    }, [state]);
+
+    function loadNextPuzzler() {
         fetchGenPuzzler()
             .then(r => r.json())
             .then((r: GenPuzzlerResponse) => {
@@ -44,16 +49,37 @@ export function Puzzler(): ReactElement {
                     }
                 )(R.range(0, r.choicesCount));
             });
-    }, [state]);
+    }
+
+    function handleNextButtonClick() {
+        loadNextPuzzler();
+    }
 
     return <>
+        <h1>Guess the code snippet which produced the layout</h1>
         { state && <div><PuzzlerIFrame puzzler={ state.gen } correctChoice={ state.correctChoice }/></div> }
+        {
+            diffHint &&
+            <div style={{ margin: '10px' }}>Only fragments <b>in bold</b> differ { ' ' }
+                <button type='button' onClick={ () => setDiffHint(false) }>Got it</button>
+            </div>
+        }
         {
             state &&
             R.map(
-                (i: number) => <Choice key={ i } choice={ state!.choices[i] } correct={ i === state!.correctChoice }/>
+                (i: number) =>
+                    <Choice
+                        key={ state!.gen.id + '_' + i }
+                        choice={ state!.choices[i] }
+                        correct={ i === state!.correctChoice }
+                    />
             )(R.range(0, state.gen.choicesCount))
         }
+        <button type='button'
+                onClick={ handleNextButtonClick }
+                style={{ display: 'block', width: '150px', height: '30px', marginTop: '20px' }}>
+            Next
+        </button>
     </>
 }
 
