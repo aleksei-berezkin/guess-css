@@ -4,6 +4,10 @@ export interface GenPuzzlerResponse {
     token: string,
 }
 
+export interface ChoiceFormatted {
+    lines: Region[][];
+}
+
 export interface Region {
     kind: RegionKind,
     text: string,

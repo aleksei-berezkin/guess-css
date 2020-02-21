@@ -1,7 +1,7 @@
 import { genPuzzler } from './model/bodyGen';
 import { Puzzler, Registry } from './puzzlerRegistry';
 import * as R from 'ramda';
-import { GenPuzzlerResponse, Region } from '../shared/beans';
+import { ChoiceFormatted, GenPuzzlerResponse, Region } from '../shared/beans';
 import { Node, TagNode } from './model/nodes';
 import { Indent } from './model/indent';
 import { Rule } from './model/cssRules';
@@ -41,7 +41,7 @@ export default function addApi(app: Express) {
         res.send(`<html><head><style>${styleText}</style></head>${puzzlerChoice.body.toUnformattedCode()}</html>`);
     });
 
-    app.get('/puzzlerFormatted', (req: Request, res: Response) => {
+    app.get('/choiceFormatted', (req: Request, res: Response) => {
         const {id, choice, token} = parse(req);
 
         const puzzlerChoice = registry.getPuzzlerChoice(id, choice, token);
@@ -51,18 +51,15 @@ export default function addApi(app: Express) {
             return;
         }
 
-        res.send(
-            JSON.stringify(
-                new TagNode('html', [], [
-                    new TagNode('head', [], [
-                        new TagNode('style', [], [
-                            new StylesNode(puzzlerChoice.rules)
-                        ])
-                    ]),
-                    puzzlerChoice.body,
-                ]).toRegions(new Indent())
-            )
-        );
+        const lines = new TagNode('html', [], [
+            new TagNode('head', [], [
+                new TagNode('style', [], [
+                    new StylesNode(puzzlerChoice.rules)
+                ])
+            ]),
+            puzzlerChoice.body,
+        ]).toRegions(new Indent());
+        res.send(JSON.stringify({lines} as ChoiceFormatted));
     });
 
     function parse(req: Request): {id: string, choice: number, token: string} {
