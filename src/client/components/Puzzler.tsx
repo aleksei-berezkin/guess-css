@@ -1,117 +1,96 @@
 import React, { ReactElement, useEffect, useState } from 'react';
 import { ChoiceFormatted, GenPuzzlerResponse, Region } from '../../shared/beans';
-import { fetchChoice, fetchGenPuzzler, getPuzzlerUrl } from '../clientApi';
-import { randomBounded } from '../../shared/util';
+import { getPuzzlerUrl } from '../clientApi';
 import * as R from 'ramda';
+import { useDispatch, useSelector } from 'react-redux';
+import { State } from '../redux/store';
+import { LoadNextPuzzler, Type } from '../redux/actions';
 
-interface State {
-    gen: GenPuzzlerResponse,
-    correctChoice: number,
-    choices: {[i: number]: ChoiceFormatted},
-}
 export function Puzzler(): ReactElement {
-    const [state, setState] = useState<State | null>(null);
-    const [diffHint, setDiffHint] = useState<boolean>(true);
-
+    const puzzler = useSelector((state: State) => state.puzzler);
+    const correctChoice = useSelector((state: State) => state.correctChoice);
     useEffect(() => {
-        if (state) {
-            return;
+        if (!puzzler) {
+            loadNextPuzzler();
         }
-
-        loadNextPuzzler();
-    }, [state]);
+    }, [puzzler]);
+    const dispatch = useDispatch();
 
     function loadNextPuzzler() {
-        fetchGenPuzzler()
-            .then(r => r.json())
-            .then((r: GenPuzzlerResponse) => {
-                setState({
-                    gen: r,
-                    correctChoice: randomBounded(r.choicesCount),
-                    choices: {},
-                });
-
-                R.forEach<number>(
-                    (choice: number) => {
-                        fetchChoice(r.id, choice, r.token)
-                            .then(r => r.json())
-                            .then((r: ChoiceFormatted) => {
-                                setState((prevState: State | null): State => {
-                                    return {
-                                        ...prevState!,
-                                        choices: {
-                                            ...prevState!.choices,
-                                            [choice]: r,
-                                        }
-                                    };
-                                });
-                            });
-                    }
-                )(R.range(0, r.choicesCount));
-            });
-    }
-
-    function handleNextButtonClick() {
-        loadNextPuzzler();
+        const loadAction: LoadNextPuzzler = {
+            type: Type.LOAD_NEXT_PUZZLER,
+        };
+        dispatch(loadAction);
     }
 
     return <>
         <h1>Guess the code snippet which produced the layout</h1>
-        { state && <div><PuzzlerIFrame puzzler={ state.gen } correctChoice={ state.correctChoice }/></div> }
-        {
-            diffHint &&
-            <div style={{ margin: '10px' }}>Only fragments <b>in bold</b> differ { ' ' }
-                <button type='button' onClick={ () => setDiffHint(false) }>Got it</button>
-            </div>
-        }
-        {
-            state &&
-            R.map(
-                (i: number) =>
-                    <Choice
-                        key={ state!.gen.id + '_' + i }
-                        choice={ state!.choices[i] }
-                        correct={ i === state!.correctChoice }
-                    />
-            )(R.range(0, state.gen.choicesCount))
-        }
+        <LayoutFrame puzzler={ puzzler } correctChoice={ correctChoice }/>
+        <DiffHint/>
+        <Choices puzzler={ puzzler } correctChoice={ correctChoice }/>
         <button type='button'
-                onClick={ handleNextButtonClick }
+                onClick={ loadNextPuzzler }
                 style={{ display: 'block', width: '150px', height: '30px', marginTop: '20px' }}>
             Next
         </button>
     </>
 }
 
-function PuzzlerIFrame(props: {puzzler: GenPuzzlerResponse, correctChoice: number}): ReactElement {
-    return <iframe className='puzzler-choice' src={ getPuzzlerUrl(props.puzzler.id, props.correctChoice, props.puzzler.token) }/>;
+function LayoutFrame(p: {puzzler: GenPuzzlerResponse | null, correctChoice: number | null}): ReactElement {
+    return <>{
+        p.puzzler && !R.isNil(p.correctChoice) &&
+        <iframe className='puzzler-choice' src={ getPuzzlerUrl(p.puzzler, p.correctChoice) }/>
+    }</>;
 }
 
-function Choice(p: {choice?: ChoiceFormatted, correct: boolean}): ReactElement {
+function DiffHint(): ReactElement {
+    const [diffHint, setDiffHint] = useState(true);
+    return <>{
+        diffHint &&
+        <div style={ {margin: '10px'} }>Only fragments <b>in bold</b> differ { ' ' }
+            <button type='button' onClick={ () => setDiffHint(false) }>Got it</button>
+        </div>
+    }</>;
+}
+
+function Choices(p: {puzzler: GenPuzzlerResponse | null, correctChoice: number | null}): ReactElement {
+    return <>{
+        p.puzzler && !R.isNil(p.correctChoice) &&
+        R.range(0, p.puzzler.choicesCount)
+            .map((choice: number) =>
+                <Choice
+                    key={ p.puzzler!.id + '_' + choice }
+                    choice={ choice }
+                    correct={ choice === p.correctChoice }
+                />
+            )
+    }</>
+}
+
+function Choice(p: {choice: number, correct: boolean}): ReactElement {
+    const code: ChoiceFormatted = useSelector((state: State) => state.choices[p.choice]);
+
     function handleClick() {
         alert(p.correct ? 'Correct!' : 'Incorrect!');
     }
 
-    return <div className='choice' onClick={ handleClick }>
-        {
-            p.choice &&
-            p.choice.lines.map((regions, i) => <Line key={ i } regions={ regions } />)
-        }
-    </div>;
+    return <div className='choice' onClick={ handleClick }>{
+        code &&
+        code.lines.map(
+            (regions, i) =>
+                <Line key={ i } regions={ regions } />
+        )
+    }</div>;
 }
 
 function Line(p: {regions: Region[]}) {
-    function getClassName(region: Region) {
-        return region.differing
-            ? region.kind + ' differing'
-            : region.kind;
-    }
+    const className = (region: Region) => region.differing
+        ? region.kind + ' differing'
+        : region.kind;
 
-    return <pre>
-        {
-            p.regions.map((region: Region, i) =>
-                <span key={ i } className={ getClassName(region) }>{ region.text }</span>
-            )
-        }
-    </pre>
+    return <pre>{
+        p.regions.map((region: Region, i) =>
+            <span key={ i } className={ className(region) }>{ region.text }</span>
+        )
+    }</pre>
 }
