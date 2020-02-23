@@ -16,21 +16,21 @@ const initialState: State = {
 };
 
 const rootReducer = combineReducers({
-    puzzler: function(current: GenPuzzlerResponse | null = initialState.puzzler, action: Action) {
+    puzzler: function(puzzler: GenPuzzlerResponse | null = initialState.puzzler, action: Action) {
         if (action.type === Type.DISPLAY_LAYOUT) {
             return (action as DisplayLayout).puzzler;
         }
-        return current;
+        return puzzler;
     },
 
-    choices: function(current: ChoiceFormatted[] = initialState.choices, action: Action) {
+    choices: function(choices: ChoiceFormatted[] = initialState.choices, action: Action) {
         if (action.type === Type.DISPLAY_CHOICE) {
             const a = action as DisplayChoice;
-            const newChoices = [...current];
+            const newChoices = [...choices];
             newChoices[a.choice] = a.code;
             return newChoices;
         }
-        return current;
+        return choices;
     },
 });
 
