@@ -1,10 +1,10 @@
 import { Node, TagNode, TextNode } from './nodes';
 import { genCssRulesChoices } from './cssGen';
 import * as R from 'ramda';
-import { randomItem } from '../../shared/util';
+import { randomBounded, randomItem } from '../../shared/util';
 import { Rule } from './cssRules';
 
-export function genPuzzler(): {body: TagNode, rulesChoices: Rule[][]} {
+export function genPuzzler(): {body: TagNode, rulesChoices: Rule[][], correctChoice: number} {
     for ( ; ; ) {
         const body = new TagNode(
             'body',
@@ -14,7 +14,11 @@ export function genPuzzler(): {body: TagNode, rulesChoices: Rule[][]} {
 
         const rulesChoices = genCssRulesChoices(body);
         if (rulesChoices) {
-            return {body, rulesChoices};
+            return {
+                body,
+                rulesChoices,
+                correctChoice: randomBounded(rulesChoices.length)
+            };
         }
     }
 }

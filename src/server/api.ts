@@ -1,7 +1,7 @@
 import { genPuzzler } from './model/bodyGen';
 import { Puzzler, Registry } from './puzzlerRegistry';
 import * as R from 'ramda';
-import { ChoiceFormatted, GenPuzzlerResponse, Region } from '../shared/beans';
+import { CheckResponse, ChoiceFormatted, GenPuzzlerResponse, Region } from '../shared/beans';
 import { Node, TagNode } from './model/nodes';
 import { Indent } from './model/indent';
 import { Rule } from './model/cssRules';
@@ -13,6 +13,7 @@ export default function addApi(app: Express) {
     app.post('/genPuzzler', (req: Request, res: Response) => {
         const puzzler: Puzzler = genPuzzler();
         const {id, token} = registry.putPuzzler(puzzler);
+        console.log('Id=' + id + ', correct=' + puzzler.correctChoice);
         const responseBean: GenPuzzlerResponse = {
             id,
             choicesCount: puzzler.rulesChoices.length,
@@ -23,10 +24,8 @@ export default function addApi(app: Express) {
     });
 
     app.get('/puzzler', (req: Request, res: Response) => {
-        const {id, choice, token} = parse(req);
-
-        const puzzlerChoice = registry.getPuzzlerChoice(id, choice, token);
-        if (!puzzlerChoice) {
+        const puzzler = registry.getPuzzler(getId(req), getToken(req));
+        if (!puzzler) {
             res.status(404);
             res.send();
             return;
@@ -35,17 +34,16 @@ export default function addApi(app: Express) {
         const styleText: string = R.pipe(
             R.map((r: Rule) => r.toUnformattedCode()),
             R.join(''),
-        )(puzzlerChoice.rules);
+        )(puzzler.rulesChoices[puzzler.correctChoice]);
 
         // noinspection HtmlRequiredLangAttribute,HtmlRequiredTitleElement
-        res.send(`<html><head><style>${styleText}</style></head>${puzzlerChoice.body.toUnformattedCode()}</html>`);
+        res.send(`<html><head><style>${styleText}</style></head>${puzzler.body.toUnformattedCode()}</html>`);
     });
 
-    app.get('/choiceFormatted', (req: Request, res: Response) => {
-        const {id, choice, token} = parse(req);
-
-        const puzzlerChoice = registry.getPuzzlerChoice(id, choice, token);
-        if (!puzzlerChoice) {
+    app.get('/choice', (req: Request, res: Response) => {
+        const puzzler = registry.getPuzzler(getId(req), getToken(req));
+        const choice = getChoice(req);
+        if (!puzzler || !hasChoice(puzzler, choice)) {
             res.status(404);
             res.send();
             return;
@@ -54,19 +52,45 @@ export default function addApi(app: Express) {
         const lines = new TagNode('html', [], [
             new TagNode('head', [], [
                 new TagNode('style', [], [
-                    new StylesNode(puzzlerChoice.rules)
+                    new StylesNode(puzzler.rulesChoices[choice])
                 ])
             ]),
-            puzzlerChoice.body,
+            puzzler.body,
         ]).toRegions(new Indent());
-        res.send(JSON.stringify({lines} as ChoiceFormatted));
+        const choiceFormatted: ChoiceFormatted = {lines};
+        res.send(JSON.stringify(choiceFormatted));
     });
 
-    function parse(req: Request): {id: string, choice: number, token: string} {
-        const id: string = req.query['id'];
-        const choice: number = Number.parseInt(req.query['choice']);
-        const token: string = req.query['token'];
-        return {id, choice, token};
+    app.get('/check', (req: Request, res: Response) => {
+        const id = getId(req);
+        const puzzler = registry.getPuzzler(id, getToken(req));
+        if (!puzzler) {
+            res.status(404);
+            res.send();
+            return;
+        }
+
+        const checkResponse: CheckResponse = {
+            id,
+            correctChoice: puzzler.correctChoice
+        };
+        res.send(JSON.stringify(checkResponse));
+    });
+
+    function getId(req: Request): string {
+        return req.query['id'];
+    }
+
+    function getChoice(req: Request): number {
+        return Number.parseInt(req.query['choice']);
+    }
+
+    function getToken(req: Request): string {
+        return req.query['token'];
+    }
+
+    function hasChoice(puzzler: Puzzler, choice: number) {
+        return !Number.isNaN(choice) && 0 <= choice && choice < puzzler.rulesChoices.length;
     }
 }
 

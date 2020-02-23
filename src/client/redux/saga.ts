@@ -1,13 +1,13 @@
-import { apply, call, put, takeEvery } from 'redux-saga/effects';
-import { DisplayChoice, DisplayLayout, LoadChoice, LoadNextPuzzler, Type } from './actions';
-import { fetchChoice, fetchGenPuzzler } from '../clientApi';
-import { ChoiceFormatted, GenPuzzlerResponse } from '../../shared/beans';
-import { randomBounded } from '../../shared/util';
+import { apply, call, put, takeEvery, takeLeading } from 'redux-saga/effects';
+import { CheckChoice, DisplayChoice, DisplayLayout, LoadChoice, LoadNextPuzzler, Type } from './actions';
+import { fetchCheck, fetchChoice, fetchGenPuzzler } from '../clientApi';
+import { CheckResponse, ChoiceFormatted, GenPuzzlerResponse } from '../../shared/beans';
 import * as R from 'ramda';
 
 export function* rootSaga() {
     yield takeEvery(Type.LOAD_NEXT_PUZZLER, loadNextPuzzler);
     yield takeEvery(Type.LOAD_CHOICE, loadChoice);
+    yield takeLeading(Type.CHECK_CHOICE, checkChoice);
 }
 
 function *loadNextPuzzler(_: LoadNextPuzzler) {
@@ -16,7 +16,6 @@ function *loadNextPuzzler(_: LoadNextPuzzler) {
     const displayLayout: DisplayLayout = {
         type: Type.DISPLAY_LAYOUT,
         puzzler,
-        correctChoice: randomBounded(puzzler.choicesCount),
     };
     yield put(displayLayout);
 
@@ -40,4 +39,12 @@ function *loadChoice(loadChoice: LoadChoice) {
         code,
     };
     yield put(displayChoice);
+}
+
+function *checkChoice(checkChoice: CheckChoice) {
+    const r: Response = yield call(fetchCheck, checkChoice.puzzler);
+    const checkResponse: CheckResponse = yield apply(r, r.json, []);
+    const message = checkChoice.choice === checkResponse.correctChoice
+        ? 'Correct!' : 'Incorrect!';
+    alert(message);
 }

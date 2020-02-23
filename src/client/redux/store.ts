@@ -7,13 +7,11 @@ import { rootSaga } from './saga';
 
 export interface State {
     puzzler: GenPuzzlerResponse | null,
-    correctChoice: number | null,
     choices: ChoiceFormatted[],
 }
 
 const initialState: State = {
     puzzler: null,
-    correctChoice: null,
     choices: [],
 };
 
@@ -21,13 +19,6 @@ const rootReducer = combineReducers({
     puzzler: function(current: GenPuzzlerResponse | null = initialState.puzzler, action: Action) {
         if (action.type === Type.DISPLAY_LAYOUT) {
             return (action as DisplayLayout).puzzler;
-        }
-        return current;
-    },
-
-    correctChoice: function(current: number | null = initialState.correctChoice, action: Action) {
-        if (action.type === Type.DISPLAY_LAYOUT) {
-            return (action as DisplayLayout).correctChoice;
         }
         return current;
     },

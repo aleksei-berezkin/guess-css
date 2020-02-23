@@ -24,3 +24,8 @@ export enum RegionKind {
     DeclName = 'decl-name',
     DeclValue = 'decl-value',
 }
+
+export interface CheckResponse {
+    id: string,
+    correctChoice: number,
+}

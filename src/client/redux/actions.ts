@@ -5,6 +5,7 @@ export enum Type {
     DISPLAY_LAYOUT = 'DISPLAY_LAYOUT',
     LOAD_CHOICE = 'LOAD_CHOICE',
     DISPLAY_CHOICE = 'DISPLAY_CHOICE',
+    CHECK_CHOICE = 'CHECK_CHOICE',
 }
 
 export interface Action {
@@ -18,7 +19,6 @@ export interface LoadNextPuzzler extends Action {
 export interface DisplayLayout extends Action {
     type: Type.DISPLAY_LAYOUT,
     puzzler: GenPuzzlerResponse,
-    correctChoice: number,
 }
 
 export interface LoadChoice extends Action {
@@ -31,4 +31,10 @@ export interface DisplayChoice extends Action {
     type: Type.DISPLAY_CHOICE,
     choice: number,
     code: ChoiceFormatted,
+}
+
+export interface CheckChoice extends Action {
+    type: Type.CHECK_CHOICE,
+    puzzler: GenPuzzlerResponse,
+    choice: number,
 }

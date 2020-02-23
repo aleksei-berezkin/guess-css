@@ -1,14 +1,13 @@
 import React, { ReactElement, useEffect, useState } from 'react';
-import { ChoiceFormatted, GenPuzzlerResponse, Region } from '../../shared/beans';
+import { GenPuzzlerResponse, Region } from '../../shared/beans';
 import { getPuzzlerUrl } from '../clientApi';
 import * as R from 'ramda';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from '../redux/store';
-import { LoadNextPuzzler, Type } from '../redux/actions';
+import { CheckChoice, LoadNextPuzzler, Type } from '../redux/actions';
 
 export function Puzzler(): ReactElement {
     const puzzler = useSelector((state: State) => state.puzzler);
-    const correctChoice = useSelector((state: State) => state.correctChoice);
     useEffect(() => {
         if (!puzzler) {
             loadNextPuzzler();
@@ -24,10 +23,10 @@ export function Puzzler(): ReactElement {
     }
 
     return <>
-        <h1>Guess the code snippet which produced the layout</h1>
-        <LayoutFrame puzzler={ puzzler } correctChoice={ correctChoice }/>
+        <h1>Guess the code snippet which produces this layout</h1>
+        <LayoutFrame puzzler={ puzzler }/>
         <DiffHint/>
-        <Choices puzzler={ puzzler } correctChoice={ correctChoice }/>
+        <Choices puzzler={ puzzler }/>
         <button type='button'
                 onClick={ loadNextPuzzler }
                 style={{ display: 'block', width: '150px', height: '30px', marginTop: '20px' }}>
@@ -36,10 +35,10 @@ export function Puzzler(): ReactElement {
     </>
 }
 
-function LayoutFrame(p: {puzzler: GenPuzzlerResponse | null, correctChoice: number | null}): ReactElement {
+function LayoutFrame(p: {puzzler: GenPuzzlerResponse | null}): ReactElement {
     return <>{
-        p.puzzler && !R.isNil(p.correctChoice) &&
-        <iframe className='puzzler-choice' src={ getPuzzlerUrl(p.puzzler, p.correctChoice) }/>
+        p.puzzler &&
+        <iframe className='puzzler-choice' src={ getPuzzlerUrl(p.puzzler) }/>
     }</>;
 }
 
@@ -53,25 +52,31 @@ function DiffHint(): ReactElement {
     }</>;
 }
 
-function Choices(p: {puzzler: GenPuzzlerResponse | null, correctChoice: number | null}): ReactElement {
+function Choices(p: {puzzler: GenPuzzlerResponse | null}): ReactElement {
     return <>{
-        p.puzzler && !R.isNil(p.correctChoice) &&
+        p.puzzler &&
         R.range(0, p.puzzler.choicesCount)
             .map((choice: number) =>
                 <Choice
                     key={ p.puzzler!.id + '_' + choice }
+                    puzzler={ p.puzzler! }
                     choice={ choice }
-                    correct={ choice === p.correctChoice }
                 />
             )
     }</>
 }
 
-function Choice(p: {choice: number, correct: boolean}): ReactElement {
-    const code: ChoiceFormatted = useSelector((state: State) => state.choices[p.choice]);
+function Choice(p: {puzzler: GenPuzzlerResponse, choice: number}): ReactElement {
+    const code = useSelector((state: State) => state.choices[p.choice]);
+    const dispatch = useDispatch();
 
     function handleClick() {
-        alert(p.correct ? 'Correct!' : 'Incorrect!');
+        const checkChoice: CheckChoice = {
+            type: Type.CHECK_CHOICE,
+            puzzler: p.puzzler,
+            choice: p.choice,
+        };
+        dispatch(checkChoice);
     }
 
     return <div className='choice' onClick={ handleClick }>{

@@ -10,6 +10,7 @@ interface Storage {
 export interface Puzzler {
     body: TagNode;
     rulesChoices: Rule[][];
+    correctChoice: number;
 }
 
 const MAX_ITEMS = 20;
@@ -44,17 +45,14 @@ export class Registry {
         return {id, token};
     }
 
-    getPuzzlerChoice(id: string, choice: number, token: string): {body: TagNode, rules: Rule[]} | null {
+    getPuzzler(id: string, token: string): Puzzler | null {
         if (!this.storage.hasOwnProperty(id)) {
             return null;
         }
-        const {puzzler, token: actualToken} = this.storage[id];
 
-        if (0 <= choice && choice < puzzler.rulesChoices.length && actualToken === token) {
-            return {
-                body: puzzler.body,
-                rules: puzzler.rulesChoices[choice],
-            }
+        const {puzzler, token: storedToken} = this.storage[id];
+        if (storedToken === token) {
+            return puzzler;
         }
 
         return null;
