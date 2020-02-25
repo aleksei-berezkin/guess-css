@@ -1,19 +1,23 @@
-import { ChoiceFormatted, GenPuzzlerResponse } from '../../shared/api';
+import { GenPuzzlerResponse, Region } from '../../shared/api';
 import { Action, DisplayChoice, DisplayPuzzler, Type } from './actions';
 import { applyMiddleware, combineReducers, createStore } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import { rootSaga } from './saga';
-import * as R from 'ramda';
 
 
 export interface State {
     puzzler: GenPuzzlerResponse | null,
-    choices: (ChoiceFormatted | null)[],
+    choiceCodes: (ChoiceCode | null)[],
+}
+
+interface ChoiceCode {
+    puzzlerId: string,
+    code: Region[][],
 }
 
 const initialState: State = {
     puzzler: null,
-    choices: [],
+    choiceCodes: [],
 };
 
 const rootReducer = combineReducers({
@@ -24,26 +28,27 @@ const rootReducer = combineReducers({
         return puzzler;
     },
 
-    choices: function(choices: (ChoiceFormatted | null)[] = initialState.choices, action: Action) {
+    choiceCodes: function(choiceCodes: (ChoiceCode | null)[] = initialState.choiceCodes, action: Action) {
         if (action.type === Type.DISPLAY_PUZZLER) {
-            return trimOrExtend(choices, (action as DisplayPuzzler).puzzler.choicesCount);
+            const {puzzler} = action as DisplayPuzzler;
+            if (choiceCodes.length > puzzler.choicesCount) {
+                return choiceCodes.slice(0, puzzler.choicesCount);
+            }
+            return choiceCodes;
         }
 
         if (action.type === Type.DISPLAY_CHOICE) {
-            const {choice, code} = action as DisplayChoice;
-            return [...choices.slice(0, choice), code, ...choices.slice(choice + 1)];
+            const {puzzler, choice, code} = action as DisplayChoice;
+            const newChoiceCodes = [...choiceCodes];
+            newChoiceCodes[choice] = {
+                puzzlerId: puzzler.id,
+                code
+            };
+            return newChoiceCodes;
         }
-        return choices;
+        return choiceCodes;
     },
 });
-
-function trimOrExtend<T>(a: (T | null)[], size: number): (T | null)[] {
-    if (a.length >= size) {
-        return a.slice(0, size);
-    }
-
-    return [...a, ...R.repeat(null, size - a.length)];
-}
 
 export function createAppStore() {
     const sagaMiddleware = createSagaMiddleware();

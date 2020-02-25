@@ -11,9 +11,7 @@ export interface GenPuzzlerResponse {
     token: string,
 }
 
-export interface ChoiceFormatted {
-    lines: Region[][];
-}
+export type ChoiceResponse = Region[][];
 
 export interface Region {
     kind: RegionKind,

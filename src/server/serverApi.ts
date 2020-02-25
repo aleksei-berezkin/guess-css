@@ -1,7 +1,7 @@
 import { genPuzzler } from './model/bodyGen';
 import { Puzzler, Registry } from './puzzlerRegistry';
 import * as R from 'ramda';
-import { CheckResponse, ChoiceFormatted, GenPuzzlerResponse, Method, Region } from '../shared/api';
+import { CheckResponse, ChoiceResponse, GenPuzzlerResponse, Method, Region } from '../shared/api';
 import { Node, TagNode } from './model/nodes';
 import { Indent } from './model/indent';
 import { Rule } from './model/cssRules';
@@ -49,7 +49,7 @@ export default function addApi(app: Express) {
             return;
         }
 
-        const lines = new TagNode('html', [], [
+        const choiceFormatted: ChoiceResponse = new TagNode('html', [], [
             new TagNode('head', [], [
                 new TagNode('style', [], [
                     new StylesNode(puzzler.rulesChoices[choice])
@@ -57,7 +57,7 @@ export default function addApi(app: Express) {
             ]),
             puzzler.body,
         ]).toRegions(new Indent());
-        const choiceFormatted: ChoiceFormatted = {lines};
+
         res.send(JSON.stringify(choiceFormatted));
     });
 

@@ -67,10 +67,15 @@ function Choices(p: {puzzler: GenPuzzlerResponse | null}): ReactElement {
 }
 
 function Choice(p: {puzzler: GenPuzzlerResponse, choice: number}): ReactElement {
-    const code = useSelector((state: State) => state.choices[p.choice]);
+    const choiceCode = useSelector((state: State) => state.choiceCodes[p.choice]);
     const dispatch = useDispatch();
 
     function handleClick() {
+        if (p.puzzler.id !== choiceCode?.puzzlerId) {
+            // Not loaded yet
+            return;
+        }
+
         const checkChoice: CheckChoice = {
             type: Type.CHECK_CHOICE,
             puzzler: p.puzzler,
@@ -80,8 +85,8 @@ function Choice(p: {puzzler: GenPuzzlerResponse, choice: number}): ReactElement 
     }
 
     return <div className='choice' onClick={ handleClick }>{
-        code &&
-        code.lines.map(
+        choiceCode &&
+        choiceCode.code.map(
             (regions, i) =>
                 <Line key={ i } regions={ regions } />
         )
