@@ -57,7 +57,8 @@ function getDeepestSingleChildSubtree(root: TagNode): SingleChildSubtree {
         R.map(getDeepestSingleChildSubtree),
         R.sortBy(nd => nd.depth),
         R.groupWith((l, r) => l.depth === r.depth),
-        R.reduce((_: SingleChildSubtree[], deeper: SingleChildSubtree[]) => deeper, []),
+        R.takeLast(1) as {(s: SingleChildSubtree[][]): SingleChildSubtree[][]},
+        R.unnest,
         randomItem
     )(root.tagChildren);
 
