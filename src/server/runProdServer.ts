@@ -1,6 +1,6 @@
 import express, { Express } from 'express';
 import path from 'path';
-import addApi from './api';
+import addApi from './serverApi';
 
 if (process.env.NODE_ENV !== 'production') {
     throw new Error(process.env.NODE_ENV);

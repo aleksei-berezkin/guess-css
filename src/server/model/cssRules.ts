@@ -1,5 +1,5 @@
 import * as R from 'ramda';
-import { Region, RegionKind } from '../../shared/beans';
+import { Region, RegionKind } from '../../shared/api';
 import { Indent } from './indent';
 
 export class Rule {

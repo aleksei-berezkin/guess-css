@@ -1,3 +1,10 @@
+export enum Method {
+    GEN_PUZZLER = 'genPuzzler',
+    PUZZLER = 'puzzler',
+    CHOICE = 'choice',
+    CHECK = 'check',
+}
+
 export interface GenPuzzlerResponse {
     id: string,
     choicesCount: number,

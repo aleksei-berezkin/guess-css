@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import addApi from './api';
+import addApi from './serverApi';
 
 if (process.env.NODE_ENV !== 'development') {
     throw new Error(process.env.NODE_ENV);

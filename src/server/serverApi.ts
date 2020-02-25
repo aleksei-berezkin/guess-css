@@ -1,7 +1,7 @@
 import { genPuzzler } from './model/bodyGen';
 import { Puzzler, Registry } from './puzzlerRegistry';
 import * as R from 'ramda';
-import { CheckResponse, ChoiceFormatted, GenPuzzlerResponse, Region } from '../shared/beans';
+import { CheckResponse, ChoiceFormatted, GenPuzzlerResponse, Method, Region } from '../shared/api';
 import { Node, TagNode } from './model/nodes';
 import { Indent } from './model/indent';
 import { Rule } from './model/cssRules';
@@ -10,7 +10,7 @@ import { Express, Request, Response } from 'express';
 export default function addApi(app: Express) {
     const registry = new Registry();
 
-    app.post('/genPuzzler', (req: Request, res: Response) => {
+    app.post(`/${ Method.GEN_PUZZLER }`, (req: Request, res: Response) => {
         const puzzler: Puzzler = genPuzzler();
         const {id, token} = registry.putPuzzler(puzzler);
         console.log('Id=' + id + ', correct=' + puzzler.correctChoice);
@@ -23,7 +23,7 @@ export default function addApi(app: Express) {
         res.send(JSON.stringify(responseBean));
     });
 
-    app.get('/puzzler', (req: Request, res: Response) => {
+    app.get(`/${ Method.PUZZLER }`, (req: Request, res: Response) => {
         const puzzler = registry.getPuzzler(getId(req), getToken(req));
         if (!puzzler) {
             res.status(404);
@@ -40,7 +40,7 @@ export default function addApi(app: Express) {
         res.send(`<html><head><style>${styleText}</style></head>${puzzler.body.toUnformattedCode()}</html>`);
     });
 
-    app.get('/choice', (req: Request, res: Response) => {
+    app.get(`/${ Method.CHOICE}`, (req: Request, res: Response) => {
         const puzzler = registry.getPuzzler(getId(req), getToken(req));
         const choice = getChoice(req);
         if (!puzzler || !hasChoice(puzzler, choice)) {
@@ -61,7 +61,7 @@ export default function addApi(app: Express) {
         res.send(JSON.stringify(choiceFormatted));
     });
 
-    app.get('/check', (req: Request, res: Response) => {
+    app.get(`/${ Method.CHECK }`, (req: Request, res: Response) => {
         const id = getId(req);
         const puzzler = registry.getPuzzler(id, getToken(req));
         if (!puzzler) {

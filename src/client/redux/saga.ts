@@ -1,7 +1,7 @@
 import { apply, call, put, takeEvery, takeLeading } from 'redux-saga/effects';
 import { CheckChoice, DisplayChoice, DisplayLayout, LoadChoice, LoadNextPuzzler, Type } from './actions';
 import { fetchCheck, fetchChoice, fetchGenPuzzler } from '../clientApi';
-import { CheckResponse, ChoiceFormatted, GenPuzzlerResponse } from '../../shared/beans';
+import { CheckResponse, ChoiceFormatted, GenPuzzlerResponse } from '../../shared/api';
 import * as R from 'ramda';
 
 export function* rootSaga() {

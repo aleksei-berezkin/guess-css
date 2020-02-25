@@ -1,4 +1,4 @@
-import { ChoiceFormatted, GenPuzzlerResponse } from '../../shared/beans';
+import { ChoiceFormatted, GenPuzzlerResponse } from '../../shared/api';
 
 export enum Type {
     LOAD_NEXT_PUZZLER = 'LOAD_NEXT_PUZZLER',

@@ -1,4 +1,4 @@
-import { ChoiceFormatted, GenPuzzlerResponse } from '../../shared/beans';
+import { ChoiceFormatted, GenPuzzlerResponse } from '../../shared/api';
 import { Action, DisplayChoice, DisplayLayout, Type } from './actions';
 import { applyMiddleware, combineReducers, createStore } from 'redux';
 import createSagaMiddleware from 'redux-saga';

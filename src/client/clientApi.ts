@@ -1,21 +1,21 @@
-import { GenPuzzlerResponse } from '../shared/beans';
+import { GenPuzzlerResponse, Method } from '../shared/api';
 
 // Injected by Webpack DefinePlugin
 // @ts-ignore
 const apiBase = global.API_BASE_URL;
 
 export function fetchGenPuzzler(): Promise<Response> {
-    return fetch(apiBase + '/genPuzzler', {method: 'post'});
+    return fetch(`${ apiBase }/${ Method.GEN_PUZZLER }`, {method: 'post'});
 }
 
 export function getPuzzlerUrl(puzzler: GenPuzzlerResponse): string {
-   return `${ apiBase }/puzzler?id=${ puzzler.id }&token=${ puzzler.token }`;
+   return `${ apiBase }/${ Method.PUZZLER }?id=${ puzzler.id }&token=${ puzzler.token }`;
 }
 
 export function fetchChoice(puzzler: GenPuzzlerResponse, choice: number): Promise<Response> {
-    return fetch(`${ apiBase }/choice?id=${ puzzler.id }&choice=${ choice }&token=${ puzzler.token }`);
+    return fetch(`${ apiBase }/${ Method.CHOICE }?id=${ puzzler.id }&choice=${ choice }&token=${ puzzler.token }`);
 }
 
 export function fetchCheck(puzzler: GenPuzzlerResponse): Promise<Response> {
-    return fetch(`${ apiBase }/check?id=${ puzzler.id }&token=${ puzzler.token }`);
+    return fetch(`${ apiBase }/${ Method.CHECK }?id=${ puzzler.id }&token=${ puzzler.token }`);
 }

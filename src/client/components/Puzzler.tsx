@@ -1,5 +1,5 @@
 import React, { ReactElement, useEffect, useState } from 'react';
-import { GenPuzzlerResponse, Region } from '../../shared/beans';
+import { GenPuzzlerResponse, Region } from '../../shared/api';
 import { getPuzzlerUrl } from '../clientApi';
 import * as R from 'ramda';
 import { useDispatch, useSelector } from 'react-redux';

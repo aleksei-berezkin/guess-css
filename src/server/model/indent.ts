@@ -1,4 +1,4 @@
-import { Region, RegionKind } from '../../shared/beans';
+import { Region, RegionKind } from '../../shared/api';
 import * as R from 'ramda';
 
 const indentSize = 2;
