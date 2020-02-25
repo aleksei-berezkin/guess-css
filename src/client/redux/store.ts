@@ -1,5 +1,5 @@
 import { ChoiceFormatted, GenPuzzlerResponse } from '../../shared/api';
-import { Action, DisplayChoice, DisplayLayout, Type } from './actions';
+import { Action, DisplayChoice, DisplayPuzzler, Type } from './actions';
 import { applyMiddleware, combineReducers, createStore } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import { rootSaga } from './saga';
@@ -18,15 +18,15 @@ const initialState: State = {
 
 const rootReducer = combineReducers({
     puzzler: function(puzzler: GenPuzzlerResponse | null = initialState.puzzler, action: Action) {
-        if (action.type === Type.DISPLAY_LAYOUT) {
-            return (action as DisplayLayout).puzzler;
+        if (action.type === Type.DISPLAY_PUZZLER) {
+            return (action as DisplayPuzzler).puzzler;
         }
         return puzzler;
     },
 
     choices: function(choices: (ChoiceFormatted | null)[] = initialState.choices, action: Action) {
-        if (action.type === Type.DISPLAY_LAYOUT) {
-            return trimOrExtend(choices, (action as DisplayLayout).puzzler.choicesCount);
+        if (action.type === Type.DISPLAY_PUZZLER) {
+            return trimOrExtend(choices, (action as DisplayPuzzler).puzzler.choicesCount);
         }
 
         if (action.type === Type.DISPLAY_CHOICE) {

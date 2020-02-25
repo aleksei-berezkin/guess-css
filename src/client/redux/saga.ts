@@ -1,5 +1,5 @@
-import { apply, call, put, takeEvery, takeLeading } from 'redux-saga/effects';
-import { CheckChoice, DisplayChoice, DisplayLayout, LoadChoice, LoadNextPuzzler, Type } from './actions';
+import { apply, call, put, takeEvery, takeLeading, putResolve } from 'redux-saga/effects';
+import { CheckChoice, DisplayChoice, DisplayPuzzler, LoadChoice, LoadNextPuzzler, Type } from './actions';
 import { fetchCheck, fetchChoice, fetchGenPuzzler } from '../clientApi';
 import { CheckResponse, ChoiceFormatted, GenPuzzlerResponse } from '../../shared/api';
 import * as R from 'ramda';
@@ -13,11 +13,11 @@ export function* rootSaga() {
 function *loadNextPuzzler(_: LoadNextPuzzler) {
     const r: Response = yield call(fetchGenPuzzler);
     const puzzler: GenPuzzlerResponse = yield apply(r, r.json, []);
-    const displayLayout: DisplayLayout = {
-        type: Type.DISPLAY_LAYOUT,
+    const displayPuzzler: DisplayPuzzler = {
+        type: Type.DISPLAY_PUZZLER,
         puzzler,
     };
-    yield put(displayLayout);
+    yield putResolve(displayPuzzler);
 
     yield *R.range(0, puzzler.choicesCount)
         .map(choice => {
