@@ -5,48 +5,47 @@ import { randomBounded, randomItem } from '../../shared/util';
 import { Rule } from './cssRules';
 
 export function genPuzzler(): {body: TagNode, rulesChoices: Rule[][], correctChoice: number} {
-    for ( ; ; ) {
-        const body = new TagNode(
-            'body',
-            [],
-            [...genSiblings('div', { classes: new CssClasses(), texts: new Texts(4) }, 1)]
-        );
+    const body = new TagNode(
+        'body',
+        [],
+        [...genSiblings('div', { classes: new CssClasses(), texts: new Texts(4) }, 1)]
+    );
 
-        const rulesChoices = genCssRulesChoices(body);
-        if (rulesChoices) {
-            return {
-                body,
-                rulesChoices,
-                correctChoice: randomBounded(rulesChoices.length)
-            };
-        }
+    const rulesChoices = genCssRulesChoices(body);
+    if (rulesChoices) {
+        return {
+            body,
+            rulesChoices,
+            correctChoice: randomBounded(rulesChoices.length)
+        };
     }
+
+    return genPuzzler();
 }
 
-function *genSiblings(name: string, ctx: Context, level: number): IterableIterator<Node> {
-    for (const p of siblingsProbabilities[level]) {
-        if (Math.random() > p || !ctx.texts.hasNext()) {
-            return;
-        }
-
-        const children = level < childrenProbabilities.length && Math.random() < childrenProbabilities[level]
+function *genSiblings(name: string, ctx: Context, level: number, i = 0): IterableIterator<Node> {
+    if (Math.random() < siblingsProbabilities[level][i] && ctx.texts.hasNext()) {
+        const children = Math.random() < childrenProbabilities[level]
             ? [...genSiblings(name, ctx, level + 1)]
             : [new TextNode(ctx.texts.next())];
 
         yield new TagNode(name, ctx.classes.genClasses(), children);
+
+        yield *genSiblings(name, ctx, level, i + 1);
     }
 }
 
 const siblingsProbabilities: number[][] = [
-    [1],    // Not actually used on level 0 (body)
-    [1, .9, .4, .15],
-    [1, .7, .1],
-    [1, .8, .6, .05]
+    [1, 0],   // Not actually used on level 0 (body)
+    [1, .9, .4, .15, 0],
+    [1, .7, .1, 0],
+    [1, .8, .6, .05, 0],
+    [0],
 ];
 
 const childrenProbabilities: number[] = [
     1,      // Not actually used on level 0 (body)
-    .5, .5
+    .5, .5, 0
 ];
 
 interface Context {

@@ -4,7 +4,7 @@ import { Rule } from './model/cssRules';
 import { randomBounded } from '../shared/util';
 
 interface Storage {
-    [k: string]: {puzzler: Puzzler, token: string};
+    [id: string]: {puzzler: Puzzler, token: string};
 }
 
 export interface Puzzler {
