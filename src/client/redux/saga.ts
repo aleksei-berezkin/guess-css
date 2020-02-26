@@ -53,11 +53,7 @@ function *loadChoice(loadChoice: LoadChoice) {
 }
 
 function *checkChoice(checkChoice: CheckChoice) {
-    if (yield select(
-        (state: State) => R.any((choiceCode: ChoiceCode | null) =>
-            choiceCode?.highlight === ChoiceHighlight.CORRECT || choiceCode?.highlight === ChoiceHighlight.INCORRECT
-        )(state.choiceCodes)
-    )) {
+    if (yield select(hasAnyHighlight)) {
         return;
     }
 
@@ -81,4 +77,12 @@ function *checkChoice(checkChoice: CheckChoice) {
         }
         yield put(highlightIncorrect);
     }
+}
+
+function hasAnyHighlight(state: State) {
+    return R.any(
+        (choiceCode: ChoiceCode | null) =>
+            choiceCode?.highlight === ChoiceHighlight.CORRECT
+            || choiceCode?.highlight === ChoiceHighlight.INCORRECT
+    )(state.choiceCodes);
 }
