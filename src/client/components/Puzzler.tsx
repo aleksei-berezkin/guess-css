@@ -25,10 +25,9 @@ export function Puzzler(): ReactElement {
     return <>
         <h1>Guess the code snippet which produces this layout</h1>
         <Score/>
-        <LayoutFrame puzzler={ puzzler }/>
+        <LayoutFrame puzzler={ puzzler } loadNextPuzzler={ loadNextPuzzler }/>
         <DiffHint/>
         <Choices puzzler={ puzzler }/>
-        <NextButton loadNextPuzzler={ loadNextPuzzler }/>
     </>
 }
 
@@ -38,11 +37,22 @@ function Score() {
     return <div>Correct answers: { correct } of { total }</div>;
 }
 
-function LayoutFrame(p: {puzzler: GenPuzzlerResponse | null}): ReactElement {
+function LayoutFrame(p: {puzzler: GenPuzzlerResponse | null, loadNextPuzzler: () => void}): ReactElement {
+    return <div className='top-content'>
+        <>{
+            p.puzzler &&
+            <iframe className='puzzler-choice' src={ getPuzzlerUrl(p.puzzler) }/>
+        }</>
+        <NextButton loadNextPuzzler={ p.loadNextPuzzler }/>
+    </div>;
+}
+
+function NextButton(p: {loadNextPuzzler: () => void}) {
+    const hasAnswer = useSelector((state: State) => state.answer != null);
     return <>{
-        p.puzzler &&
-        <iframe className='puzzler-choice' src={ getPuzzlerUrl(p.puzzler) }/>
-    }</>;
+        hasAnswer &&
+        <div onClick={ p.loadNextPuzzler } className='next'/>
+    }</>
 }
 
 function DiffHint(): ReactElement {
@@ -81,6 +91,12 @@ function Choice(p: {puzzler: GenPuzzlerResponse, choice: number}): ReactElement 
             }
         }
         return '';
+    });
+    const userChoiceOutline = useSelector((state: State) => {
+        if (state.answer?.puzzlerId === p.puzzler.id && state.answer.userChoice === p.choice) {
+            return 'user-choice';
+        }
+        return '';
     })
 
     const dispatch = useDispatch();
@@ -99,7 +115,7 @@ function Choice(p: {puzzler: GenPuzzlerResponse, choice: number}): ReactElement 
         dispatch(checkChoice);
     }
 
-    return <div className={ `choice ${highlight}` } onClick={ handleClick }>{
+    return <div className={ `choice ${highlight} ${userChoiceOutline}` } onClick={ handleClick }>{
         choiceCode &&
         choiceCode.code.map(
             (regions, i) =>
@@ -118,16 +134,4 @@ function Line(p: {regions: Region[]}) {
             <span key={ i } className={ className(region) }>{ region.text }</span>
         )
     }</pre>
-}
-
-function NextButton(p: {loadNextPuzzler: () => void}) {
-    const hasAnswer = useSelector((state: State) => state.answer != null);
-    return <>{
-        hasAnswer &&
-        <button type='button'
-            onClick={ p.loadNextPuzzler }
-            style={{ display: 'block', width: '150px', height: '30px', marginTop: '20px' }}>
-            Next
-        </button>}
-    </>
 }
