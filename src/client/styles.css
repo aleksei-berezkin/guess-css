@@ -11,6 +11,28 @@ iframe.puzzler-choice {
     cursor: pointer;
 }
 
+.choice.correct {
+    background-color: #e0ffe0;
+}
+
+.choice.correct::before {
+    content: "✓";
+    color: darkgreen;
+    float: right;
+    margin: 10px;
+}
+
+.choice.incorrect {
+    background-color: #ffe0e0;
+}
+
+.choice.incorrect::before {
+    content: "✗";
+    color: darkred;
+    float: right;
+    margin: 10px;
+}
+
 .choice>pre {
     margin: 0;
 }

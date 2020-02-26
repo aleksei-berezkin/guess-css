@@ -1,4 +1,4 @@
-import { ChoiceResponse, GenPuzzlerResponse, Region } from '../../shared/api';
+import { GenPuzzlerResponse, Region } from '../../shared/api';
 
 export enum Type {
     LOAD_NEXT_PUZZLER = 'LOAD_NEXT_PUZZLER',
@@ -6,6 +6,7 @@ export enum Type {
     LOAD_CHOICE = 'LOAD_CHOICE',
     DISPLAY_CHOICE = 'DISPLAY_CHOICE',
     CHECK_CHOICE = 'CHECK_CHOICE',
+    HIGHLIGHT_CHOICE = 'HIGHLIGHT_CHOICE',
 }
 
 export interface Action {
@@ -29,7 +30,7 @@ export interface LoadChoice extends Action {
 
 export interface DisplayChoice extends Action {
     type: Type.DISPLAY_CHOICE,
-    puzzler: GenPuzzlerResponse,
+    puzzlerId: string,
     choice: number,
     code: Region[][],
 }
@@ -38,4 +39,17 @@ export interface CheckChoice extends Action {
     type: Type.CHECK_CHOICE,
     puzzler: GenPuzzlerResponse,
     choice: number,
+}
+
+export interface HighlightChoice extends Action {
+    type: Type.HIGHLIGHT_CHOICE,
+    puzzlerId: string,
+    choice: number,
+    highlight: ChoiceHighlight,
+}
+
+export enum ChoiceHighlight {
+    NONE = '',
+    CORRECT = 'correct',
+    INCORRECT = 'incorrect',
 }

@@ -84,7 +84,7 @@ function Choice(p: {puzzler: GenPuzzlerResponse, choice: number}): ReactElement 
         dispatch(checkChoice);
     }
 
-    return <div className='choice' onClick={ handleClick }>{
+    return <div className={ `choice ${choiceCode?.highlight}` } onClick={ handleClick }>{
         choiceCode &&
         choiceCode.code.map(
             (regions, i) =>

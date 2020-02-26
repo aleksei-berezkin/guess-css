@@ -1,8 +1,18 @@
-import { apply, call, put, takeEvery, takeLeading, putResolve } from 'redux-saga/effects';
-import { CheckChoice, DisplayChoice, DisplayPuzzler, LoadChoice, LoadNextPuzzler, Type } from './actions';
-import { fetchCorrectChoice, fetchChoice, fetchGenPuzzler } from '../clientApi';
+import { apply, call, put, putResolve, select, takeEvery, takeLeading } from 'redux-saga/effects';
+import {
+    CheckChoice,
+    ChoiceHighlight,
+    DisplayChoice,
+    DisplayPuzzler,
+    HighlightChoice,
+    LoadChoice,
+    LoadNextPuzzler,
+    Type
+} from './actions';
+import { fetchChoice, fetchCorrectChoice, fetchGenPuzzler } from '../clientApi';
 import { ChoiceResponse, CorrectChoiceResponse, GenPuzzlerResponse } from '../../shared/api';
 import * as R from 'ramda';
+import { ChoiceCode, State } from './store';
 
 export function* rootSaga() {
     yield takeEvery(Type.LOAD_NEXT_PUZZLER, loadNextPuzzler);
@@ -35,7 +45,7 @@ function *loadChoice(loadChoice: LoadChoice) {
     const code: ChoiceResponse = yield apply(r, r.json, []);
     const displayChoice: DisplayChoice = {
         type: Type.DISPLAY_CHOICE,
-        puzzler: loadChoice.puzzler,
+        puzzlerId: loadChoice.puzzler.id,
         choice: loadChoice.choice,
         code,
     };
@@ -43,9 +53,32 @@ function *loadChoice(loadChoice: LoadChoice) {
 }
 
 function *checkChoice(checkChoice: CheckChoice) {
+    if (yield select(
+        (state: State) => R.any((choiceCode: ChoiceCode | null) =>
+            choiceCode?.highlight === ChoiceHighlight.CORRECT || choiceCode?.highlight === ChoiceHighlight.INCORRECT
+        )(state.choiceCodes)
+    )) {
+        return;
+    }
+
     const r: Response = yield call(fetchCorrectChoice, checkChoice.puzzler);
     const correctChoice: CorrectChoiceResponse = yield apply(r, r.json, []);
-    const message = checkChoice.choice === correctChoice
-        ? 'Correct!' : 'Incorrect!';
-    alert(message);
+
+    const highlightCorrect: HighlightChoice = {
+        type: Type.HIGHLIGHT_CHOICE,
+        puzzlerId: checkChoice.puzzler.id,
+        choice: correctChoice,
+        highlight: ChoiceHighlight.CORRECT,
+    }
+    yield put(highlightCorrect);
+
+    if (checkChoice.choice !== correctChoice) {
+        const highlightIncorrect: HighlightChoice = {
+            type: Type.HIGHLIGHT_CHOICE,
+            puzzlerId: checkChoice.puzzler.id,
+            choice: checkChoice.choice,
+            highlight: ChoiceHighlight.INCORRECT,
+        }
+        yield put(highlightIncorrect);
+    }
 }
