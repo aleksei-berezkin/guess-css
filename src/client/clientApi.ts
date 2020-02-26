@@ -16,6 +16,6 @@ export function fetchChoice(puzzler: GenPuzzlerResponse, choice: number): Promis
     return fetch(`${ apiBase }/${ Method.CHOICE }?id=${ puzzler.id }&choice=${ choice }&token=${ puzzler.token }`);
 }
 
-export function fetchCheck(puzzler: GenPuzzlerResponse): Promise<Response> {
-    return fetch(`${ apiBase }/${ Method.CHECK }?id=${ puzzler.id }&token=${ puzzler.token }`);
+export function fetchCorrectChoice(puzzler: GenPuzzlerResponse): Promise<Response> {
+    return fetch(`${ apiBase }/${ Method.CORRECT_CHOICE }?id=${ puzzler.id }&token=${ puzzler.token }`);
 }

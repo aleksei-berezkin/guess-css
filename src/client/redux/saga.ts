@@ -1,7 +1,7 @@
 import { apply, call, put, takeEvery, takeLeading, putResolve } from 'redux-saga/effects';
 import { CheckChoice, DisplayChoice, DisplayPuzzler, LoadChoice, LoadNextPuzzler, Type } from './actions';
-import { fetchCheck, fetchChoice, fetchGenPuzzler } from '../clientApi';
-import { CheckResponse, ChoiceResponse, GenPuzzlerResponse } from '../../shared/api';
+import { fetchCorrectChoice, fetchChoice, fetchGenPuzzler } from '../clientApi';
+import { ChoiceResponse, CorrectChoiceResponse, GenPuzzlerResponse } from '../../shared/api';
 import * as R from 'ramda';
 
 export function* rootSaga() {
@@ -43,9 +43,9 @@ function *loadChoice(loadChoice: LoadChoice) {
 }
 
 function *checkChoice(checkChoice: CheckChoice) {
-    const r: Response = yield call(fetchCheck, checkChoice.puzzler);
-    const checkResponse: CheckResponse = yield apply(r, r.json, []);
-    const message = checkChoice.choice === checkResponse.correctChoice
+    const r: Response = yield call(fetchCorrectChoice, checkChoice.puzzler);
+    const correctChoice: CorrectChoiceResponse = yield apply(r, r.json, []);
+    const message = checkChoice.choice === correctChoice
         ? 'Correct!' : 'Incorrect!';
     alert(message);
 }

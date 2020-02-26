@@ -2,7 +2,7 @@ export enum Method {
     GEN_PUZZLER = 'genPuzzler',
     PUZZLER = 'puzzler',
     CHOICE = 'choice',
-    CHECK = 'check',
+    CORRECT_CHOICE = 'correctChoice',
 }
 
 export interface GenPuzzlerResponse {
@@ -30,7 +30,4 @@ export enum RegionKind {
     DeclValue = 'decl-value',
 }
 
-export interface CheckResponse {
-    id: string,
-    correctChoice: number,
-}
+export type CorrectChoiceResponse = number;

@@ -1,7 +1,7 @@
 import { genPuzzler } from './model/bodyGen';
 import { Puzzler, Registry } from './puzzlerRegistry';
 import * as R from 'ramda';
-import { CheckResponse, ChoiceResponse, GenPuzzlerResponse, Method, Region } from '../shared/api';
+import { ChoiceResponse, CorrectChoiceResponse, GenPuzzlerResponse, Method, Region } from '../shared/api';
 import { Node, TagNode } from './model/nodes';
 import { Indent } from './model/indent';
 import { Rule } from './model/cssRules';
@@ -61,7 +61,7 @@ export default function addApi(app: Express) {
         res.send(JSON.stringify(choiceFormatted));
     });
 
-    app.get(`/${ Method.CHECK }`, (req: Request, res: Response) => {
+    app.get(`/${ Method.CORRECT_CHOICE }`, (req: Request, res: Response) => {
         const id = getId(req);
         const puzzler = registry.getPuzzler(id, getToken(req));
         if (!puzzler) {
@@ -70,11 +70,8 @@ export default function addApi(app: Express) {
             return;
         }
 
-        const checkResponse: CheckResponse = {
-            id,
-            correctChoice: puzzler.correctChoice
-        };
-        res.send(JSON.stringify(checkResponse));
+        const correctChoiceResponse: CorrectChoiceResponse = puzzler.correctChoice;
+        res.send(JSON.stringify(correctChoiceResponse));
     });
 
     function getId(req: Request): string {
