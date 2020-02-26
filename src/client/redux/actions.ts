@@ -6,7 +6,7 @@ export enum Type {
     LOAD_CHOICE = 'LOAD_CHOICE',
     DISPLAY_CHOICE = 'DISPLAY_CHOICE',
     CHECK_CHOICE = 'CHECK_CHOICE',
-    HIGHLIGHT_CHOICE = 'HIGHLIGHT_CHOICE',
+    DISPLAY_ANSWER = 'DISPLAY_ANSWER',
 }
 
 export interface Action {
@@ -41,15 +41,9 @@ export interface CheckChoice extends Action {
     choice: number,
 }
 
-export interface HighlightChoice extends Action {
-    type: Type.HIGHLIGHT_CHOICE,
+export interface DisplayAnswer extends Action {
+    type: Type.DISPLAY_ANSWER,
     puzzlerId: string,
-    choice: number,
-    highlight: ChoiceHighlight,
-}
-
-export enum ChoiceHighlight {
-    NONE = '',
-    CORRECT = 'correct',
-    INCORRECT = 'incorrect',
+    userChoice: number,
+    correctChoice: number,
 }

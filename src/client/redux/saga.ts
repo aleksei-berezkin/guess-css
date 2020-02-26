@@ -1,10 +1,9 @@
 import { apply, call, put, putResolve, select, takeEvery, takeLeading } from 'redux-saga/effects';
 import {
     CheckChoice,
-    ChoiceHighlight,
+    DisplayAnswer,
     DisplayChoice,
     DisplayPuzzler,
-    HighlightChoice,
     LoadChoice,
     LoadNextPuzzler,
     Type
@@ -12,7 +11,7 @@ import {
 import { fetchChoice, fetchCorrectChoice, fetchGenPuzzler } from '../clientApi';
 import { ChoiceResponse, CorrectChoiceResponse, GenPuzzlerResponse } from '../../shared/api';
 import * as R from 'ramda';
-import { ChoiceCode, State } from './store';
+import { State } from './store';
 
 export function* rootSaga() {
     yield takeEvery(Type.LOAD_NEXT_PUZZLER, loadNextPuzzler);
@@ -53,36 +52,18 @@ function *loadChoice(loadChoice: LoadChoice) {
 }
 
 function *checkChoice(checkChoice: CheckChoice) {
-    if (yield select(hasAnyHighlight)) {
+    if (yield select((state: State) => state.answer != null)) {
         return;
     }
 
     const r: Response = yield call(fetchCorrectChoice, checkChoice.puzzler);
     const correctChoice: CorrectChoiceResponse = yield apply(r, r.json, []);
 
-    const highlightCorrect: HighlightChoice = {
-        type: Type.HIGHLIGHT_CHOICE,
+    const displayAnswer: DisplayAnswer = {
+        type: Type.DISPLAY_ANSWER,
         puzzlerId: checkChoice.puzzler.id,
-        choice: correctChoice,
-        highlight: ChoiceHighlight.CORRECT,
+        userChoice: checkChoice.choice,
+        correctChoice,
     }
-    yield put(highlightCorrect);
-
-    if (checkChoice.choice !== correctChoice) {
-        const highlightIncorrect: HighlightChoice = {
-            type: Type.HIGHLIGHT_CHOICE,
-            puzzlerId: checkChoice.puzzler.id,
-            choice: checkChoice.choice,
-            highlight: ChoiceHighlight.INCORRECT,
-        }
-        yield put(highlightIncorrect);
-    }
-}
-
-function hasAnyHighlight(state: State) {
-    return R.any(
-        (choiceCode: ChoiceCode | null) =>
-            choiceCode?.highlight === ChoiceHighlight.CORRECT
-            || choiceCode?.highlight === ChoiceHighlight.INCORRECT
-    )(state.choiceCodes);
+    yield put(displayAnswer);
 }

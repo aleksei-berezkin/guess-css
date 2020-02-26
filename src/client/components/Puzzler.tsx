@@ -27,11 +27,7 @@ export function Puzzler(): ReactElement {
         <LayoutFrame puzzler={ puzzler }/>
         <DiffHint/>
         <Choices puzzler={ puzzler }/>
-        <button type='button'
-                onClick={ loadNextPuzzler }
-                style={{ display: 'block', width: '150px', height: '30px', marginTop: '20px' }}>
-            Next
-        </button>
+        <NextButton loadNextPuzzler={ loadNextPuzzler }/>
     </>
 }
 
@@ -68,6 +64,18 @@ function Choices(p: {puzzler: GenPuzzlerResponse | null}): ReactElement {
 
 function Choice(p: {puzzler: GenPuzzlerResponse, choice: number}): ReactElement {
     const choiceCode = useSelector((state: State) => state.choiceCodes[p.choice]);
+    const highlight = useSelector((state: State) => {
+        if (state.answer?.puzzlerId === p.puzzler.id) {
+            if (state.answer.correctChoice === p.choice) {
+                return 'correct';
+            }
+            if (state.answer.userChoice === p.choice) {
+                return 'incorrect';
+            }
+        }
+        return '';
+    })
+
     const dispatch = useDispatch();
 
     function handleClick() {
@@ -84,7 +92,7 @@ function Choice(p: {puzzler: GenPuzzlerResponse, choice: number}): ReactElement 
         dispatch(checkChoice);
     }
 
-    return <div className={ `choice ${choiceCode?.highlight}` } onClick={ handleClick }>{
+    return <div className={ `choice ${highlight}` } onClick={ handleClick }>{
         choiceCode &&
         choiceCode.code.map(
             (regions, i) =>
@@ -103,4 +111,16 @@ function Line(p: {regions: Region[]}) {
             <span key={ i } className={ className(region) }>{ region.text }</span>
         )
     }</pre>
+}
+
+function NextButton(p: {loadNextPuzzler: () => void}) {
+    const hasAnswer = useSelector((state: State) => state.answer != null);
+    return <>{
+        hasAnswer &&
+        <button type='button'
+            onClick={ p.loadNextPuzzler }
+            style={{ display: 'block', width: '150px', height: '30px', marginTop: '20px' }}>
+            Next
+        </button>}
+    </>
 }
