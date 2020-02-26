@@ -9,6 +9,7 @@ export interface State {
     puzzler: GenPuzzlerResponse | null,
     choiceCodes: (ChoiceCode | null)[],
     answer: Answer | null,
+    score: Score,
 }
 
 export interface ChoiceCode {
@@ -22,10 +23,19 @@ export interface Answer {
     correctChoice: number,
 }
 
+export interface Score {
+    correct: number,
+    total: number,
+}
+
 const initialState: State = {
     puzzler: null,
     choiceCodes: [],
     answer: null,
+    score: {
+        correct: 0,
+        total: 0,
+    },
 };
 
 const rootReducer = combineReducers({
@@ -64,6 +74,18 @@ const rootReducer = combineReducers({
         }
 
         return answer;
+    },
+
+    score: function(score: Score = initialState.score, action: Action): Score {
+        if (action.type === Type.DISPLAY_ANSWER) {
+            const {userChoice, correctChoice} = action as DisplayAnswer;
+            return {
+                correct: (userChoice === correctChoice) ? score.correct + 1 : score.correct,
+                total: score.total + 1,
+            }
+        }
+
+        return score;
     }
 });
 

@@ -24,11 +24,18 @@ export function Puzzler(): ReactElement {
 
     return <>
         <h1>Guess the code snippet which produces this layout</h1>
+        <Score/>
         <LayoutFrame puzzler={ puzzler }/>
         <DiffHint/>
         <Choices puzzler={ puzzler }/>
         <NextButton loadNextPuzzler={ loadNextPuzzler }/>
     </>
+}
+
+function Score() {
+    const correct = useSelector((state: State) => state.score.correct);
+    const total = useSelector((state: State) => state.score.total);
+    return <div>Correct answers: { correct } of { total }</div>;
 }
 
 function LayoutFrame(p: {puzzler: GenPuzzlerResponse | null}): ReactElement {
