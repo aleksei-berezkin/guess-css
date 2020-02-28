@@ -64,11 +64,11 @@ function getDonePuzzlersNum(st: State) {
 function LayoutFrame() {
     const id = useSelector((st: State) => st.puzzlers[st.current]?.id);
     const token = useSelector((st: State) => st.puzzlers[st.current]?.token);
-    return <div className='top-content'>
+    return <div className='puzzler-top'>
         <PrevButton/>
         <>{
             id && token &&
-            <iframe className='puzzler-choice' src={ getPuzzlerUrl(id, token) }/>
+            <iframe className='layout' src={ getPuzzlerUrl(id, token) }/>
         }</>
         <NextButton/>
     </div>;

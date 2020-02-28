@@ -1,0 +1,105 @@
+.puzzler-top {
+    display: flex;
+
+    &>* {
+        margin: 3px;
+    }
+
+    @h: 200px;
+
+    .layout {
+        width: 240px;
+        height: @h;
+        border: 1px solid #a0a0a0;
+        border-radius: .25em;
+    }
+
+    .nav-puzzlers {
+        width: 100px;
+        height: @h + 2;
+        line-height: @h + 2;
+        text-align: center;
+
+        &.active {
+            background-color: #e8e8e8;
+            cursor: pointer;
+
+            &.next::before {
+                content: "Next ›";
+            }
+
+            &.prev::before {
+                content: "‹ Prev";
+            }
+        }
+    }
+}
+
+.choice {
+    display: inline-block;
+    border: 1px solid white;
+    border-radius: .25em;
+
+    &.active {
+        cursor: pointer;
+    }
+
+    &.correct {
+        .answer-color(#e0ffe0, darkgreen);
+    }
+
+    &.incorrect {
+        .answer-color(#ffe0e0, darkred);
+    }
+
+    .answer-color(@bg; @border) {
+        background-color: @bg;
+        border-color: @bg;
+        &.user-choice {
+            border-color: @border;
+        }
+    }
+
+    &.correct::before {
+        .answer-mark("✓", darkgreen);
+    }
+
+    &.incorrect::before {
+        .answer-mark("✗", darkred);
+    }
+
+    .answer-mark(@content, @color) {
+        float: right;
+        margin: 10px;
+        content: @content;
+        color: @color;
+    }
+
+    pre {
+        margin: 0;
+    }
+
+    .tag {
+        color: #881280;
+    }
+
+    .attr-name {
+        color: #994600;
+    }
+
+    .attr-value {
+        color: #191aa7;
+    }
+
+    .operator {
+        color: #a894a6;
+    }
+
+    .decl-name {
+        color: #c80000;
+    }
+
+    .differing {
+        font-weight: bold;
+    }
+}
