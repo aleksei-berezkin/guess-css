@@ -8,19 +8,16 @@ import { CheckChoice, LoadNextPuzzler, NavNextPuzzler, NavPrevPuzzler, Type } fr
 
 export function Puzzler(): ReactElement {
     const initialized = useSelector((state: State) => state.puzzlers.length > 0);
-    useEffect(() => {
-        if (!initialized) {
-            loadNextPuzzler();
-        }
-    }, [initialized]);
     const dispatch = useDispatch();
 
-    function loadNextPuzzler() {
-        const loadAction: LoadNextPuzzler = {
-            type: Type.LOAD_NEXT_PUZZLER,
-        };
-        dispatch(loadAction);
-    }
+    useEffect(() => {
+        if (!initialized) {
+            const loadAction: LoadNextPuzzler = {
+                type: Type.LOAD_NEXT_PUZZLER,
+            };
+            dispatch(loadAction);
+        }
+    }, [initialized]);
 
     return <>
         <h1>Guess the code snippet which produces this layout</h1>
