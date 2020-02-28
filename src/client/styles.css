@@ -18,23 +18,29 @@ iframe.puzzler-choice {
     height: 202px;
     line-height: 202px;
     text-align: center;
+}
+
+.nav-puzzlers.active {
     background-color: #e8e8e8;
     cursor: pointer;
 }
 
-.nav-puzzlers.next::before {
+.nav-puzzlers.active.next::before {
     content: "Next ›";
 }
 
-.nav-puzzlers.prev::before {
+.nav-puzzlers.active.prev::before {
     content: "‹ Prev";
 }
 
 .choice {
     display: inline-block;
-    cursor: pointer;
     border: 1px solid white;
     border-radius: .25em;
+}
+
+.choice.active {
+    cursor: pointer;
 }
 
 .choice.correct {

@@ -79,16 +79,16 @@ function PrevButton() {
     const dispatch = useDispatch();
 
     function handlePrev() {
-        const navPrev: NavPrevPuzzler = {
-            type: Type.NAV_PREV_PUZZLER,
-        };
-        dispatch(navPrev);
+        if (hasPrev) {
+            const navPrev: NavPrevPuzzler = {
+                type: Type.NAV_PREV_PUZZLER,
+            };
+            dispatch(navPrev);
+        }
     }
 
-    return <>{
-        hasPrev &&
-        <div onClick={ handlePrev } className='nav-puzzlers prev'/>
-    }</>
+    const active = hasPrev ? 'active' : '';
+    return <div onClick={ handlePrev } className={ `nav-puzzlers ${ active } prev` }/>;
 }
 
 function NextButton() {
@@ -112,10 +112,8 @@ function NextButton() {
         }
     }
 
-    return <>{
-        (hasNext || answer) &&
-        <div onClick={ handleNext } className='nav-puzzlers next'/>
-    }</>
+    const active = (hasNext || answer) ? 'active' : '';
+    return <div onClick={ handleNext } className={ `nav-puzzlers ${ active } next` } />;
 }
 
 function DiffHint(): ReactElement {
@@ -180,7 +178,9 @@ function Choice(p: {choice: number}): ReactElement {
         }
     }
 
-    return <div className={ `choice ${ highlight } ${ outline }` } onClick={ handleClick }>{
+    const active = answer ? '' : 'active';
+    return <div className={ `choice ${ highlight } ${ outline } ${ active }` }
+                onClick={ handleClick }>{
         choiceCode &&
         choiceCode.map(
             (regions, i) =>
