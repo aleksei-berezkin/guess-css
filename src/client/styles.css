@@ -13,7 +13,7 @@ iframe.puzzler-choice {
     border-radius: .25em;
 }
 
-.next {
+.nav-puzzlers {
     width: 100px;
     height: 202px;
     line-height: 202px;
@@ -22,8 +22,12 @@ iframe.puzzler-choice {
     cursor: pointer;
 }
 
-.next::before {
+.nav-puzzlers.next::before {
     content: "Next ›";
+}
+
+.nav-puzzlers.prev::before {
+    content: "‹ Prev";
 }
 
 .choice {

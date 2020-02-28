@@ -10,7 +10,7 @@ export interface State {
     // head is the most recent, tail is history
     puzzlers: PuzzlerFull[],
     current: number,
-    score: Score,
+    correctAnswers: number,
 }
 
 export interface PuzzlerFull {
@@ -25,18 +25,10 @@ export interface Answer {
     correctChoice: number,
 }
 
-export interface Score {
-    correct: number,
-    total: number,
-}
-
 const initialState: State = {
     puzzlers: [],
     current: -1,
-    score: {
-        correct: 0,
-        total: 0,
-    },
+    correctAnswers: 0,
 };
 
 const rootReducer = combineReducers({
@@ -83,22 +75,36 @@ const rootReducer = combineReducers({
     },
 
     current: function(current: number = initialState.current, action: Action): number {
-        if (action.type === Type.DISPLAY_PUZZLER && current === -1) {
-            return 0;
+        if (action.type === Type.DISPLAY_PUZZLER) {
+            if (current === -1 || current === 0) {
+                return 0;
+            }
+            throw new Error('Current=' + current);
         }
+
+        if (action.type === Type.NAV_NEXT_PUZZLER) {
+            if (current > 0) {
+                return current - 1;
+            }
+            throw new Error('Current=' + current);
+        }
+
+        if (action.type === Type.NAV_PREV_PUZZLER) {
+            return current + 1;
+        }
+
         return current;
     },
 
-    score: function(score: Score = initialState.score, action: Action): Score {
+    correctAnswers: function(correctAnswers: number = initialState.correctAnswers, action: Action): number {
         if (action.type === Type.DISPLAY_ANSWER) {
             const {userChoice, correctChoice} = action as DisplayAnswer;
-            return {
-                correct: (userChoice === correctChoice) ? score.correct + 1 : score.correct,
-                total: score.total + 1,
+            if (userChoice === correctChoice) {
+                return correctAnswers + 1;
             }
         }
 
-        return score;
+        return correctAnswers;
     }
 });
 

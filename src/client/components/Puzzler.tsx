@@ -4,7 +4,7 @@ import { getPuzzlerUrl } from '../clientApi';
 import * as R from 'ramda';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from '../redux/store';
-import { CheckChoice, LoadNextPuzzler, Type } from '../redux/actions';
+import { CheckChoice, LoadNextPuzzler, NavNextPuzzler, NavPrevPuzzler, Type } from '../redux/actions';
 
 export function Puzzler(): ReactElement {
     const initialized = useSelector((state: State) => state.puzzlers.length > 0);
@@ -25,35 +25,99 @@ export function Puzzler(): ReactElement {
     return <>
         <h1>Guess the code snippet which produces this layout</h1>
         <Score/>
-        <LayoutFrame loadNextPuzzler={ loadNextPuzzler }/>
+        <DonePuzzler/>
+        <LayoutFrame/>
         <DiffHint/>
         <Choices/>
     </>
 }
 
 function Score() {
-    const correct = useSelector((state: State) => state.score.correct);
-    const total = useSelector((state: State) => state.score.total);
-    return <div>Correct answers: { correct } of { total }</div>;
+    const isLast = useSelector((st: State) => st.current === 0);
+    const correctAnswers = useSelector((st: State) => st.correctAnswers);
+    const donePuzzlersNum = useSelector(getDonePuzzlersNum)
+
+    return <>{
+        isLast &&
+        <div>Correct answers: { correctAnswers } of { donePuzzlersNum }</div>
+    }</>;
 }
 
-function LayoutFrame(p: {loadNextPuzzler: () => void}): ReactElement {
+function DonePuzzler() {
+    const isHistory = useSelector((st: State) => st.current > 0);
+    const historyPuzzlerPos = useSelector((st: State) => st.puzzlers.length - st.current);
+    const donePuzzlersNum = useSelector(getDonePuzzlersNum);
+
+    return <>{
+        isHistory &&
+        <div>Done puzzler: { historyPuzzlerPos } of { donePuzzlersNum }</div>
+    }</>
+}
+
+function getDonePuzzlersNum(st: State) {
+    if (!st.puzzlers.length) {
+        return 0;
+    }
+    if (st.puzzlers[0]?.answer) {
+        return st.puzzlers.length;
+    }
+    return st.puzzlers.length - 1;
+}
+
+function LayoutFrame() {
     const id = useSelector((st: State) => st.puzzlers[st.current]?.id);
     const token = useSelector((st: State) => st.puzzlers[st.current]?.token);
     return <div className='top-content'>
+        <PrevButton/>
         <>{
             id && token &&
             <iframe className='puzzler-choice' src={ getPuzzlerUrl(id, token) }/>
         }</>
-        <NextButton loadNextPuzzler={ p.loadNextPuzzler }/>
+        <NextButton/>
     </div>;
 }
 
-function NextButton(p: {loadNextPuzzler: () => void}) {
-    const answer = useSelector((st: State) => st.puzzlers[st.current]?.answer);
+function PrevButton() {
+    const hasPrev = useSelector((st: State) => st.current < st.puzzlers.length - 1);
+    const dispatch = useDispatch();
+
+    function handlePrev() {
+        const navPrev: NavPrevPuzzler = {
+            type: Type.NAV_PREV_PUZZLER,
+        };
+        dispatch(navPrev);
+    }
+
     return <>{
-        answer &&
-        <div onClick={ p.loadNextPuzzler } className='next'/>
+        hasPrev &&
+        <div onClick={ handlePrev } className='nav-puzzlers prev'/>
+    }</>
+}
+
+function NextButton() {
+    const hasNext = useSelector((st: State) => st.current > 0);
+    const answer = useSelector((st: State) => st.puzzlers[st.current]?.answer);
+    const dispatch = useDispatch();
+
+    function handleNext() {
+        if (hasNext) {
+            const navNext: NavNextPuzzler = {
+                type: Type.NAV_NEXT_PUZZLER,
+            };
+            dispatch(navNext);
+        } else if (answer) {
+            const loadNext: LoadNextPuzzler = {
+                type: Type.LOAD_NEXT_PUZZLER,
+            };
+            dispatch(loadNext);
+        } else {
+            throw new Error('Cannot dispatch');
+        }
+    }
+
+    return <>{
+        (hasNext || answer) &&
+        <div onClick={ handleNext } className='nav-puzzlers next'/>
     }</>
 }
 

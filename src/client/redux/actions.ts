@@ -7,6 +7,8 @@ export enum Type {
     DISPLAY_CHOICE = 'DISPLAY_CHOICE',
     CHECK_CHOICE = 'CHECK_CHOICE',
     DISPLAY_ANSWER = 'DISPLAY_ANSWER',
+    NAV_NEXT_PUZZLER = 'NAV_NEXT_PUZZLER',
+    NAV_PREV_PUZZLER = 'NAV_PREV_PUZZLER',
 }
 
 export interface Action {
@@ -48,4 +50,12 @@ export interface DisplayAnswer extends Action {
     puzzlerId: string,
     userChoice: number,
     correctChoice: number,
+}
+
+export interface NavNextPuzzler extends Action {
+    type: Type.NAV_NEXT_PUZZLER,
+}
+
+export interface NavPrevPuzzler extends Action {
+    type: Type.NAV_PREV_PUZZLER,
 }
