@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import { Region } from '../../shared/api';
 import { getPuzzlerUrl } from '../clientApi';
 import * as R from 'ramda';
@@ -24,7 +24,6 @@ export function Puzzler(): ReactElement {
         <Score/>
         <DonePuzzler/>
         <LayoutFrame/>
-        <DiffHint/>
         <Choices/>
     </>
 }
@@ -64,6 +63,7 @@ function getDonePuzzlersNum(st: State) {
 function LayoutFrame() {
     const id = useSelector((st: State) => st.puzzlers[st.current]?.id);
     const token = useSelector((st: State) => st.puzzlers[st.current]?.token);
+
     return <div className='puzzler-top'>
         <PrevButton/>
         <>{
@@ -114,16 +114,6 @@ function NextButton() {
 
     const active = (hasNext || answer) ? 'active' : '';
     return <div onClick={ handleNext } className={ `nav-puzzlers ${ active } next` } />;
-}
-
-function DiffHint(): ReactElement {
-    const [diffHint, setDiffHint] = useState(true);
-    return <>{
-        diffHint &&
-        <div style={ {margin: '10px'} }>Only fragments <b>in bold</b> differ { ' ' }
-            <button type='button' onClick={ () => setDiffHint(false) }>Got it</button>
-        </div>
-    }</>;
 }
 
 function Choices(): ReactElement {

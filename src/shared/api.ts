@@ -28,6 +28,7 @@ export enum RegionKind {
     Selector = 'selector',
     DeclName = 'decl-name',
     DeclValue = 'decl-value',
+    Comment = 'comment',
 }
 
 export type CorrectChoiceResponse = number;

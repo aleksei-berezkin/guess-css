@@ -29,6 +29,7 @@ export interface LoadChoice extends Action {
     puzzlerId: string,
     choice: number,
     token: string,
+    diffHint: boolean,
 }
 
 export interface DisplayChoice extends Action {

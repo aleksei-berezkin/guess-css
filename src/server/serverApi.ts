@@ -1,7 +1,7 @@
 import { genPuzzler } from './model/bodyGen';
 import { Puzzler, Registry } from './puzzlerRegistry';
 import * as R from 'ramda';
-import { ChoiceCode, CorrectChoiceResponse, PuzzlerSpec, Method, Region } from '../shared/api';
+import { ChoiceCode, CorrectChoiceResponse, Method, PuzzlerSpec, Region, RegionKind } from '../shared/api';
 import { Node, TagNode } from './model/nodes';
 import { Indent } from './model/indent';
 import { Rule } from './model/cssRules';
@@ -52,7 +52,10 @@ export default function addApi(app: Express) {
         const choiceFormatted: ChoiceCode = new TagNode('html', [], [
             new TagNode('head', [], [
                 new TagNode('style', [], [
-                    new StylesNode(puzzler.rulesChoices[choice])
+                    new StylesNode(
+                        puzzler.rulesChoices[choice],
+                        isDiffHint(req),
+                    )
                 ])
             ]),
             puzzler.body,
@@ -86,6 +89,10 @@ export default function addApi(app: Express) {
         return req.query['token'];
     }
 
+    function isDiffHint(req: Request): boolean {
+        return req.query['diffHint'] === 'true';
+    }
+
     function hasChoice(puzzler: Puzzler, choice: number) {
         return !Number.isNaN(choice) && 0 <= choice && choice < puzzler.rulesChoices.length;
     }
@@ -94,7 +101,7 @@ export default function addApi(app: Express) {
 class StylesNode implements Node {
     readonly children: Node[] = [];
 
-    constructor(private readonly rules: Rule[]) {
+    constructor(private readonly rules: Rule[], private readonly isDiffHint: boolean) {
     }
 
     copyWithSingleChild(child: Node): Node {
@@ -102,6 +109,32 @@ class StylesNode implements Node {
     }
 
     toRegions(indent: Indent): Region[][] {
+        if (this.isDiffHint) {
+            return [
+                [
+                    indent,
+                    {
+                        kind: RegionKind.Comment,
+                        text: '/* Only text in ',
+                    },
+                    {
+                        kind: RegionKind.Comment,
+                        text: 'bold',
+                        differing: true,
+                    },
+                    {
+                        kind: RegionKind.Comment,
+                        text: ' differs */',
+                    },
+                ],
+                ...this.doToRegions(indent),
+            ];
+        }
+
+        return this.doToRegions(indent);
+    }
+
+    private doToRegions(indent: Indent): Region[][] {
         return R.pipe(
             R.map((rule: Rule) => rule.toRegions(indent)),
             R.unnest,

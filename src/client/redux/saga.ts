@@ -1,4 +1,4 @@
-import { apply, call, put, putResolve, takeEvery, takeLeading } from 'redux-saga/effects';
+import { apply, call, put, putResolve, select, takeEvery, takeLeading } from 'redux-saga/effects';
 import {
     CheckChoice,
     DisplayAnswer,
@@ -11,6 +11,7 @@ import {
 import { fetchChoice, fetchCorrectChoice, fetchGenPuzzler } from '../clientApi';
 import { ChoiceCode, CorrectChoiceResponse, PuzzlerSpec } from '../../shared/api';
 import * as R from 'ramda';
+import { State } from './store';
 
 export function* rootSaga() {
     yield takeEvery(Type.LOAD_NEXT_PUZZLER, loadNextPuzzler);
@@ -19,6 +20,7 @@ export function* rootSaga() {
 }
 
 function *loadNextPuzzler(_: LoadNextPuzzler) {
+    const veryFirst = yield select((st: State) => !st.puzzlers.length);
     const r: Response = yield call(fetchGenPuzzler);
     const puzzler: PuzzlerSpec = yield apply(r, r.json, []);
     const displayPuzzler: DisplayPuzzler = {
@@ -34,13 +36,14 @@ function *loadNextPuzzler(_: LoadNextPuzzler) {
                 puzzlerId: puzzler.id,
                 choice,
                 token: puzzler.token,
+                diffHint: veryFirst,
             };
             return put(loadChoice);
         });
 }
 
 function *loadChoice(loadChoice: LoadChoice) {
-    const r: Response = yield call(fetchChoice, loadChoice.puzzlerId, loadChoice.choice, loadChoice.token);
+    const r: Response = yield call(fetchChoice, loadChoice.puzzlerId, loadChoice.choice, loadChoice.token, loadChoice.diffHint);
     const code: ChoiceCode = yield apply(r, r.json, []);
     const displayChoice: DisplayChoice = {
         type: Type.DISPLAY_CHOICE,
