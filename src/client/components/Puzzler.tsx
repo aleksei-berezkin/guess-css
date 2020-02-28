@@ -1,5 +1,5 @@
 import React, { ReactElement, useEffect, useState } from 'react';
-import { GenPuzzlerResponse, Region } from '../../shared/api';
+import { Region } from '../../shared/api';
 import { getPuzzlerUrl } from '../clientApi';
 import * as R from 'ramda';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,12 +7,12 @@ import { State } from '../redux/store';
 import { CheckChoice, LoadNextPuzzler, Type } from '../redux/actions';
 
 export function Puzzler(): ReactElement {
-    const puzzler = useSelector((state: State) => state.puzzler);
+    const initialized = useSelector((state: State) => state.puzzlers.length > 0);
     useEffect(() => {
-        if (!puzzler) {
+        if (!initialized) {
             loadNextPuzzler();
         }
-    }, [puzzler]);
+    }, [initialized]);
     const dispatch = useDispatch();
 
     function loadNextPuzzler() {
@@ -25,9 +25,9 @@ export function Puzzler(): ReactElement {
     return <>
         <h1>Guess the code snippet which produces this layout</h1>
         <Score/>
-        <LayoutFrame puzzler={ puzzler } loadNextPuzzler={ loadNextPuzzler }/>
+        <LayoutFrame loadNextPuzzler={ loadNextPuzzler }/>
         <DiffHint/>
-        <Choices puzzler={ puzzler }/>
+        <Choices/>
     </>
 }
 
@@ -37,20 +37,22 @@ function Score() {
     return <div>Correct answers: { correct } of { total }</div>;
 }
 
-function LayoutFrame(p: {puzzler: GenPuzzlerResponse | null, loadNextPuzzler: () => void}): ReactElement {
+function LayoutFrame(p: {loadNextPuzzler: () => void}): ReactElement {
+    const id = useSelector((st: State) => st.puzzlers[st.current]?.id);
+    const token = useSelector((st: State) => st.puzzlers[st.current]?.token);
     return <div className='top-content'>
         <>{
-            p.puzzler &&
-            <iframe className='puzzler-choice' src={ getPuzzlerUrl(p.puzzler) }/>
+            id && token &&
+            <iframe className='puzzler-choice' src={ getPuzzlerUrl(id, token) }/>
         }</>
         <NextButton loadNextPuzzler={ p.loadNextPuzzler }/>
     </div>;
 }
 
 function NextButton(p: {loadNextPuzzler: () => void}) {
-    const hasAnswer = useSelector((state: State) => state.answer != null);
+    const answer = useSelector((st: State) => st.puzzlers[st.current]?.answer);
     return <>{
-        hasAnswer &&
+        answer &&
         <div onClick={ p.loadNextPuzzler } className='next'/>
     }</>
 }
@@ -65,59 +67,61 @@ function DiffHint(): ReactElement {
     }</>;
 }
 
-function Choices(p: {puzzler: GenPuzzlerResponse | null}): ReactElement {
+function Choices(): ReactElement {
+    const id = useSelector((st: State) => st.puzzlers[st.current]?.id);
+    const choicesCount = useSelector((st: State) => st.puzzlers[st.current]?.choiceCodes.length);
     return <>{
-        p.puzzler &&
-        R.range(0, p.puzzler.choicesCount)
+        id && choicesCount &&
+        R.range(0, choicesCount)
             .map((choice: number) =>
                 <Choice
-                    key={ p.puzzler!.id + '_' + choice }
-                    puzzler={ p.puzzler! }
+                    key={ id + '_' + choice }
                     choice={ choice }
                 />
             )
     }</>
 }
 
-function Choice(p: {puzzler: GenPuzzlerResponse, choice: number}): ReactElement {
-    const choiceCode = useSelector((state: State) => state.choiceCodes[p.choice]);
-    const highlight = useSelector((state: State) => {
-        if (state.answer?.puzzlerId === p.puzzler.id) {
-            if (state.answer.correctChoice === p.choice) {
-                return 'correct';
-            }
-            if (state.answer.userChoice === p.choice) {
-                return 'incorrect';
-            }
+function Choice(p: {choice: number}): ReactElement {
+    const puzzlerId = useSelector((st: State) => st.puzzlers[st.current]?.id);
+    const token = useSelector((st: State) => st.puzzlers[st.current]?.token);
+
+    const choiceCode = useSelector((st: State) => st.puzzlers[st.current]?.choiceCodes[p.choice]);
+    const answer = useSelector((st: State) => st.puzzlers[st.current]?.answer);
+
+    const highlight = (() => {
+        if (answer?.correctChoice === p.choice) {
+            return 'correct';
+        }
+        if (answer?.userChoice === p.choice) {
+            return 'incorrect';
         }
         return '';
-    });
-    const userChoiceOutline = useSelector((state: State) => {
-        if (state.answer?.puzzlerId === p.puzzler.id && state.answer.userChoice === p.choice) {
+    })();
+    const outline = (() => {
+        if (answer?.userChoice === p.choice) {
             return 'user-choice';
         }
         return '';
-    })
+    })();
 
     const dispatch = useDispatch();
 
     function handleClick() {
-        if (p.puzzler.id !== choiceCode?.puzzlerId) {
-            // Not loaded yet
-            return;
+        if (!answer) {
+            const checkChoice: CheckChoice = {
+                type: Type.CHECK_CHOICE,
+                puzzlerId,
+                token,
+                choice: p.choice,
+            };
+            dispatch(checkChoice);
         }
-
-        const checkChoice: CheckChoice = {
-            type: Type.CHECK_CHOICE,
-            puzzler: p.puzzler,
-            choice: p.choice,
-        };
-        dispatch(checkChoice);
     }
 
-    return <div className={ `choice ${highlight} ${userChoiceOutline}` } onClick={ handleClick }>{
+    return <div className={ `choice ${ highlight } ${ outline }` } onClick={ handleClick }>{
         choiceCode &&
-        choiceCode.code.map(
+        choiceCode.map(
             (regions, i) =>
                 <Line key={ i } regions={ regions } />
         )

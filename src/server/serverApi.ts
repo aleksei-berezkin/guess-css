@@ -1,7 +1,7 @@
 import { genPuzzler } from './model/bodyGen';
 import { Puzzler, Registry } from './puzzlerRegistry';
 import * as R from 'ramda';
-import { ChoiceResponse, CorrectChoiceResponse, GenPuzzlerResponse, Method, Region } from '../shared/api';
+import { ChoiceCode, CorrectChoiceResponse, PuzzlerSpec, Method, Region } from '../shared/api';
 import { Node, TagNode } from './model/nodes';
 import { Indent } from './model/indent';
 import { Rule } from './model/cssRules';
@@ -14,7 +14,7 @@ export default function addApi(app: Express) {
         const puzzler: Puzzler = genPuzzler();
         const {id, token} = registry.putPuzzler(puzzler);
         console.log('Id=' + id + ', correct=' + puzzler.correctChoice);
-        const responseBean: GenPuzzlerResponse = {
+        const responseBean: PuzzlerSpec = {
             id,
             choicesCount: puzzler.rulesChoices.length,
             token,
@@ -49,7 +49,7 @@ export default function addApi(app: Express) {
             return;
         }
 
-        const choiceFormatted: ChoiceResponse = new TagNode('html', [], [
+        const choiceFormatted: ChoiceCode = new TagNode('html', [], [
             new TagNode('head', [], [
                 new TagNode('style', [], [
                     new StylesNode(puzzler.rulesChoices[choice])

@@ -5,13 +5,13 @@ export enum Method {
     CORRECT_CHOICE = 'correctChoice',
 }
 
-export interface GenPuzzlerResponse {
+export interface PuzzlerSpec {
     id: string,
     choicesCount: number,
     token: string,
 }
 
-export type ChoiceResponse = Region[][];
+export type ChoiceCode = Region[][];
 
 export interface Region {
     kind: RegionKind,

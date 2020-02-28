@@ -1,4 +1,4 @@
-import { GenPuzzlerResponse, Method } from '../shared/api';
+import { PuzzlerSpec, Method } from '../shared/api';
 
 // Injected by Webpack DefinePlugin
 // @ts-ignore
@@ -8,14 +8,14 @@ export function fetchGenPuzzler(): Promise<Response> {
     return fetch(`${ apiBase }/${ Method.GEN_PUZZLER }`, {method: 'post'});
 }
 
-export function getPuzzlerUrl(puzzler: GenPuzzlerResponse): string {
-   return `${ apiBase }/${ Method.PUZZLER }?id=${ puzzler.id }&token=${ puzzler.token }`;
+export function getPuzzlerUrl(id: string, token: string): string {
+   return `${ apiBase }/${ Method.PUZZLER }?id=${ id }&token=${ token }`;
 }
 
-export function fetchChoice(puzzler: GenPuzzlerResponse, choice: number): Promise<Response> {
-    return fetch(`${ apiBase }/${ Method.CHOICE }?id=${ puzzler.id }&choice=${ choice }&token=${ puzzler.token }`);
+export function fetchChoice(id: string, choice: number, token: string): Promise<Response> {
+    return fetch(`${ apiBase }/${ Method.CHOICE }?id=${ id }&choice=${ choice }&token=${ token }`);
 }
 
-export function fetchCorrectChoice(puzzler: GenPuzzlerResponse): Promise<Response> {
-    return fetch(`${ apiBase }/${ Method.CORRECT_CHOICE }?id=${ puzzler.id }&token=${ puzzler.token }`);
+export function fetchCorrectChoice(id: string, token: string): Promise<Response> {
+    return fetch(`${ apiBase }/${ Method.CORRECT_CHOICE }?id=${ id }&token=${ token }`);
 }
