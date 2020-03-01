@@ -20,8 +20,8 @@ function *loadNextPuzzler(_: LoadNextPuzzler) {
     const genPuzzlerResponse: GenPuzzlerResponse = yield apply(r1, r1.json, []);
     const {id, token} = genPuzzlerResponse;
 
-    const veryFirst = yield select((st: State) => !st.puzzlers.length);
-    const r2: Response = yield call(fetchChoices, id, token, veryFirst);
+    const isVeryFirst = yield select((st: State) => !st.puzzlers.length);
+    const r2: Response = yield call(fetchChoices, id, token, isVeryFirst);
     const choiceCodes: ChoiceCodes = yield apply(r2, r2.json, []);
 
     const displayPuzzler: DisplayPuzzler = {

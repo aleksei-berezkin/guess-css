@@ -34,12 +34,12 @@ const initialState: State = {
 const rootReducer = combineReducers({
     puzzlers: function(puzzlers: PuzzlerFull[] = initialState.puzzlers, action: Action): PuzzlerFull[] {
         if (action.type === Type.DISPLAY_PUZZLER) {
-            const a: DisplayPuzzler = action as DisplayPuzzler;
+            const {puzzlerId, token, choiceCodes} = action as DisplayPuzzler;
             return [
                 {
-                    id: a.puzzlerId,
-                    token: a.token,
-                    choiceCodes: a.choiceCodes,
+                    id: puzzlerId,
+                    token,
+                    choiceCodes,
                     answer: null,
                 },
                 ...puzzlers,
@@ -47,14 +47,14 @@ const rootReducer = combineReducers({
         }
 
         if (action.type === Type.DISPLAY_ANSWER) {
-            const a: DisplayAnswer = action as DisplayAnswer;
-            const i = R.findIndex(p => p.id === a.puzzlerId, puzzlers);
+            const {puzzlerId, userChoice, correctChoice} = action as DisplayAnswer;
+            const i = R.findIndex(p => p.id === puzzlerId, puzzlers);
             return insert(puzzlers, i,
                 {
                     ...puzzlers[i],
                     answer: {
-                        userChoice: a.userChoice,
-                        correctChoice: a.correctChoice,
+                        userChoice,
+                        correctChoice,
                     }
                 }
             );
