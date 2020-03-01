@@ -1,7 +1,7 @@
 import { genPuzzler } from './model/bodyGen';
 import { Puzzler, Registry } from './puzzlerRegistry';
 import * as R from 'ramda';
-import { ChoiceCode, CorrectChoiceResponse, Method, PuzzlerSpec, Region, RegionKind } from '../shared/api';
+import { ChoiceCodes, CorrectChoiceResponse, GenPuzzlerResponse, Method, Region, RegionKind } from '../shared/api';
 import { Node, TagNode } from './model/nodes';
 import { Indent } from './model/indent';
 import { Rule } from './model/cssRules';
@@ -14,9 +14,8 @@ export default function addApi(app: Express) {
         const puzzler: Puzzler = genPuzzler();
         const {id, token} = registry.putPuzzler(puzzler);
         console.log('Id=' + id + ', correct=' + puzzler.correctChoice);
-        const responseBean: PuzzlerSpec = {
+        const responseBean: GenPuzzlerResponse = {
             id,
-            choicesCount: puzzler.rulesChoices.length,
             token,
         };
 
@@ -24,10 +23,10 @@ export default function addApi(app: Express) {
     });
 
     app.get(`/${ Method.PUZZLER }`, (req: Request, res: Response) => {
-        const puzzler = registry.getPuzzler(getId(req), getToken(req));
+        const {id, token} = req.query;
+        const puzzler = registry.getPuzzler(id, token);
         if (!puzzler) {
-            res.status(404);
-            res.send();
+            res.status(404).send();
             return;
         }
 
@@ -40,62 +39,49 @@ export default function addApi(app: Express) {
         res.send(`<html><head><style>${styleText}</style></head>${puzzler.body.toUnformattedCode()}</html>`);
     });
 
-    app.get(`/${ Method.CHOICE}`, (req: Request, res: Response) => {
-        const puzzler = registry.getPuzzler(getId(req), getToken(req));
-        const choice = getChoice(req);
-        if (!puzzler || !hasChoice(puzzler, choice)) {
-            res.status(404);
-            res.send();
+    app.get(`/${ Method.CHOICES }`, (req: Request, res: Response) => {
+        const {id, token, diffHint} = req.query;
+        console.log(id, token, diffHint);
+        const puzzler = registry.getPuzzler(id, token);
+        if (!puzzler) {
+            res.status(404).send();
             return;
         }
 
-        const choiceFormatted: ChoiceCode = new TagNode('html', [], [
-            new TagNode('head', [], [
-                new TagNode('style', [], [
-                    new StylesNode(
-                        puzzler.rulesChoices[choice],
-                        isDiffHint(req),
-                    )
-                ])
-            ]),
-            puzzler.body,
-        ]).toRegions(new Indent());
+        const choiceCodes: ChoiceCodes = R.pipe(
+            R.range(0),
+            R.map(choiceCode(puzzler, diffHint === 'true'))
+        )(puzzler.rulesChoices.length);
 
-        res.send(JSON.stringify(choiceFormatted));
+        res.json(choiceCodes);
     });
 
+    function choiceCode(puzzler: Puzzler, diffHint: boolean): {(choice: number): Region[][]} {
+        return (choice: number) =>
+            new TagNode('html', [], [
+                new TagNode('head', [], [
+                    new TagNode('style', [], [
+                        new StylesNode(
+                            puzzler.rulesChoices[choice],
+                            diffHint,
+                        )
+                    ])
+                ]),
+                puzzler.body,
+            ]).toRegions(new Indent());
+    }
+
     app.get(`/${ Method.CORRECT_CHOICE }`, (req: Request, res: Response) => {
-        const id = getId(req);
-        const puzzler = registry.getPuzzler(id, getToken(req));
+        const {id, token} = req.query;
+        const puzzler = registry.getPuzzler(id, token);
         if (!puzzler) {
-            res.status(404);
-            res.send();
+            res.status(404).send();
             return;
         }
 
         const correctChoiceResponse: CorrectChoiceResponse = puzzler.correctChoice;
-        res.send(JSON.stringify(correctChoiceResponse));
+        res.json(correctChoiceResponse);
     });
-
-    function getId(req: Request): string {
-        return req.query['id'];
-    }
-
-    function getChoice(req: Request): number {
-        return Number.parseInt(req.query['choice']);
-    }
-
-    function getToken(req: Request): string {
-        return req.query['token'];
-    }
-
-    function isDiffHint(req: Request): boolean {
-        return req.query['diffHint'] === 'true';
-    }
-
-    function hasChoice(puzzler: Puzzler, choice: number) {
-        return !Number.isNaN(choice) && 0 <= choice && choice < puzzler.rulesChoices.length;
-    }
 }
 
 class StylesNode implements Node {

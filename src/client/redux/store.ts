@@ -1,5 +1,5 @@
-import { ChoiceCode } from '../../shared/api';
-import { Action, DisplayAnswer, DisplayChoice, DisplayPuzzler, Type } from './actions';
+import { ChoiceCodes } from '../../shared/api';
+import { Action, DisplayAnswer, DisplayPuzzler, Type } from './actions';
 import { applyMiddleware, combineReducers, createStore } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import { rootSaga } from './saga';
@@ -16,7 +16,7 @@ export interface State {
 export interface PuzzlerFull {
     id: string,
     token: string,
-    choiceCodes: ChoiceCode[],
+    choiceCodes: ChoiceCodes,
     answer: Answer | null,
 }
 
@@ -37,24 +37,13 @@ const rootReducer = combineReducers({
             const a: DisplayPuzzler = action as DisplayPuzzler;
             return [
                 {
-                    id: a.puzzler.id,
-                    token: a.puzzler.token,
-                    choiceCodes: R.repeat([], a.puzzler.choicesCount),
+                    id: a.puzzlerId,
+                    token: a.token,
+                    choiceCodes: a.choiceCodes,
                     answer: null,
                 },
                 ...puzzlers,
             ]
-        }
-
-        if (action.type === Type.DISPLAY_CHOICE) {
-            const a: DisplayChoice = action as DisplayChoice;
-            const i = R.findIndex(p => p.id === a.puzzlerId, puzzlers);
-            return insert(puzzlers, i,
-                {
-                    ...puzzlers[i],
-                    choiceCodes: insert(puzzlers[i].choiceCodes, a.choice, a.code),
-                }
-            );
         }
 
         if (action.type === Type.DISPLAY_ANSWER) {
