@@ -49,9 +49,14 @@ export class TagNode implements Node {
     }
 
     private openTagToRegions(): Region[] {
+        const classesRegions = this.classesToRegions();
+        if (!classesRegions.length) {
+            return [{kind: RegionKind.Tag, text: `<${this.name}>`}];
+        }
+
         return [
             {kind: RegionKind.Tag, text: `<${this.name}`},
-            ...this.classesToRegions(),
+            ...classesRegions,
             {kind: RegionKind.Tag, text: `>`},
         ];
     }
