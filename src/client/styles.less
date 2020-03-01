@@ -16,144 +16,143 @@ body {
     align-items: center;
     flex-direction: column;
 
-    &>:not(:last-child) {
+    & > :not(:last-child) {
         margin-top: 0;
         margin-bottom: 8px;
     }
+}
 
-    .puzzler-top {
-        display: flex;
+.puzzler-top {
+    display: flex;
 
-        &>* {
-            margin: 3px;
+    &>* {
+        margin: 3px;
+    }
+
+    @h: 200px;
+
+    .layout {
+        width: 240px;
+        height: @h;
+        border: 1px solid #a0a0a0;
+        border-radius: .25em;
+    }
+
+    .nav-puzzlers {
+        width: 100px;
+        height: @h + 2;
+        line-height: @h + 2;
+        text-align: center;
+
+        &.active {
+            cursor: pointer;
+
+            background-color: #f5f5f5;
+            color: #606060;
+            transition: all .3s;
+
+            &:hover {
+                background-color: #e8e8e8;
+                color: black;
+            }
+
+            &.next::before {
+                content: "Next ›";
+            }
+
+            &.prev::before {
+                content: "‹ Prev";
+            }
         }
+    }
+}
 
-        @h: 200px;
+.choices {
+    display: flex;
 
-        .layout {
-            width: 240px;
-            height: @h;
-            border: 1px solid #a0a0a0;
-            border-radius: .25em;
-        }
+    .choice {
+        border: 1px solid white;
+        border-radius: .25em;
 
-        .nav-puzzlers {
-            width: 100px;
-            height: @h + 2;
-            line-height: @h + 2;
-            text-align: center;
+        &.active {
+            cursor: pointer;
+            transition: all .3s;
 
-            &.active {
-                cursor: pointer;
-
+            &:hover {
                 background-color: #f5f5f5;
-                color: #606060;
-                transition: all .3s;
-
-                &:hover {
-                    background-color: #e8e8e8;
-                    color: black;
-                }
-
-                &.next::before {
-                    content: "Next ›";
-                }
-
-                &.prev::before {
-                    content: "‹ Prev";
-                }
             }
         }
-    }
 
-    .choices {
-        display: flex;
+        &.correct {
+            .answer-color(#e0ffe0, darkgreen);
+        }
 
-        .choice {
-            border: 1px solid white;
-            border-radius: .25em;
+        &.incorrect {
+            .answer-color(#ffe0e0, darkred);
+        }
 
-            &.active {
-                cursor: pointer;
-                transition: all .3s;
+        .answer-color(@bg; @border) {
+            background-color: @bg;
+            border-color: @bg;
+            transition: all .4s;
 
-                &:hover {
-                    background-color: #f5f5f5;
-                }
-            }
-
-            &.correct {
-                .answer-color(#e0ffe0, darkgreen);
-            }
-
-            &.incorrect {
-                .answer-color(#ffe0e0, darkred);
-            }
-
-            .answer-color(@bg; @border) {
-                background-color: @bg;
-                border-color: @bg;
-                transition: all .4s;
-
-                &.user-choice {
-                    border-color: @border;
-                }
-            }
-
-            &.correct::before {
-                .answer-mark("✓", darkgreen);
-            }
-
-            &.incorrect::before {
-                .answer-mark("✗", darkred);
-            }
-
-            .answer-mark(@content, @color) {
-                float: right;
-                margin: 10px;
-                content: @content;
-                color: @color;
-            }
-
-            pre {
-                margin: 0;
-                font-family: Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace;
-                font-size: 12px;
-            }
-
-            .tag {
-                color: #000080;
-            }
-
-            .attr-name {
-                color: #0000ff;
-            }
-
-            .attr-value {
-                color: #008000;
-            }
-
-            .operator {
-                color: #008000;
-            }
-
-            .selector {
-                color: #000080;
-            }
-
-            .decl-name {
-                color: #000000;
-            }
-
-            .comment {
-                color: #808080;
-                font-style: italic;
-            }
-
-            .differing {
-                font-weight: bold;
+            &.user-choice {
+                border-color: @border;
             }
         }
-    }
 
+        &.correct::before {
+            .answer-mark("✓", darkgreen);
+        }
+
+        &.incorrect::before {
+            .answer-mark("✗", darkred);
+        }
+
+        .answer-mark(@content, @color) {
+            float: right;
+            margin: 10px;
+            content: @content;
+            color: @color;
+        }
+
+        pre {
+            margin: 0;
+            font-family: Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace;
+            font-size: 12px;
+        }
+
+        .tag {
+            color: #000080;
+        }
+
+        .attr-name {
+            color: #0000ff;
+        }
+
+        .attr-value {
+            color: #008000;
+        }
+
+        .operator {
+            color: #008000;
+        }
+
+        .selector {
+            color: #000080;
+        }
+
+        .decl-name {
+            color: #000000;
+        }
+
+        .comment {
+            color: #808080;
+            font-style: italic;
+        }
+
+        .differing {
+            font-weight: bold;
+        }
+    }
 }
