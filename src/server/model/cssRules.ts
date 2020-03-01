@@ -43,7 +43,12 @@ export class Rule {
                     indent,
                     {kind: RegionKind.DeclName, text: name},
                     {kind: RegionKind.Default, text: ': '},
-                    {kind: RegionKind.DeclValue, text: value},
+                    ((): Region => {
+                        if (name === 'background-color') {
+                            return {kind: RegionKind.DeclValue, text: value, backgroundColor: value};
+                        }
+                        return {kind: RegionKind.DeclValue, text: value};
+                    })(),
                     {kind: RegionKind.Default, text: ';'},
                 ]
         )(R.toPairs(this.declarations));

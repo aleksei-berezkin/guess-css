@@ -18,6 +18,7 @@ export interface Region {
     kind: RegionKind,
     text: string,
     differing?: boolean,
+    backgroundColor?: string,
 }
 
 export enum RegionKind {

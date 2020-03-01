@@ -180,13 +180,19 @@ function Choice(p: {choice: number}): ReactElement {
 }
 
 function Line(p: {regions: Region[]}) {
-    const className = (region: Region) => region.differing
-        ? region.kind + ' differing'
-        : region.kind;
-
     return <pre>{
-        p.regions.map((region: Region, i) =>
-            <span key={ i } className={ className(region) }>{ region.text }</span>
+        p.regions.map(
+            (reg, i) => {
+                const className = reg.differing
+                    ? reg.kind + ' differing'
+                    : reg.kind;
+
+                const style = reg.backgroundColor
+                    ? {backgroundColor: reg.backgroundColor}
+                    : undefined;
+
+                return <span key={ i } className={ className } style={ style }>{ reg.text }</span>;
+            }
         )
     }</pre>
 }
