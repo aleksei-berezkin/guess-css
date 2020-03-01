@@ -65,14 +65,12 @@ function LayoutFrame() {
     const token = useSelector((st: State) => st.puzzlers[st.current]?.token);
 
     return <div className='puzzler-top'>
-        <div className='puzzler-top-content'>
-            <PrevButton/>
-            <>{
-                id && token &&
-                <iframe className='layout' src={ getPuzzlerUrl(id, token) }/>
-            }</>
-            <NextButton/>
-        </div>
+        <PrevButton/>
+        <>{
+            id && token &&
+            <iframe className='layout' src={ getPuzzlerUrl(id, token) }/>
+        }</>
+        <NextButton/>
     </div>;
 }
 
@@ -121,7 +119,7 @@ function NextButton() {
 function Choices(): ReactElement {
     const id = useSelector((st: State) => st.puzzlers[st.current]?.id);
     const choicesCount = useSelector((st: State) => st.puzzlers[st.current]?.choiceCodes.length);
-    return <>{
+    return <div className='choices'>{
         id && choicesCount &&
         R.range(0, choicesCount)
             .map((choice: number) =>
@@ -130,7 +128,7 @@ function Choices(): ReactElement {
                     choice={ choice }
                 />
             )
-    }</>
+    }</div>
 }
 
 function Choice(p: {choice: number}): ReactElement {
