@@ -1,16 +1,9 @@
 import * as R from 'ramda';
-import { TagNode } from './model/nodes';
-import { Rule } from './model/cssRules';
 import { randomBounded } from '../shared/util';
+import { Puzzler } from './model/puzzler';
 
 interface Storage {
     [id: string]: {puzzler: Puzzler, token: string};
-}
-
-export interface Puzzler {
-    body: TagNode;
-    rulesChoices: Rule[][];
-    correctChoice: number;
 }
 
 const MAX_ITEMS = 20;
