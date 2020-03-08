@@ -1,18 +1,16 @@
 export enum Method {
     GEN_PUZZLER = 'genPuzzler',
     PUZZLER = 'puzzler',
-    CHOICES = 'choices',
     CORRECT_CHOICE = 'correctChoice',
 }
 
 export interface GenPuzzlerResponse {
     id: string,
     token: string,
+    choiceCodes: ChoiceCode[],
 }
 
-type ChoiceCode = Region[][];
-
-export type ChoiceCodes = ChoiceCode[];
+export type ChoiceCode = Region[][];
 
 export interface Region {
     kind: RegionKind,

@@ -1,4 +1,4 @@
-import { ChoiceCodes } from '../../shared/api';
+import { ChoiceCode } from '../../shared/api';
 
 export enum Type {
     LOAD_NEXT_PUZZLER = 'LOAD_NEXT_PUZZLER',
@@ -15,13 +15,14 @@ export interface Action {
 
 export interface LoadNextPuzzler extends Action {
     type: Type.LOAD_NEXT_PUZZLER,
+    diffHint: boolean,
 }
 
 export interface DisplayPuzzler extends Action {
     type: Type.DISPLAY_PUZZLER,
     puzzlerId: string,
     token: string,
-    choiceCodes: ChoiceCodes,
+    choiceCodes: ChoiceCode[],
 }
 
 export interface CheckChoice extends Action {

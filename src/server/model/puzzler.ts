@@ -1,7 +1,7 @@
 import { Node, TagNode } from './nodes';
 import { Rule } from './cssRules';
 import * as R from 'ramda';
-import { ChoiceCodes, Region, RegionKind } from '../../shared/api';
+import { ChoiceCode, Region, RegionKind } from '../../shared/api';
 import { Indent } from './indent';
 
 export class Puzzler {
@@ -21,7 +21,7 @@ export class Puzzler {
         return `<html><head><style>${styleText}</style></head>${this.body.toUnformattedCode()}</html>`;
     }
 
-    getChoiceCodes(diffHint: boolean): ChoiceCodes {
+    getChoiceCodes(diffHint: boolean): ChoiceCode[] {
         return R.pipe(
             R.range(0),
             R.map(this.choiceCode(diffHint))

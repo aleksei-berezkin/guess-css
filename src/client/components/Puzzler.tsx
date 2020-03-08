@@ -14,6 +14,7 @@ export function Puzzler(): ReactElement {
         if (!initialized) {
             const loadAction: LoadNextPuzzler = {
                 type: Type.LOAD_NEXT_PUZZLER,
+                diffHint: true,
             };
             dispatch(loadAction);
         }
@@ -105,6 +106,7 @@ function NextButton() {
         } else if (answer) {
             const loadNext: LoadNextPuzzler = {
                 type: Type.LOAD_NEXT_PUZZLER,
+                diffHint: false,
             };
             dispatch(loadNext);
         } else {

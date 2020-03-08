@@ -1,4 +1,4 @@
-import { apply, call, put, select, takeEvery, takeLeading } from 'redux-saga/effects';
+import { apply, call, put, takeEvery, takeLeading } from 'redux-saga/effects';
 import {
     CheckChoice,
     DisplayAnswer,
@@ -6,23 +6,18 @@ import {
     LoadNextPuzzler,
     Type
 } from './actions';
-import { fetchChoices, fetchCorrectChoice, fetchGenPuzzler } from '../clientApi';
-import { ChoiceCodes, CorrectChoiceResponse, GenPuzzlerResponse } from '../../shared/api';
-import { State } from './store';
+import { fetchCorrectChoice, fetchGenPuzzler } from '../clientApi';
+import { CorrectChoiceResponse, GenPuzzlerResponse } from '../../shared/api';
 
 export function* rootSaga() {
     yield takeEvery(Type.LOAD_NEXT_PUZZLER, loadNextPuzzler);
     yield takeLeading(Type.CHECK_CHOICE, checkChoice);
 }
 
-function *loadNextPuzzler(_: LoadNextPuzzler) {
-    const r1: Response = yield call(fetchGenPuzzler);
+function *loadNextPuzzler(loadNextPuzzler: LoadNextPuzzler) {
+    const r1: Response = yield call(fetchGenPuzzler, loadNextPuzzler.diffHint);
     const genPuzzlerResponse: GenPuzzlerResponse = yield apply(r1, r1.json, []);
-    const {id, token} = genPuzzlerResponse;
-
-    const isVeryFirst = yield select((st: State) => !st.puzzlers.length);
-    const r2: Response = yield call(fetchChoices, id, token, isVeryFirst);
-    const choiceCodes: ChoiceCodes = yield apply(r2, r2.json, []);
+    const {id, token, choiceCodes} = genPuzzlerResponse;
 
     const displayPuzzler: DisplayPuzzler = {
         type: Type.DISPLAY_PUZZLER,

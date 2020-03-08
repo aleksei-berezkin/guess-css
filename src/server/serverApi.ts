@@ -8,11 +8,15 @@ export default function addApi(app: Express) {
     const registry = new Registry();
 
     app.post(`/${ Method.GEN_PUZZLER }`, (req: Request, res: Response) => {
+        const {diffHint} = req.query;
+
         const puzzler: Puzzler = genPuzzler();
         const {id, token} = registry.putPuzzler(puzzler);
+
         const responseBean: GenPuzzlerResponse = {
             id,
             token,
+            choiceCodes: puzzler.getChoiceCodes(diffHint === 'true'),
         };
 
         res.json(responseBean);
@@ -27,18 +31,6 @@ export default function addApi(app: Express) {
         }
 
         res.send(puzzler.html);
-    });
-
-    app.get(`/${ Method.CHOICES }`, (req: Request, res: Response) => {
-        const {id, token, diffHint} = req.query;
-        console.log(id, token, diffHint);
-        const puzzler = registry.getPuzzler(id, token);
-        if (!puzzler) {
-            res.status(404).send();
-            return;
-        }
-
-        res.json(puzzler.getChoiceCodes(diffHint === 'true'));
     });
 
     app.get(`/${ Method.CORRECT_CHOICE }`, (req: Request, res: Response) => {

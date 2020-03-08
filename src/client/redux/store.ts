@@ -1,4 +1,4 @@
-import { ChoiceCodes } from '../../shared/api';
+import { ChoiceCode } from '../../shared/api';
 import { Action, DisplayAnswer, DisplayPuzzler, Type } from './actions';
 import { applyMiddleware, combineReducers, createStore } from 'redux';
 import createSagaMiddleware from 'redux-saga';
@@ -16,7 +16,7 @@ export interface State {
 export interface PuzzlerFull {
     id: string,
     token: string,
-    choiceCodes: ChoiceCodes,
+    choiceCodes: ChoiceCode[],
     answer: Answer | null,
 }
 
