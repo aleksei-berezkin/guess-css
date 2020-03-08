@@ -39,10 +39,11 @@ body {
     }
 
     .nav-puzzlers {
-        width: 100px;
+        width: 38px;
         height: @h + 2;
         line-height: @h + 2;
         text-align: center;
+        font-size: 2em;
 
         &.active {
             cursor: pointer;
@@ -57,11 +58,11 @@ body {
             }
 
             &.next::before {
-                content: "Next ›";
+                content: "⟩";
             }
 
             &.prev::before {
-                content: "‹ Prev";
+                content: "⟨";
             }
         }
     }
