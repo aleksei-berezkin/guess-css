@@ -4,6 +4,7 @@ if (!['development', 'production'].includes(process.env.NODE_ENV)) {
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { ROOT_EL_ID, ROOT_EL_TEXT } = require('./src/shared/template');
 
 module.exports = {
     mode: process.env.NODE_ENV,
@@ -13,8 +14,8 @@ module.exports = {
             title: 'CSS Puzzler',
             inject: false,
             template: require('html-webpack-template'),
-            appMountId: 'app-root-div',
-            appMountHtmlSnippet: 'Initializing...',
+            appMountId: ROOT_EL_ID,
+            appMountHtmlSnippet: ROOT_EL_TEXT,
         }),
         new MiniCssExtractPlugin({
             filename: '[name].[contenthash].css',

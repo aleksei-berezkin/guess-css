@@ -2,27 +2,27 @@ import * as R from 'ramda';
 import { randomBounded } from '../shared/util';
 import { Puzzler } from './model/puzzler';
 
-interface Storage {
-    [id: string]: {puzzler: Puzzler, token: string};
+export interface Registry {
+    putPuzzler(puzzler: Puzzler): {id: string, token: string};
+    getPuzzler(id: string, token: string): Puzzler | null;
 }
 
-const MAX_ITEMS = 20;
-
-export class Registry {
-    private storage: Storage = {};
+class RegistryImpl implements Registry {
+    private readonly MAX_ITEMS = 20;
+    private storage: {[id: string]: {puzzler: Puzzler, token: string}} = {};
     private counter: number = 0;
 
     constructor() {
         setInterval(() => this.cleanOldEntries(), 10_000);
     }
 
-    cleanOldEntries() {
+    private cleanOldEntries() {
         const keys: string[] = Object.keys(this.storage);
-        if (keys.length <= MAX_ITEMS) {
+        if (keys.length <= this.MAX_ITEMS) {
             return;
         }
 
-        const itemsToClear = keys.length - MAX_ITEMS;
+        const itemsToClear = keys.length - this.MAX_ITEMS;
         R.pipe(
             R.take(itemsToClear) as (keys: string[]) => string[],
             R.forEach((key: string) => delete this.storage[key])
@@ -51,3 +51,5 @@ export class Registry {
         return null;
     }
 }
+
+export const theRegistry = new RegistryImpl();

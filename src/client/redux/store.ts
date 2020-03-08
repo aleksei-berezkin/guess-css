@@ -25,7 +25,7 @@ export interface Answer {
     correctChoice: number,
 }
 
-const initialState: State = {
+export const initialState: State = {
     puzzlers: [],
     current: -1,
     correctAnswers: 0,
@@ -103,16 +103,17 @@ function insert<T>(a: T[], i: number, val: T): T[] {
     return b;
 }
 
-export function createAppStore() {
+export function createAppStore(state: State) {
     const sagaMiddleware = createSagaMiddleware();
-
-    const store = createStore(
-        rootReducer,
-        initialState,
-        applyMiddleware(sagaMiddleware),
-    );
-
+    const store = createAppStoreWithMiddleware(state, sagaMiddleware);
     sagaMiddleware.run(rootSaga);
-
     return store;
+}
+
+export function createAppStoreWithMiddleware(state: State, middleware?: any) {
+    return createStore(
+        rootReducer,
+        state,
+        middleware && applyMiddleware(middleware),
+    );
 }
