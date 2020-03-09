@@ -1,6 +1,6 @@
 const baseConfig = require('./webpack.config.base');
 const DefinePlugin = require('webpack').DefinePlugin;
-const { PORT, API_DEV_PORT } = require('./src/server/ports.config');
+const { API_DEV_PORT } = require('./src/server/ports.config');
 
 module.exports = {
     ...baseConfig,
@@ -11,8 +11,4 @@ module.exports = {
         }),
     ],
     devtool: 'inline-source-map',
-    devServer: {
-        compress: false,
-        port: PORT
-    }
 };
