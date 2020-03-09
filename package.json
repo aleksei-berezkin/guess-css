@@ -9,8 +9,7 @@
     "dev:client": "NODE_ENV=development webpack-dev-server --config webpack.config.dev.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "NODE_ENV=production webpack --config webpack.config.prod.js",
-    "stage": "NODE_ENV=production ts-node src/server/runProdServer.ts 3000",
-    "prod": "NODE_ENV=production ts-node src/server/runProdServer.ts 80"
+    "prod": "NODE_ENV=production ts-node src/server/runProdServer.ts"
   },
   "author": "Aleksei Berezkin",
   "license": "ISC",

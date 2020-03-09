@@ -4,7 +4,7 @@ if (!['development', 'production'].includes(process.env.NODE_ENV)) {
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const { ROOT_EL_ID, ROOT_EL_TEXT } = require('./src/shared/template');
+const { ROOT_EL_ID, ROOT_EL_TEXT } = require('./src/shared/appWideConst');
 
 module.exports = {
     mode: process.env.NODE_ENV,

@@ -10,7 +10,7 @@ import React from 'react';
 import { readFile } from 'fs';
 import path from 'path';
 // @ts-ignore
-import { ROOT_EL_ID, ROOT_EL_TEXT } from '../shared/template';
+import { ROOT_EL_ID, ROOT_EL_TEXT } from '../shared/appWideConst';
 
 const indexHtmlParts = new Promise<[string, string]>((resolve, reject) => {
     readFile(path.resolve(__dirname, '..', '..', 'dist', 'index.html'), (err, data) => {

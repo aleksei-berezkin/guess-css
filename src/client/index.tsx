@@ -5,7 +5,7 @@ import { Puzzler } from './components/Puzzler';
 import { Provider } from 'react-redux';
 import { createAppStore, initialState } from './redux/store';
 // @ts-ignore
-import { ROOT_EL_ID } from '../shared/template';
+import { ROOT_EL_ID } from '../shared/appWideConst';
 
 // @ts-ignore
 const preloadedState = window.__PRELOADED_STATE__;
