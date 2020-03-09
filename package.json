@@ -8,6 +8,10 @@
     "dev:server": "ts-node-dev --no-notify src/server/runDevApiServer.ts",
     "dev:client": "ts-node-dev --no-notify src/server/runDevWebServer.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
+
+    "dev:build": "NODE_ENV=development webpack --config webpack.config.prod.js",
+    "dev:prod": "ts-node-dev --no-notify src/server/runProdServer.ts",
+
     "build": "NODE_ENV=production webpack --config webpack.config.prod.js",
     "prod": "NODE_ENV=production ts-node src/server/runProdServer.ts"
   },

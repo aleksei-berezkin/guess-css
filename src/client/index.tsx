@@ -3,12 +3,12 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Puzzler } from './components/Puzzler';
 import { Provider } from 'react-redux';
-import { createAppStore, initialState } from './redux/store';
+import { createAppStore, initialState, State } from './redux/store';
 // @ts-ignore
-import { ROOT_EL_ID } from '../shared/appWideConst';
+import { ROOT_EL_ID, PRELOADED_STATE_ID } from '../shared/appWideConst';
 
 // @ts-ignore
-const preloadedState = window.__PRELOADED_STATE__;
+const preloadedState: State = window[PRELOADED_STATE_ID];
 
 if (preloadedState) {
     ReactDOM.hydrate(
@@ -17,8 +17,7 @@ if (preloadedState) {
         </Provider>,
         document.getElementById(ROOT_EL_ID)
     );
-    // @ts-ignore
-    delete window.__PRELOADED_STATE__;
+    delete window[PRELOADED_STATE_ID];
 } else {
     ReactDOM.render(
         <Provider store={ createAppStore(initialState) }>

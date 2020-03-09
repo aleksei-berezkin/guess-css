@@ -10,7 +10,7 @@ import React from 'react';
 import { readFile } from 'fs';
 import path from 'path';
 // @ts-ignore
-import { ROOT_EL_ID, ROOT_EL_TEXT } from '../shared/appWideConst';
+import { ROOT_EL_ID, ROOT_EL_TEXT, PRELOADED_STATE_ID } from '../shared/appWideConst';
 
 const indexHtmlParts = new Promise<[string, string]>((resolve, reject) => {
     readFile(path.resolve(__dirname, '..', '..', 'dist', 'index.html'), (err, data) => {
@@ -61,7 +61,7 @@ export function sendRenderedApp(req: Request, res: Response) {
             `${ before }
             <div id="${ ROOT_EL_ID }">${ appHtml }</div>
             <script>
-                window.__PRELOADED_STATE__ = ${ JSON.stringify(state).replace(/</g, '\\u003c') };
+                window.${ PRELOADED_STATE_ID } = ${ JSON.stringify(state).replace(/</g, '\\u003c') };
             </script>
             ${ after }`
         );

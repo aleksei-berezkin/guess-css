@@ -5,7 +5,9 @@ import { sendRenderedApp } from './renderServerSide';
 // @ts-ignore
 import { PORT } from './ports.config';
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV === 'development') {
+    console.warn('WARNING: Production runs in dev mode');
+} else if (process.env.NODE_ENV !== 'production') {
     throw new Error(process.env.NODE_ENV);
 }
 
