@@ -5,7 +5,7 @@ import webpack from 'webpack';
 // @ts-ignore
 import config from '../../webpack.config.dev';
 // @ts-ignore
-import { PORT } from './ports.config';
+import { WEB_DEV_PORT } from './ports.config';
 
 if (process.env.NODE_ENV !== 'development') {
     throw new Error(process.env.NODE_ENV);
@@ -18,4 +18,4 @@ app.use(webpackDevMiddleware(compiler, {
     publicPath: config.output.publicPath,
 }));
 
-app.listen(PORT, () => console.log(`Dev web server is listening on port ${PORT}`));
+app.listen(WEB_DEV_PORT, () => console.log(`Dev web server is listening on port ${WEB_DEV_PORT}`));
