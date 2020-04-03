@@ -1,5 +1,5 @@
 import * as R from 'ramda';
-import { nRandom, randomItem, shuffled, twoElementVariationsInOrder } from '../../shared/util';
+import { nRandom, randomSeqItem, shuffled, twoElementVariationsInOrder, xprod } from '../../shared/util';
 import { TagNode } from './nodes';
 import {
     ChildCombinator,
@@ -10,6 +10,7 @@ import {
     Selector,
     TypeSelector
 } from './cssRules';
+import { Option, Vector } from 'prelude-ts';
 
 const constantRule = new Rule(new TypeSelector('div'), {'padding': '6px', 'border': '1px solid black'});
 
@@ -53,16 +54,14 @@ function getDeepestSingleChildSubtree(root: TagNode): SingleChildSubtree {
         return new SingleChildSubtree(root);
     }
 
-    const oneOfDeepestChildren: SingleChildSubtree = R.pipe(
-        R.map(getDeepestSingleChildSubtree),
-        R.sortBy(nd => nd.depth),
-        R.groupWith((l, r) => l.depth === r.depth),
-        R.takeLast(1) as {(s: SingleChildSubtree[][]): SingleChildSubtree[][]},
-        R.unnest,
-        randomItem
-    )(root.tagChildren);
+    const deepestChildren: Vector<SingleChildSubtree> = root.tagChildrenVector
+        .map(getDeepestSingleChildSubtree)
+        .groupBy(subtree => subtree.depth)
+        .reduce(([d1, s1], [d2, s2]) => d1 > d2 ? [d1, s1] : [d2, s2])
+        .map(([_, s]) => s)
+        .getOrThrow();
 
-    return oneOfDeepestChildren.createWithParent(root);
+    return randomSeqItem(deepestChildren).createWithParent(root);
 }
 
 class SingleChildSubtree {
@@ -79,19 +78,11 @@ class SingleChildSubtree {
         return new SingleChildSubtree(parent.copyWithSingleChild(this.root), this.depth + 1);
     }
 
-    unfold(): TagNode[] {
-        return R.unfold((n: TagNode | null) => {
-            if (!n) {
-                return false;
-            }
-            if (n.tagChildren.length === 0) {
-                return [n, null];
-            }
-            if (n.tagChildren.length === 1) {
-                return [n, n.tagChildren[0]]
-            }
-            throw Error('Not the single child: ' + n.tagChildren);
-        })(this.root);
+    unfold(): Vector<TagNode> {
+        return Vector.unfoldRight<TagNode | undefined, TagNode>(
+            this.root,
+            n => Option.of(n).map(n => [n, n.tagChildrenVector.single().getOrUndefined()])
+        );
     }
 }
 
@@ -100,13 +91,12 @@ function getSiblingsSubtree(root: TagNode): SiblingsSubtree | null {
         return null;
     }
 
-    const childrenSubtrees = R.pipe(
-        R.map(getSiblingsSubtree),
-        R.reject(R.isNil)
-    )(root.tagChildren) as SiblingsSubtree[];
+    const childrenSubtrees = root.tagChildrenVector
+        .map(getSiblingsSubtree)
+        .filter(s => s != null) as Vector<SiblingsSubtree>
 
-    if (childrenSubtrees.length) {
-        return randomItem(childrenSubtrees).createWithParent(root);
+    if (childrenSubtrees.length()) {
+        return randomSeqItem(childrenSubtrees).createWithParent(root);
     }
 
     if (root.tagChildren.length > 1) {
@@ -155,32 +145,28 @@ class SiblingsSubtree {
 }
 
 function genDeepChildRules(deepest: SingleChildSubtree, style: {[p: string]: string}): Rule[] {
-    const path: TagNode[] = R.reject(n => n.name === 'body', deepest.unfold());
+    const path: Vector<TagNode> = deepest.unfold().filter(n => n.name !== 'body');
 
-    if (path.length === 0) {
+    if (path.length() === 0) {
         return [];
     }
 
-    if (path.length === 1) {
-        return R.map(
-            (s: Selector) => new Rule(s, style),
-            genAllPossibleSelectors(path[0])
-        );
+    if (path.length() === 1) {
+        return path.take(1)
+            .flatMap(genAllPossibleSelectors)
+            .map(s => new Rule(s, style))
+            .toArray()
     }
 
-    return R.pipe(
-        R.chain(
-            ([ancestor, descendant]: [TagNode, TagNode]): [Selector, Selector][] =>
-                R.xprod(genAllPossibleSelectors(ancestor), genAllPossibleSelectors(descendant))
-        ),
-        R.chain(
-            ([ancestorSelector, descendantSelector]: [Selector, Selector]): Rule[] =>
-                [
-                    new Rule(new DescendantCombinator(ancestorSelector, descendantSelector), style, true),
-                    new Rule(new ChildCombinator(ancestorSelector, descendantSelector), style, true)
-                ]
+    return twoElementVariationsInOrder(path)
+        .flatMap(([ancestor, descendant]) =>
+            xprod(genAllPossibleSelectors(ancestor), genAllPossibleSelectors(descendant))
         )
-    )(twoElementVariationsInOrder(path));
+        .flatMap(([ancestorSelector, descendantSelector]) => Vector.of(
+            new Rule(new DescendantCombinator(ancestorSelector, descendantSelector), style, true),
+            new Rule(new ChildCombinator(ancestorSelector, descendantSelector), style, true)
+        ))
+        .toArray();
 }
 
 function *genSiblingsRules(siblingsSubtree: SiblingsSubtree, style: {[k: string]: string}): IterableIterator<Rule> {
@@ -193,52 +179,45 @@ function *genSiblingsRules(siblingsSubtree: SiblingsSubtree, style: {[k: string]
 
     if (allSameName(siblings)) {
         const innerSelectors = genAllPossiblePseudoClassSelectors(siblings[0].name);
-        yield *R.map((selector: Selector): Rule => new Rule(selector, style, true))(innerSelectors);
+        yield *innerSelectors.map(s => new Rule(s, style, true));
 
         if (path.length) {
-            yield *R.pipe(
-                R.chain((innerSelector: Selector): [TagNode, Selector][] =>
-                    R.xprod(path, [innerSelector])
-                ),
-                R.chain(([ancestor, innerSelector]: [TagNode, Selector]): [Selector, Selector][] =>
-                    R.xprod(genAllPossibleSelectors(ancestor), [innerSelector])
-                ),
-                R.map(([ancestorSelector, innerSelector]): Rule =>
-                    new Rule(new DescendantCombinator(ancestorSelector, innerSelector), style, true)
-                )
-            )(innerSelectors);
+            yield *Vector.ofIterable(path)
+                .flatMap(genAllPossibleSelectors)
+                .flatMap(ancestorSelector =>
+                    innerSelectors.map(innerSelector =>
+                        new Rule(new DescendantCombinator(ancestorSelector, innerSelector), style, true)
+                    )
+                );
         }
     }
 
     if (path.length) {
-        yield *R.map(
-            (selector: Selector) => new Rule(new ChildCombinator(selector, new TypeSelector('*')), style, true)
-        )(genAllPossibleSelectors(R.last(path)!));
+        yield *genAllPossibleSelectors(R.last(path)!)
+            .map(selector => new Rule(new ChildCombinator(selector, new TypeSelector('*')), style, true));
     }
 
-    yield *R.pipe(
-        R.chain((node: TagNode): string[] => node.classList),
-        R.uniq,
-        R.map(clazz => new Rule(new ClassSelector(clazz), style, true))
-    )(siblings);
+    yield *Vector.ofIterable(siblings)
+        .flatMap(n => Vector.ofIterable(n.classList))
+        .distinctBy(_ => _)
+        .map(clazz => new Rule(new ClassSelector(clazz), style, true))
 }
 
-function genAllPossibleSelectors(node: TagNode): Selector[] {
+function genAllPossibleSelectors(node: TagNode): Vector<Selector> {
     if (node.classList.length) {
-        return R.map(
-            c => new ClassSelector(c),
-            node.classList
-        );
+        return Vector.ofIterable(node.classList)
+            .map(c => new ClassSelector(c));
     }
-    return [new TypeSelector(node.name)];
+
+    return Vector.of(new TypeSelector(node.name));
 }
 
-function genAllPossiblePseudoClassSelectors(name: string): Selector[] {
+function genAllPossiblePseudoClassSelectors(name: string): Vector<Selector> {
     const baseSelector = new TypeSelector(name);
-    return [
+    return Vector.of(
         new PseudoClassSelector(baseSelector, 'first-child'),
         new PseudoClassSelector(baseSelector, 'last-child')
-    ]
+    );
 }
 
 function allSameName(nodes: TagNode[]) {

@@ -1,6 +1,7 @@
 import * as R from 'ramda';
 import { Region, RegionKind } from '../../shared/api';
 import { Indent } from './indent';
+import { Vector } from 'prelude-ts';
 
 export interface Node {
     readonly children: Node[];
@@ -27,6 +28,10 @@ export class TagNode implements Node {
             this._tagChildren = R.filter(c => c instanceof TagNode, this.children) as TagNode[];
         }
         return this._tagChildren;
+    }
+
+    get tagChildrenVector(): Vector<TagNode> {
+        return Vector.ofIterable(this.tagChildren);
     }
 
     copyWithSingleChild(child: Node): TagNode {
