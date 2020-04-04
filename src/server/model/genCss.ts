@@ -1,5 +1,5 @@
 import * as R from 'ramda';
-import { nRandom, randomSeqItem, shuffled, twoElementVariationsInOrder, xprod } from '../../shared/util';
+import { nRandom, randomSeqItem, range, twoElementVariationsInOrder, xprod } from '../../shared/util';
 import { TagNode } from './nodes';
 import {
     ChildCombinator,
@@ -26,7 +26,7 @@ export function genCssRulesChoices(body: TagNode): Rule[][] | null {
 
     const deepest: SingleChildSubtree = getDeepestSingleChildSubtree(body);
     const deepChildRules = genDeepChildRules(deepest, styles[0]);
-    if (deepChildRules.length < RULES_CHOICES) {
+    if (deepChildRules.length() < RULES_CHOICES) {
         return null;
     }
 
@@ -35,22 +35,21 @@ export function genCssRulesChoices(body: TagNode): Rule[][] | null {
         return null;
     }
 
-    const siblingsRules = [...genSiblingsRules(siblingsSubtree, styles[1])];
-    if (siblingsRules.length < RULES_CHOICES) {
+    const siblingsRules = Vector.ofIterable(genSiblingsRules(siblingsSubtree, styles[1]));
+    if (siblingsRules.length() < RULES_CHOICES) {
         return null;
     }
 
-    const shuffledDeepRules = shuffled(deepChildRules);
-    const shuffledSiblingRules = shuffled(siblingsRules);
+    const shuffledDeepRules = nRandom<Rule>(RULES_CHOICES)(deepChildRules.toArray());
+    const shuffledSiblingRules = nRandom<Rule>(RULES_CHOICES)(siblingsRules.toArray());
 
-    return R.pipe(
-        R.range(0),
-        R.map((i: number) => [constantRule, shuffledDeepRules[i], shuffledSiblingRules[i]]),
-    )(RULES_CHOICES);
+    return range(0, RULES_CHOICES)
+        .map((i: number) => [constantRule, shuffledDeepRules[i], shuffledSiblingRules[i]])
+        .toArray();
 }
 
 function getDeepestSingleChildSubtree(root: TagNode): SingleChildSubtree {
-    if (!root.tagChildren.length) {
+    if (root.tagChildrenVector.isEmpty()) {
         return new SingleChildSubtree(root);
     }
 
@@ -125,37 +124,31 @@ class SiblingsSubtree {
         return new SiblingsSubtree(parent.copyWithSingleChild(this.root), this.depth + 1);
     }
 
-    unfold(): {path: TagNode[], siblings: TagNode[]} {
-        const path = R.unfold((n: TagNode | null) => {
-            if (!n) {
-                return false;
-            }
-            if (n.tagChildren.length > 1) {
-                return [n, null];
-            }
-            return [n, n.tagChildren[0]];
-        })(this.root);
+    unfold(): {path: Vector<TagNode>, siblings: Vector<TagNode>} {
+        const path = Vector.unfoldRight<TagNode | undefined, TagNode>(
+            this.root,
+            n => Option.of(n).map(n => [n, n.tagChildrenVector.single().getOrUndefined()])
+        );
 
-        if (!path.length) {
-            return {path:[], siblings: []};
+        if (path.isEmpty()) {
+            return {path: Vector.empty(), siblings: Vector.empty()};
         }
 
-        return {path, siblings: R.last(path)!.tagChildren};
+        return {path, siblings: path.last().getOrThrow().tagChildrenVector};
     }
 }
 
-function genDeepChildRules(deepest: SingleChildSubtree, style: {[p: string]: string}): Rule[] {
+function genDeepChildRules(deepest: SingleChildSubtree, style: {[p: string]: string}): Vector<Rule> {
     const path: Vector<TagNode> = deepest.unfold().filter(n => n.name !== 'body');
 
     if (path.length() === 0) {
-        return [];
+        return Vector.empty();
     }
 
     if (path.length() === 1) {
         return path.take(1)
             .flatMap(genAllPossibleSelectors)
-            .map(s => new Rule(s, style))
-            .toArray()
+            .map(s => new Rule(s, style));
     }
 
     return twoElementVariationsInOrder(path)
@@ -165,39 +158,36 @@ function genDeepChildRules(deepest: SingleChildSubtree, style: {[p: string]: str
         .flatMap(([ancestorSelector, descendantSelector]) => Vector.of(
             new Rule(new DescendantCombinator(ancestorSelector, descendantSelector), style, true),
             new Rule(new ChildCombinator(ancestorSelector, descendantSelector), style, true)
-        ))
-        .toArray();
+        ));
 }
 
 function *genSiblingsRules(siblingsSubtree: SiblingsSubtree, style: {[k: string]: string}): IterableIterator<Rule> {
     const pathAndSiblings = siblingsSubtree.unfold();
-    const path = R.reject(n => n.name === 'body', pathAndSiblings.path);
+    const path = pathAndSiblings.path.filter(n => n.name !== 'body');
     const siblings = pathAndSiblings.siblings;
-    if (!path.length || !siblings.length) {
+    if (path.isEmpty() || siblings.isEmpty()) {
         return;
     }
 
-    if (allSameName(siblings)) {
-        const innerSelectors = genAllPossiblePseudoClassSelectors(siblings[0].name);
+    const sameName = allSameName(siblings).getOrUndefined();
+    if (sameName) {
+        const innerSelectors = genAllPossiblePseudoClassSelectors(sameName);
+
         yield *innerSelectors.map(s => new Rule(s, style, true));
 
-        if (path.length) {
-            yield *Vector.ofIterable(path)
-                .flatMap(genAllPossibleSelectors)
-                .flatMap(ancestorSelector =>
-                    innerSelectors.map(innerSelector =>
-                        new Rule(new DescendantCombinator(ancestorSelector, innerSelector), style, true)
-                    )
-                );
-        }
+        yield *path
+            .flatMap(genAllPossibleSelectors)
+            .flatMap(ancestorSelector =>
+                innerSelectors.map(innerSelector =>
+                    new Rule(new DescendantCombinator(ancestorSelector, innerSelector), style, true)
+                )
+            );
     }
 
-    if (path.length) {
-        yield *genAllPossibleSelectors(R.last(path)!)
-            .map(selector => new Rule(new ChildCombinator(selector, new TypeSelector('*')), style, true));
-    }
+    yield *genAllPossibleSelectors(path.last().getOrThrow())
+        .map(selector => new Rule(new ChildCombinator(selector, new TypeSelector('*')), style, true));
 
-    yield *Vector.ofIterable(siblings)
+    yield *siblings
         .flatMap(n => Vector.ofIterable(n.classList))
         .distinctBy(_ => _)
         .map(clazz => new Rule(new ClassSelector(clazz), style, true))
@@ -220,6 +210,9 @@ function genAllPossiblePseudoClassSelectors(name: string): Vector<Selector> {
     );
 }
 
-function allSameName(nodes: TagNode[]) {
-    return R.all(n => n.name === nodes[0].name, nodes);
+function allSameName(nodes: Vector<TagNode>): Option<string> {
+    const firstName = nodes.head().getOrThrow().name;
+    return nodes.allMatch(n => n.name === firstName)
+        ? Option.of(firstName)
+        : Option.none();
 }

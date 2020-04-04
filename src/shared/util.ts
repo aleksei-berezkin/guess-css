@@ -29,7 +29,7 @@ export function twoElementVariationsInOrder<T>(items: Vector<T>): Vector<[T, T]>
         .map(([i, j]) => [items.get(i).getOrThrow(), items.get(j).getOrThrow()]);
 }
 
-function range(from: number, bound: number): Vector<number> {
+export function range(from: number, bound: number): Vector<number> {
     return Vector.unfoldRight(
         from,
         i => Option.of(i).filter(i => i < bound).map(i => [i, i + 1])
