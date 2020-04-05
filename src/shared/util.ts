@@ -1,8 +1,7 @@
 import { take } from 'ramda';
-import { Seq } from 'prelude-ts/dist/src/Seq';
 import { Option, Vector } from 'prelude-ts';
 
-export function randomSeqItem<T>(items: Seq<T>): T {
+export function randomVectorItem<T>(items: Vector<T>): T {
     return items.get(randomBounded(items.length())).getOrThrow();
 }
 

@@ -1,5 +1,4 @@
-import * as R from 'ramda';
-import { nRandom, randomSeqItem, range, twoElementVariationsInOrder, xprod } from '../../shared/util';
+import { nRandom, randomVectorItem, range, twoElementVariationsInOrder, xprod } from '../../shared/util';
 import { TagNode } from './nodes';
 import {
     ChildCombinator,
@@ -16,16 +15,16 @@ const constantRule = new Rule(new TypeSelector('div'), {'padding': '6px', 'borde
 
 const RULES_CHOICES = 3;
 
-const colors = ['pink', 'lightgreen', 'lightblue', 'cyan', 'magenta', 'yellow', 'lightgrey'];
+const colors = Vector.of('pink', 'lightgreen', 'lightblue', 'cyan', 'magenta', 'yellow', 'lightgrey');
 
 export function genCssRulesChoices(body: TagNode): Rule[][] | null {
-    const styles: {[k: string]: string}[] = R.pipe(
-        nRandom<string>(2),
-        R.map((color: string) => ({'background-color': color})),
-    )(colors);
+    const [deepStyle, siblingsStyle] = colors
+        .shuffle()
+        .take(2)
+        .map(color => ({'background-color': color}));
 
     const deepest: SingleChildSubtree = getDeepestSingleChildSubtree(body);
-    const deepChildRules = genDeepChildRules(deepest, styles[0]);
+    const deepChildRules = genDeepChildRules(deepest, deepStyle);
     if (deepChildRules.length() < RULES_CHOICES) {
         return null;
     }
@@ -35,7 +34,7 @@ export function genCssRulesChoices(body: TagNode): Rule[][] | null {
         return null;
     }
 
-    const siblingsRules = Vector.ofIterable(genSiblingsRules(siblingsSubtree, styles[1]));
+    const siblingsRules = Vector.ofIterable(genSiblingsRules(siblingsSubtree, siblingsStyle));
     if (siblingsRules.length() < RULES_CHOICES) {
         return null;
     }
@@ -60,7 +59,7 @@ function getDeepestSingleChildSubtree(root: TagNode): SingleChildSubtree {
         .map(([_, s]) => s)
         .getOrThrow();
 
-    return randomSeqItem(deepestChildren).createWithParent(root);
+    return randomVectorItem(deepestChildren).createWithParent(root);
 }
 
 class SingleChildSubtree {
@@ -95,7 +94,7 @@ function getSiblingsSubtree(root: TagNode): SiblingsSubtree | null {
         .filter(s => s != null) as Vector<SiblingsSubtree>
 
     if (childrenSubtrees.length()) {
-        return randomSeqItem(childrenSubtrees).createWithParent(root);
+        return randomVectorItem(childrenSubtrees).createWithParent(root);
     }
 
     if (root.tagChildren.length > 1) {
