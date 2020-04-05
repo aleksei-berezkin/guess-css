@@ -3,6 +3,7 @@ import { genCssRulesChoices } from './genCss';
 import * as R from 'ramda';
 import { randomBounded, randomItem } from '../../shared/util';
 import { Puzzler } from './puzzler';
+import { Vector } from 'prelude-ts';
 
 export function genPuzzler(): Puzzler {
     const body = new TagNode(
@@ -62,9 +63,10 @@ class CssClasses {
 
         const p = Math.random();
         if (p < .05) {
-            const first = this.randomClass();
-            const second = randomItem(R.reject(R.equals(first), this.classes));
-            return [first, second];
+            return Vector.ofIterable(this.classes)
+                .shuffle()
+                .take(2)
+                .toArray();
         }
 
         if (p < .9) {

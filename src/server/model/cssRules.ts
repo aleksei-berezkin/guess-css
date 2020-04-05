@@ -1,6 +1,7 @@
 import * as R from 'ramda';
 import { Region, RegionKind } from '../../shared/api';
 import { Indent } from './indent';
+import { Vector } from 'prelude-ts';
 
 export class Rule {
     constructor(
@@ -14,10 +15,9 @@ export class Rule {
     }
 
     private declarationsToString(): string {
-        return R.pipe(
-            R.map(([name, value]): string => `${name}: ${value};`),
-            R.join(' '),
-        )(R.toPairs(this.declarations));
+        return Vector.ofIterable(R.toPairs(this.declarations))
+            .map(([name, value]) => `${name}: ${value};`)
+            .mkString(' ');
     }
 
     toRegions(indent: Indent): Region[][] {

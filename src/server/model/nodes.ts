@@ -85,10 +85,11 @@ export class TagNode implements Node {
     }
 
     private childrenToRegions(indent: Indent): Region[][] {
-        return R.pipe(
-            R.map((child: Node): Region[][] => child.toRegions(indent)),
-            R.unnest
-        )(this.children);
+        return Vector.ofIterable(this.children)
+            .map(node => node.toRegions(indent))
+            // Vector<Region[][]> => Vector<Region[]>
+            .flatMap(Vector.ofIterable)
+            .toArray();
     }
 
     toUnformattedCode(): string {
@@ -104,10 +105,9 @@ export class TagNode implements Node {
     }
 
     private childrenToUnformattedCode(): string {
-        return R.pipe(
-            R.map((child: Node) => child.toUnformattedCode()),
-            R.join(''),
-        )(this.children);
+        return Vector.ofIterable(this.children)
+            .map(node => node.toUnformattedCode())
+            .mkString('');
     }
 }
 

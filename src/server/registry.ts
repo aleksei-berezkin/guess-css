@@ -1,6 +1,6 @@
-import * as R from 'ramda';
 import { randomBounded } from '../shared/util';
 import { Puzzler } from './model/puzzler';
+import { Vector } from 'prelude-ts';
 
 export interface Registry {
     putPuzzler(puzzler: Puzzler): {id: string, token: string};
@@ -23,10 +23,10 @@ class RegistryImpl implements Registry {
         }
 
         const itemsToClear = keys.length - this.MAX_ITEMS;
-        R.pipe(
-            R.take(itemsToClear) as (keys: string[]) => string[],
-            R.forEach((key: string) => delete this.storage[key])
-        )(keys);
+        Vector.ofIterable(keys)
+            .take(itemsToClear)
+            .forEach(key => delete this.storage[key]);
+
         console.log(`Puzzler registry: cleared ${ itemsToClear } entries`);
     }
 
