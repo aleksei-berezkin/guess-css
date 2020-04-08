@@ -1,10 +1,9 @@
-import * as R from 'ramda';
 import { Region, RegionKind } from '../../shared/api';
 import { Indent } from './indent';
 import { Vector } from 'prelude-ts';
 
 export interface Node {
-    readonly children: Node[];
+    readonly children: Vector<Node>;
     copyWithSingleChild(child: Node): Node;
     toRegions(indent: Indent): Region[][];
     toUnformattedCode(): string;
@@ -13,34 +12,30 @@ export interface Node {
 export class TagNode implements Node {
     name: string;
     classes: Vector<string>;
-    children: Node[] = [];
+    children: Vector<Node>;
 
-    private _tagChildren: TagNode[] | null = null;
+    private _tagChildren: Vector<TagNode> | undefined;
 
-    constructor(name: string, classes: Vector<string>, children: Node[]) {
+    constructor(name: string, classes: Vector<string>, children: Vector<Node>) {
         this.name = name;
         this.classes = classes;
         this.children = children;
     }
 
-    get tagChildren(): TagNode[] {
+    get tagChildren(): Vector<TagNode> {
         if (!this._tagChildren) {
-            this._tagChildren = R.filter(c => c instanceof TagNode, this.children) as TagNode[];
+            this._tagChildren = this.children.filter(c => c instanceof TagNode) as Vector<TagNode>;
         }
         return this._tagChildren;
     }
 
-    get tagChildrenVector(): Vector<TagNode> {
-        return Vector.ofIterable(this.tagChildren);
-    }
-
     copyWithSingleChild(child: Node): TagNode {
-        return new TagNode(this.name, this.classes, [child]);
+        return new TagNode(this.name, this.classes, Vector.of(child));
     }
 
     toRegions(indent: Indent): Region[][] {
-        if (this.children.length === 1 && this.children[0] instanceof TextNode) {
-            const textNode = this.children[0] as TextNode;
+        if (this.children.single().filter(c => c instanceof TextNode).isSome()) {
+            const textNode = this.children.single().getOrThrow() as TextNode;
             return [
                 [indent, ...this.openTagToRegions(), textNode.toTextRegion(), this.closeTagToRegion()]
             ];
@@ -112,7 +107,7 @@ export class TagNode implements Node {
 }
 
 export class TextNode implements Node {
-    readonly children = [];
+    readonly children = Vector.empty<Node>();
 
     constructor(public text: string) {
     }

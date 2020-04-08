@@ -30,23 +30,23 @@ export class Puzzler {
 
     private choiceCode(diffHint: boolean): {(choice: number): Region[][]} {
         return (choice: number) =>
-            new TagNode('html', Vector.empty(), [
-                new TagNode('head', Vector.empty(), [
-                    new TagNode('style', Vector.empty(), [
+            new TagNode('html', Vector.empty(), Vector.of(
+                new TagNode('head', Vector.empty(), Vector.of(
+                    new TagNode('style', Vector.empty(), Vector.of(
                         new StylesNode(
                             this.rulesChoices[choice],
                             diffHint,
                         )
-                    ])
-                ]),
+                    ))
+                )),
                 this.body,
-            ]).toRegions(new Indent());
+            )).toRegions(new Indent());
     }
 }
 
 
 class StylesNode implements Node {
-    readonly children: Node[] = [];
+    readonly children: Vector<Node> = Vector.empty();
 
     constructor(private readonly rules: Rule[], private readonly isDiffHint: boolean) {
     }

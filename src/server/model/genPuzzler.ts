@@ -1,6 +1,6 @@
 import { Node, TagNode, TextNode } from './nodes';
 import { genCssRulesChoices } from './genCss';
-import { randomBounded, randomItem, randomVectorItem } from '../../shared/util';
+import { randomBounded, randomVectorItem } from '../../shared/util';
 import { Puzzler } from './puzzler';
 import { Vector } from 'prelude-ts';
 
@@ -8,7 +8,7 @@ export function genPuzzler(): Puzzler {
     const body = new TagNode(
         'body',
         Vector.empty(),
-        [...genSiblings('div', { classes: new CssClasses(), texts: new Texts(4) }, 1)]
+        Vector.ofIterable(genSiblings('div', { classes: new CssClasses(), texts: new Texts(4) }, 1))
     );
 
     const rulesChoices = genCssRulesChoices(body);
@@ -22,8 +22,8 @@ export function genPuzzler(): Puzzler {
 function *genSiblings(name: string, ctx: Context, level: number, i = 0): IterableIterator<Node> {
     if (Math.random() < siblingsProbabilities[level][i] && ctx.texts.hasNext()) {
         const children = Math.random() < childrenProbabilities[level]
-            ? [...genSiblings(name, ctx, level + 1)]
-            : [new TextNode(ctx.texts.next())];
+            ? Vector.ofIterable(genSiblings(name, ctx, level + 1))
+            : Vector.of(new TextNode(ctx.texts.next()));
 
         yield new TagNode(name, ctx.classes.genClasses(), children);
 
