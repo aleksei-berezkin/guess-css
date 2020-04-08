@@ -1,4 +1,4 @@
-import { nRandom, randomVectorItem, range, twoElementVariationsInOrder, xprod } from '../../shared/util';
+import { randomVectorItem, twoElementVariationsInOrder, xprod } from '../../shared/util';
 import { TagNode } from './nodes';
 import {
     ChildCombinator,
@@ -20,7 +20,7 @@ const RULES_CHOICES = 3;
 
 const colors = Vector.of('pink', 'lightgreen', 'lightblue', 'cyan', 'magenta', 'yellow', 'lightgrey');
 
-export function genCssRulesChoices(body: TagNode): Rule[][] | null {
+export function genCssRulesChoices(body: TagNode): Vector<Vector<Rule>> | null {
     const [deepStyle, siblingsStyle] = colors
         .shuffle()
         .take(2)
@@ -42,12 +42,9 @@ export function genCssRulesChoices(body: TagNode): Rule[][] | null {
         return null;
     }
 
-    const shuffledDeepRules = nRandom<Rule>(RULES_CHOICES)(deepChildRules.toArray());
-    const shuffledSiblingRules = nRandom<Rule>(RULES_CHOICES)(siblingsRules.toArray());
-
-    return range(0, RULES_CHOICES)
-        .map((i: number) => [constantRule, shuffledDeepRules[i], shuffledSiblingRules[i]])
-        .toArray();
+    return deepChildRules.shuffle().take(RULES_CHOICES)
+        .zip(siblingsRules.shuffle().take(RULES_CHOICES))
+        .map(([deepRule, siblingRule]) => Vector.of(constantRule, deepRule, siblingRule))
 }
 
 function getDeepestSingleChildSubtree(root: TagNode): SingleChildSubtree {

@@ -13,7 +13,7 @@ export function genPuzzler(): Puzzler {
 
     const rulesChoices = genCssRulesChoices(body);
     if (rulesChoices) {
-        return new Puzzler(body, rulesChoices, randomBounded(rulesChoices.length));
+        return new Puzzler(body, rulesChoices, randomBounded(rulesChoices.length()));
     }
 
     return genPuzzler();

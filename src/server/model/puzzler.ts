@@ -3,17 +3,16 @@ import { Rule } from './cssRules';
 import { ChoiceCode, Region, RegionKind } from '../../shared/api';
 import { Indent } from './indent';
 import { Vector } from 'prelude-ts';
-import { range } from '../../shared/util';
 
 export class Puzzler {
     constructor(
         private readonly body: TagNode,
-        private readonly rulesChoices: Rule[][],
+        private readonly rulesChoices: Vector<Vector<Rule>>,
         readonly correctChoice: number) {
     }
 
     get html(): string {
-        const styleText = Vector.ofIterable(this.rulesChoices[this.correctChoice])
+        const styleText = this.rulesChoices.get(this.correctChoice).getOrThrow()
             .map(r => r.toUnformattedCode())
             .mkString('');
 
@@ -22,17 +21,17 @@ export class Puzzler {
     }
 
     getChoiceCodes(diffHint: boolean): ChoiceCode[] {
-        return range(0, this.rulesChoices.length)
-            .map(choice => this.choiceCode(diffHint, choice).toArray())
+        return this.rulesChoices
+            .map(choice => this.choiceCode(choice, diffHint).toArray())
             .toArray();
     };
 
-    private choiceCode(diffHint: boolean, choice: number): Vector<Region[]> {
+    private choiceCode(choice: Vector<Rule>, diffHint: boolean): Vector<Region[]> {
         return new TagNode('html', Vector.empty(), Vector.of(
             new TagNode('head', Vector.empty(), Vector.of(
                 new TagNode('style', Vector.empty(), Vector.of(
                     new StylesNode(
-                        this.rulesChoices[choice],
+                        choice,
                         diffHint,
                     )
                 ))
@@ -45,7 +44,7 @@ export class Puzzler {
 class StylesNode implements Node {
     readonly children: Vector<Node> = Vector.empty();
 
-    constructor(private readonly rules: Rule[], private readonly isDiffHint: boolean) {
+    constructor(private readonly rules: Vector<Rule>, private readonly isDiffHint: boolean) {
     }
 
     copyWithSingleChild(child: Node): Node {
@@ -78,7 +77,7 @@ class StylesNode implements Node {
     }
 
     private doToRegions(indent: Indent): Vector<Region[]> {
-        return Vector.ofIterable(this.rules)
+        return this.rules
             .flatMap(rule => rule.toRegions(indent));
     }
 
