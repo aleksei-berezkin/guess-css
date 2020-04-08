@@ -30,9 +30,9 @@ export class Puzzler {
 
     private choiceCode(diffHint: boolean): {(choice: number): Region[][]} {
         return (choice: number) =>
-            new TagNode('html', [], [
-                new TagNode('head', [], [
-                    new TagNode('style', [], [
+            new TagNode('html', Vector.empty(), [
+                new TagNode('head', Vector.empty(), [
+                    new TagNode('style', Vector.empty(), [
                         new StylesNode(
                             this.rulesChoices[choice],
                             diffHint,

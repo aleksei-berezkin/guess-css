@@ -12,14 +12,14 @@ export interface Node {
 
 export class TagNode implements Node {
     name: string;
-    classList: string[] = [];
+    classes: Vector<string>;
     children: Node[] = [];
 
     private _tagChildren: TagNode[] | null = null;
 
-    constructor(name: string, classes: string[], children: Node[]) {
+    constructor(name: string, classes: Vector<string>, children: Node[]) {
         this.name = name;
-        this.classList = classes;
+        this.classes = classes;
         this.children = children;
     }
 
@@ -35,7 +35,7 @@ export class TagNode implements Node {
     }
 
     copyWithSingleChild(child: Node): TagNode {
-        return new TagNode(this.name, this.classList, [child]);
+        return new TagNode(this.name, this.classes, [child]);
     }
 
     toRegions(indent: Indent): Region[][] {
@@ -67,7 +67,7 @@ export class TagNode implements Node {
     }
 
     private classesToRegions(): Region[] {
-        if (!this.classList.length) {
+        if (this.classes.isEmpty()) {
             return [];
         }
 
@@ -75,7 +75,7 @@ export class TagNode implements Node {
             {kind: RegionKind.Default, text: ' '},
             {kind: RegionKind.AttrName, text: 'class'},
             {kind: RegionKind.Operator, text: '="'},
-            {kind: RegionKind.AttrValue, text: R.join(' ')(this.classList)},
+            {kind: RegionKind.AttrValue, text: this.classes.mkString(' ')},
             {kind: RegionKind.Operator, text: '"'},
         ];
     }
@@ -97,11 +97,11 @@ export class TagNode implements Node {
     }
 
     private classesAttrToString(): string {
-        if (!this.classList.length) {
+        if (this.classes.isEmpty()) {
             return '';
         }
 
-        return ` class="${R.join(' ')(this.classList)}"`;
+        return ` class="${this.classes.mkString(' ')}"`;
     }
 
     private childrenToUnformattedCode(): string {

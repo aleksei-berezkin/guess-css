@@ -187,14 +187,14 @@ function *genSiblingsRules(siblingsSubtree: SiblingsSubtree, style: {[k: string]
         .map(selector => new Rule(new ChildCombinator(selector, new TypeSelector('*')), style, true));
 
     yield *siblings
-        .flatMap(n => Vector.ofIterable(n.classList))
+        .flatMap(n => n.classes)
         .distinctBy(_ => _)
         .map(clazz => new Rule(new ClassSelector(clazz), style, true))
 }
 
 function genAllPossibleSelectors(node: TagNode): Vector<Selector> {
-    if (node.classList.length) {
-        return Vector.ofIterable(node.classList)
+    if (!node.classes.isEmpty()) {
+        return node.classes
             .map(c => new ClassSelector(c));
     }
 

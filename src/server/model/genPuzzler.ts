@@ -1,14 +1,13 @@
 import { Node, TagNode, TextNode } from './nodes';
 import { genCssRulesChoices } from './genCss';
-import * as R from 'ramda';
-import { randomBounded, randomItem } from '../../shared/util';
+import { randomBounded, randomItem, randomVectorItem } from '../../shared/util';
 import { Puzzler } from './puzzler';
 import { Vector } from 'prelude-ts';
 
 export function genPuzzler(): Puzzler {
     const body = new TagNode(
         'body',
-        [],
+        Vector.empty(),
         [...genSiblings('div', { classes: new CssClasses(), texts: new Texts(4) }, 1)]
     );
 
@@ -51,41 +50,44 @@ interface Context {
 }
 
 class CssClasses {
-    readonly classes: string[] = ['a', 'b', 'c'];
+    classes: Vector<string> = Vector.of('a', 'b', 'c');
 
     constructor() {
     }
 
-    genClasses(): string[] {
-        if (Math.random() < .8 / this.classes.length) {
+    genClasses(): Vector<string> {
+        if (Math.random() < .8 / this.classes.length()) {
             this.addOneClass();
         }
 
         const p = Math.random();
         if (p < .05) {
-            return Vector.ofIterable(this.classes)
+            return this.classes
                 .shuffle()
-                .take(2)
-                .toArray();
+                .take(2);
         }
 
         if (p < .9) {
-            return [this.randomClass()];
+            return Vector.of(this.randomClass());
         }
 
-        return [];
+        return Vector.empty();
     }
 
     private addOneClass() {
-        if (R.last(this.classes) === 'z') {
+        if (this.classes.last().contains('z')) {
             return;
         }
 
-        this.classes.push(String.fromCharCode(R.last(this.classes)!.charCodeAt(0) + 1));
+        this.classes = this.classes.append(
+            String.fromCharCode(
+                this.classes.last().map(c => c.charCodeAt(0) + 1).getOrThrow()
+            )
+        );
     }
 
     private randomClass(): string {
-        return randomItem(this.classes);
+        return randomVectorItem(this.classes);
     }
 }
 
