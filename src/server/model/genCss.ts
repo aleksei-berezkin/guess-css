@@ -11,7 +11,10 @@ import {
 } from './cssRules';
 import { Option, Vector } from 'prelude-ts';
 
-const constantRule = new Rule(new TypeSelector('div'), {'padding': '6px', 'border': '1px solid black'});
+const constantRule = new Rule(
+    new TypeSelector('div'),
+    Vector.of(['padding', '6px'], ['border', '1px solid black'])
+);
 
 const RULES_CHOICES = 3;
 
@@ -21,7 +24,7 @@ export function genCssRulesChoices(body: TagNode): Rule[][] | null {
     const [deepStyle, siblingsStyle] = colors
         .shuffle()
         .take(2)
-        .map(color => ({'background-color': color}));
+        .map(color => Vector.of<[string, string]>(['background-color', color]));
 
     const deepest: SingleChildSubtree = getDeepestSingleChildSubtree(body);
     const deepChildRules = genDeepChildRules(deepest, deepStyle);
@@ -137,7 +140,7 @@ class SiblingsSubtree {
     }
 }
 
-function genDeepChildRules(deepest: SingleChildSubtree, style: {[p: string]: string}): Vector<Rule> {
+function genDeepChildRules(deepest: SingleChildSubtree, style: Vector<[string, string]>): Vector<Rule> {
     const path: Vector<TagNode> = deepest.unfold().filter(n => n.name !== 'body');
 
     if (path.length() === 0) {
@@ -160,7 +163,7 @@ function genDeepChildRules(deepest: SingleChildSubtree, style: {[p: string]: str
         ));
 }
 
-function *genSiblingsRules(siblingsSubtree: SiblingsSubtree, style: {[k: string]: string}): IterableIterator<Rule> {
+function *genSiblingsRules(siblingsSubtree: SiblingsSubtree, style: Vector<[string, string]>): IterableIterator<Rule> {
     const pathAndSiblings = siblingsSubtree.unfold();
     const path = pathAndSiblings.path.filter(n => n.name !== 'body');
     const siblings = pathAndSiblings.siblings;

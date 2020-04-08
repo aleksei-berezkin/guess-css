@@ -1,4 +1,3 @@
-import * as R from 'ramda';
 import { Region, RegionKind } from '../../shared/api';
 import { Indent } from './indent';
 import { Vector } from 'prelude-ts';
@@ -6,7 +5,7 @@ import { Vector } from 'prelude-ts';
 export class Rule {
     constructor(
         private readonly selectorsGroup: Selector | Combinator,
-        private readonly declarations: { [k: string]: string },
+        private readonly declarations: Vector<[string, string]>,
         private readonly selectorsDiffering: boolean = false) {
     }
 
@@ -15,7 +14,7 @@ export class Rule {
     }
 
     private declarationsToString(): string {
-        return Vector.ofIterable(R.toPairs(this.declarations))
+        return this.declarations
             .map(([name, value]) => `${name}: ${value};`)
             .mkString(' ');
     }
@@ -26,19 +25,18 @@ export class Rule {
                 indent,
                 {kind: RegionKind.Selector, text: this.selectorsGroup.toString(), differing: this.selectorsDiffering},
                 {kind: RegionKind.Default, text: ' {'},
-            ],
-            ...this.declarationsToRegions(indent.indent()),
-            [
+            ])
+            .appendAll(this.declarationsToRegions(indent.indent()))
+            .append([
                 indent,
                 {kind: RegionKind.Default, text: '}'},
-            ]
-        );
+            ]);
     }
 
 
-    private declarationsToRegions(indent: Indent): Region[][] {
-        return R.map(
-        ([name, value]: [string, string]): Region[] =>
+    private declarationsToRegions(indent: Indent): Vector<Region[]> {
+        return this.declarations
+            .map(([name, value]): Region[] =>
                 [
                     indent,
                     {kind: RegionKind.DeclName, text: name},
@@ -51,7 +49,7 @@ export class Rule {
                     })(),
                     {kind: RegionKind.Default, text: ';'},
                 ]
-        )(R.toPairs(this.declarations));
+            );
     }
 }
 
@@ -96,23 +94,23 @@ export abstract class Combinator {
 
 
 export class DescendantCombinator extends Combinator {
-    private readonly selectors: Selector[];
+    private readonly selectors: Vector<Selector>;
     constructor(...selectors: Selector[]) {
         super();
-        this.selectors = selectors;
+        this.selectors = Vector.ofIterable(selectors);
     }
     toString(): string {
-        return R.join(' ', R.map(s => s.toString(), this.selectors));
+        return this.selectors.mkString(' ');
     }
 }
 
 export class ChildCombinator extends Combinator {
-    private readonly selectors: Selector[];
+    private readonly selectors: Vector<Selector>;
     constructor(...selectors: Selector[]) {
         super();
-        this.selectors = selectors;
+        this.selectors = Vector.ofIterable(selectors);
     }
     toString(): string {
-        return R.join('>', R.map(s => s.toString(), this.selectors));
+        return this.selectors.mkString('>');
     }
 }
