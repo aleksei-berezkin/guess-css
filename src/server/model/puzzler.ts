@@ -1,6 +1,5 @@
 import { Node, TagNode } from './nodes';
 import { Rule } from './cssRules';
-import * as R from 'ramda';
 import { ChoiceCode, Region, RegionKind } from '../../shared/api';
 import { Indent } from './indent';
 import { Vector } from 'prelude-ts';
@@ -19,31 +18,29 @@ export class Puzzler {
             .mkString('');
 
         // noinspection HtmlRequiredLangAttribute,HtmlRequiredTitleElement
-        return `<html><head><style>${styleText}</style></head>${this.body.toUnformattedCode()}</html>`;
+        return `<html><head><style>${ styleText }</style></head>${ this.body.toUnformattedCode() }</html>`;
     }
 
     getChoiceCodes(diffHint: boolean): ChoiceCode[] {
         return range(0, this.rulesChoices.length)
-            .map(this.choiceCode(diffHint))
+            .map(choice => this.choiceCode(diffHint, choice).toArray())
             .toArray();
     };
 
-    private choiceCode(diffHint: boolean): {(choice: number): Region[][]} {
-        return (choice: number) =>
-            new TagNode('html', Vector.empty(), Vector.of(
-                new TagNode('head', Vector.empty(), Vector.of(
-                    new TagNode('style', Vector.empty(), Vector.of(
-                        new StylesNode(
-                            this.rulesChoices[choice],
-                            diffHint,
-                        )
-                    ))
-                )),
-                this.body,
-            )).toRegions(new Indent());
+    private choiceCode(diffHint: boolean, choice: number): Vector<Region[]> {
+        return new TagNode('html', Vector.empty(), Vector.of(
+            new TagNode('head', Vector.empty(), Vector.of(
+                new TagNode('style', Vector.empty(), Vector.of(
+                    new StylesNode(
+                        this.rulesChoices[choice],
+                        diffHint,
+                    )
+                ))
+            )),
+            this.body,
+        )).toRegions(new Indent());
     }
 }
-
 
 class StylesNode implements Node {
     readonly children: Vector<Node> = Vector.empty();
@@ -55,9 +52,9 @@ class StylesNode implements Node {
         throw new Error('Unsupported');
     }
 
-    toRegions(indent: Indent): Region[][] {
+    toRegions(indent: Indent): Vector<Region[]> {
         if (this.isDiffHint) {
-            return [
+            return Vector.of<Region[]>(
                 [
                     indent,
                     {
@@ -73,19 +70,16 @@ class StylesNode implements Node {
                         kind: RegionKind.Comment,
                         text: ' differs */',
                     },
-                ],
-                ...this.doToRegions(indent),
-            ];
+                ]
+            ).appendAll(this.doToRegions(indent));
         }
 
         return this.doToRegions(indent);
     }
 
-    private doToRegions(indent: Indent): Region[][] {
-        return R.pipe(
-            R.map((rule: Rule) => rule.toRegions(indent)),
-            R.unnest,
-        )(this.rules);
+    private doToRegions(indent: Indent): Vector<Region[]> {
+        return Vector.ofIterable(this.rules)
+            .flatMap(rule => rule.toRegions(indent));
     }
 
     toUnformattedCode(): string {

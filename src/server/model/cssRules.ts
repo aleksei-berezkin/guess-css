@@ -20,8 +20,8 @@ export class Rule {
             .mkString(' ');
     }
 
-    toRegions(indent: Indent): Region[][] {
-        return [
+    toRegions(indent: Indent): Vector<Region[]> {
+        return Vector.of<Region[]>(
             [
                 indent,
                 {kind: RegionKind.Selector, text: this.selectorsGroup.toString(), differing: this.selectorsDiffering},
@@ -32,7 +32,7 @@ export class Rule {
                 indent,
                 {kind: RegionKind.Default, text: '}'},
             ]
-        ];
+        );
     }
 
 
