@@ -3,6 +3,8 @@ import { Rule } from './cssRules';
 import * as R from 'ramda';
 import { ChoiceCode, Region, RegionKind } from '../../shared/api';
 import { Indent } from './indent';
+import { Vector } from 'prelude-ts';
+import { range } from '../../shared/util';
 
 export class Puzzler {
     constructor(
@@ -12,20 +14,18 @@ export class Puzzler {
     }
 
     get html(): string {
-        const styleText: string = R.pipe(
-            R.map((r: Rule) => r.toUnformattedCode()),
-            R.join(''),
-        )(this.rulesChoices[this.correctChoice]);
+        const styleText = Vector.ofIterable(this.rulesChoices[this.correctChoice])
+            .map(r => r.toUnformattedCode())
+            .mkString('');
 
         // noinspection HtmlRequiredLangAttribute,HtmlRequiredTitleElement
         return `<html><head><style>${styleText}</style></head>${this.body.toUnformattedCode()}</html>`;
     }
 
     getChoiceCodes(diffHint: boolean): ChoiceCode[] {
-        return R.pipe(
-            R.range(0),
-            R.map(this.choiceCode(diffHint))
-        )(this.rulesChoices.length);
+        return range(0, this.rulesChoices.length)
+            .map(this.choiceCode(diffHint))
+            .toArray();
     };
 
     private choiceCode(diffHint: boolean): {(choice: number): Region[][]} {
