@@ -1,14 +1,14 @@
 import { ChoiceCode } from '../../shared/api';
-import { Action, DisplayAnswer, DisplayPuzzler, Type } from './actions';
-import { applyMiddleware, combineReducers, createStore } from 'redux';
+import { DisplayAnswer, DisplayPuzzler, Type } from './actions';
+import { Action, applyMiddleware, combineReducers, createStore } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import { rootSaga } from './saga';
-import * as R from 'ramda';
+import { Vector } from 'prelude-ts';
 
 
 export interface State {
     // head is the most recent, tail is history
-    puzzlers: PuzzlerFull[],
+    puzzlers: Vector<PuzzlerFull>,
     current: number,
     correctAnswers: number,
 }
@@ -17,7 +17,7 @@ export interface PuzzlerFull {
     id: string,
     token: string,
     choiceCodes: ChoiceCode[],
-    answer: Answer | null,
+    answer: Answer | undefined,
 }
 
 export interface Answer {
@@ -26,38 +26,38 @@ export interface Answer {
 }
 
 export const initialState: State = {
-    puzzlers: [],
+    puzzlers: Vector.empty(),
     current: -1,
     correctAnswers: 0,
 };
 
 const rootReducer = combineReducers({
-    puzzlers: function(puzzlers: PuzzlerFull[] = initialState.puzzlers, action: Action): PuzzlerFull[] {
+    puzzlers: function(puzzlers: Vector<PuzzlerFull> = initialState.puzzlers, action: Action): Vector<PuzzlerFull> {
         if (action.type === Type.DISPLAY_PUZZLER) {
             const {puzzlerId, token, choiceCodes} = action as DisplayPuzzler;
-            return [
+            return Vector.of<PuzzlerFull>(
                 {
                     id: puzzlerId,
                     token,
                     choiceCodes,
-                    answer: null,
-                },
-                ...puzzlers,
-            ]
+                    answer: undefined,
+                }
+            ).appendAll(puzzlers);
         }
 
         if (action.type === Type.DISPLAY_ANSWER) {
             const {puzzlerId, userChoice, correctChoice} = action as DisplayAnswer;
-            const i = R.findIndex(p => p.id === puzzlerId, puzzlers);
-            return insert(puzzlers, i,
-                {
-                    ...puzzlers[i],
-                    answer: {
-                        userChoice,
-                        correctChoice,
-                    }
+            const [puzzler, i] = puzzlers.zipWithIndex()
+                .find(([p, _]) => p.id === puzzlerId)
+                .getOrThrow();
+            const updatedPuzzler = {
+                ...puzzler,
+                answer: {
+                    userChoice,
+                    correctChoice,
                 }
-            );
+            };
+            return puzzlers.replace(i, updatedPuzzler);
         }
 
         return puzzlers;
@@ -96,12 +96,6 @@ const rootReducer = combineReducers({
         return correctAnswers;
     }
 });
-
-function insert<T>(a: T[], i: number, val: T): T[] {
-    const b = [...a];
-    b[i] = val;
-    return b;
-}
 
 export function createAppStore(state: State) {
     const sagaMiddleware = createSagaMiddleware();

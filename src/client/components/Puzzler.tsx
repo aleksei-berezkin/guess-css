@@ -1,13 +1,13 @@
 import React, { ReactElement, useEffect } from 'react';
-import { Region } from '../../shared/api';
+import { ChoiceCode, Region } from '../../shared/api';
 import { getPuzzlerUrl } from '../clientApi';
 import * as R from 'ramda';
 import { useDispatch, useSelector } from 'react-redux';
-import { State } from '../redux/store';
+import { Answer, State } from '../redux/store';
 import { CheckChoice, LoadNextPuzzler, NavNextPuzzler, NavPrevPuzzler, Type } from '../redux/actions';
 
 export function Puzzler(): ReactElement {
-    const initialized = useSelector((state: State) => state.puzzlers.length > 0);
+    const initialized = useSelector((state: State) => !state.puzzlers.isEmpty());
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -42,7 +42,7 @@ function Score() {
 
 function DonePuzzler() {
     const isHistory = useSelector((st: State) => st.current > 0);
-    const historyPuzzlerPos = useSelector((st: State) => st.puzzlers.length - st.current);
+    const historyPuzzlerPos = useSelector((st: State) => st.puzzlers.length() - st.current);
     const donePuzzlersNum = useSelector(getDonePuzzlersNum);
 
     return <>{
@@ -52,18 +52,21 @@ function DonePuzzler() {
 }
 
 function getDonePuzzlersNum(st: State) {
-    if (!st.puzzlers.length) {
+    if (st.puzzlers.isEmpty()) {
         return 0;
     }
-    if (st.puzzlers[0]?.answer) {
-        return st.puzzlers.length;
+    if (st.puzzlers.head().filter(p => p.answer != null).isSome()) {
+        return st.puzzlers.length();
     }
-    return st.puzzlers.length - 1;
+    return st.puzzlers.length() - 1;
 }
 
 function LayoutFrame() {
-    const id = useSelector((st: State) => st.puzzlers[st.current]?.id);
-    const token = useSelector((st: State) => st.puzzlers[st.current]?.token);
+    const [id, token] = useSelector((st: State) =>
+        st.puzzlers.get(st.current)
+            .map<[string?, string?]>(p => [p.id, p.token])
+            .getOrElse([undefined, undefined])
+    );
 
     return <div className='puzzler-top'>
         <PrevButton/>
@@ -76,7 +79,7 @@ function LayoutFrame() {
 }
 
 function PrevButton() {
-    const hasPrev = useSelector((st: State) => st.current < st.puzzlers.length - 1);
+    const hasPrev = useSelector((st: State) => st.current < st.puzzlers.length() - 1);
     const dispatch = useDispatch();
 
     function handlePrev() {
@@ -94,7 +97,7 @@ function PrevButton() {
 
 function NextButton() {
     const hasNext = useSelector((st: State) => st.current > 0);
-    const answer = useSelector((st: State) => st.puzzlers[st.current]?.answer);
+    const answer = useSelector((st: State) => st.puzzlers.get(st.current).map(p => p.answer).getOrElse(undefined));
     const dispatch = useDispatch();
 
     function handleNext() {
@@ -119,8 +122,12 @@ function NextButton() {
 }
 
 function Choices(): ReactElement {
-    const id = useSelector((st: State) => st.puzzlers[st.current]?.id);
-    const choicesCount = useSelector((st: State) => st.puzzlers[st.current]?.choiceCodes.length);
+    const [id, choicesCount] = useSelector((st: State) =>
+        st.puzzlers.get(st.current)
+            .map<[string?, number?]>(p => [p.id, p.choiceCodes.length])
+            .getOrElse([undefined, undefined])
+    );
+
     return <div className='choices'>{
         id && choicesCount &&
         R.range(0, choicesCount)
@@ -134,11 +141,11 @@ function Choices(): ReactElement {
 }
 
 function Choice(p: {choice: number}): ReactElement {
-    const puzzlerId = useSelector((st: State) => st.puzzlers[st.current]?.id);
-    const token = useSelector((st: State) => st.puzzlers[st.current]?.token);
-
-    const choiceCode = useSelector((st: State) => st.puzzlers[st.current]?.choiceCodes[p.choice]);
-    const answer = useSelector((st: State) => st.puzzlers[st.current]?.answer);
+    const [puzzlerId, token, choiceCode, answer] = useSelector((st: State) =>
+        st.puzzlers.get(st.current)
+            .map<[string?, string?, ChoiceCode?, Answer?]>(puz => [puz.id, puz.token, puz.choiceCodes[p.choice], puz.answer])
+            .getOrElse([undefined, undefined, undefined, undefined])
+    );
 
     const highlight = (() => {
         if (answer?.correctChoice === p.choice) {
@@ -162,8 +169,8 @@ function Choice(p: {choice: number}): ReactElement {
         if (!answer) {
             const checkChoice: CheckChoice = {
                 type: Type.CHECK_CHOICE,
-                puzzlerId,
-                token,
+                puzzlerId: puzzlerId!,
+                token: token!,
                 choice: p.choice,
             };
             dispatch(checkChoice);

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { Puzzler } from './model/puzzler';
 import { genPuzzler } from './model/genPuzzler';
 import { theRegistry } from './registry';
-import { createAppStoreWithMiddleware } from '../client/redux/store';
+import { createAppStoreWithMiddleware, State } from '../client/redux/store';
 import { renderToString } from 'react-dom/server';
 import { Provider } from 'react-redux';
 import { Puzzler as PuzzlerComponent } from '../client/components/Puzzler';
@@ -11,6 +11,7 @@ import { readFile } from 'fs';
 import path from 'path';
 // @ts-ignore
 import { ROOT_EL_ID, ROOT_EL_TEXT, PRELOADED_STATE_ID } from '../shared/appWideConst';
+import { Vector } from 'prelude-ts';
 
 const indexHtmlParts = new Promise<[string, string]>((resolve, reject) => {
     readFile(path.resolve(__dirname, '..', '..', 'dist', 'index.html'), (err, data) => {
@@ -37,15 +38,15 @@ export function sendRenderedApp(req: Request, res: Response) {
     const puzzler: Puzzler = genPuzzler();
     const {id, token} = theRegistry.putPuzzler(puzzler);
 
-    const state = {
-        puzzlers: [
+    const state: State = {
+        puzzlers: Vector.of(
             {
                 id,
                 token,
                 choiceCodes: puzzler.getChoiceCodes(true),
-                answer: null,
+                answer: undefined,
             },
-        ],
+        ),
         current: 0,
         correctAnswers: 0,
     };
