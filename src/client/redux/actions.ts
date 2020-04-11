@@ -10,36 +10,31 @@ export enum Type {
     NAV_PREV_PUZZLER = 'NAV_PREV_PUZZLER',
 }
 
-export interface LoadNextPuzzler extends Action {
+export interface LoadNextPuzzler extends Action<Type.LOAD_NEXT_PUZZLER> {
     type: Type.LOAD_NEXT_PUZZLER,
     diffHint: boolean,
 }
 
-export interface DisplayPuzzler extends Action {
-    type: Type.DISPLAY_PUZZLER,
+export interface DisplayPuzzler extends Action<Type.DISPLAY_PUZZLER> {
     puzzlerId: string,
     token: string,
     choiceCodes: ChoiceCode[],
 }
 
-export interface CheckChoice extends Action {
-    type: Type.CHECK_CHOICE,
+export interface CheckChoice extends Action<Type.CHECK_CHOICE> {
     puzzlerId: string,
     token: string,
     choice: number,
 }
 
-export interface DisplayAnswer extends Action {
-    type: Type.DISPLAY_ANSWER,
+export interface DisplayAnswer extends Action<Type.DISPLAY_ANSWER> {
     puzzlerId: string,
     userChoice: number,
     correctChoice: number,
 }
 
-export interface NavNextPuzzler extends Action {
-    type: Type.NAV_NEXT_PUZZLER,
+export interface NavNextPuzzler extends Action<Type.NAV_NEXT_PUZZLER> {
 }
 
-export interface NavPrevPuzzler extends Action {
-    type: Type.NAV_PREV_PUZZLER,
+export interface NavPrevPuzzler extends Action<Type.NAV_PREV_PUZZLER> {
 }

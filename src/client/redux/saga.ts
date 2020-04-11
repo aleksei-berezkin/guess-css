@@ -19,24 +19,22 @@ function *loadNextPuzzler(loadNextPuzzler: LoadNextPuzzler) {
     const genPuzzlerResponse: GenPuzzlerResponse = yield apply(r1, r1.json, []);
     const {id, token, choiceCodes} = genPuzzlerResponse;
 
-    const displayPuzzler: DisplayPuzzler = {
+    yield put<DisplayPuzzler>({
         type: Type.DISPLAY_PUZZLER,
         puzzlerId: id,
         token,
         choiceCodes,
-    }
-    yield put(displayPuzzler);
+    });
 }
 
 function *checkChoice(checkChoice: CheckChoice) {
     const r: Response = yield call(fetchCorrectChoice, checkChoice.puzzlerId, checkChoice.token);
     const correctChoice: CorrectChoiceResponse = yield apply(r, r.json, []);
 
-    const displayAnswer: DisplayAnswer = {
+    yield put<DisplayAnswer>({
         type: Type.DISPLAY_ANSWER,
         puzzlerId: checkChoice.puzzlerId,
         userChoice: checkChoice.choice,
         correctChoice,
-    }
-    yield put(displayAnswer);
+    });
 }

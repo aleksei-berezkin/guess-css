@@ -5,18 +5,18 @@ import * as R from 'ramda';
 import { useDispatch, useSelector } from 'react-redux';
 import { Answer, State } from '../redux/store';
 import { CheckChoice, LoadNextPuzzler, NavNextPuzzler, NavPrevPuzzler, Type } from '../redux/actions';
+import { Dispatch } from 'redux';
 
 export function Puzzler(): ReactElement {
     const initialized = useSelector((state: State) => !state.puzzlers.isEmpty());
-    const dispatch = useDispatch();
+    const dispatch: Dispatch<LoadNextPuzzler> = useDispatch();
 
     useEffect(() => {
         if (!initialized) {
-            const loadAction: LoadNextPuzzler = {
+            dispatch({
                 type: Type.LOAD_NEXT_PUZZLER,
                 diffHint: true,
-            };
-            dispatch(loadAction);
+            });
         }
     }, [initialized]);
 
@@ -80,14 +80,11 @@ function LayoutFrame() {
 
 function PrevButton() {
     const hasPrev = useSelector((st: State) => st.current < st.puzzlers.length() - 1);
-    const dispatch = useDispatch();
+    const dispatch: Dispatch<NavPrevPuzzler> = useDispatch();
 
     function handlePrev() {
         if (hasPrev) {
-            const navPrev: NavPrevPuzzler = {
-                type: Type.NAV_PREV_PUZZLER,
-            };
-            dispatch(navPrev);
+            dispatch({type: Type.NAV_PREV_PUZZLER});
         }
     }
 
@@ -98,20 +95,16 @@ function PrevButton() {
 function NextButton() {
     const hasNext = useSelector((st: State) => st.current > 0);
     const answer = useSelector((st: State) => st.puzzlers.get(st.current).map(p => p.answer).getOrElse(undefined));
-    const dispatch = useDispatch();
+    const dispatch: Dispatch<NavNextPuzzler | LoadNextPuzzler> = useDispatch();
 
     function handleNext() {
         if (hasNext) {
-            const navNext: NavNextPuzzler = {
-                type: Type.NAV_NEXT_PUZZLER,
-            };
-            dispatch(navNext);
+            dispatch({type: Type.NAV_NEXT_PUZZLER});
         } else if (answer) {
-            const loadNext: LoadNextPuzzler = {
+            dispatch({
                 type: Type.LOAD_NEXT_PUZZLER,
                 diffHint: false,
-            };
-            dispatch(loadNext);
+            });
         } else {
             throw new Error('Cannot dispatch');
         }
@@ -163,17 +156,16 @@ function Choice(p: {choice: number}): ReactElement {
         return '';
     })();
 
-    const dispatch = useDispatch();
+    const dispatch: Dispatch<CheckChoice> = useDispatch();
 
     function handleClick() {
         if (!answer) {
-            const checkChoice: CheckChoice = {
+            dispatch({
                 type: Type.CHECK_CHOICE,
                 puzzlerId: puzzlerId!,
                 token: token!,
                 choice: p.choice,
-            };
-            dispatch(checkChoice);
+            });
         }
     }
 
