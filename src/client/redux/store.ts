@@ -1,5 +1,5 @@
 import { ChoiceCode } from '../../shared/api';
-import { DisplayAnswer, DisplayPuzzler, Type } from './actions';
+import { DisplayAnswer, DisplayPuzzler, typedOrUndefined, Type } from './actions';
 import { Action, applyMiddleware, combineReducers, createStore } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import { rootSaga } from './saga';
@@ -33,28 +33,28 @@ export const initialState: State = {
 
 const rootReducer = combineReducers({
     puzzlers: function(puzzlers: Vector<PuzzlerFull> = initialState.puzzlers, action: Action): Vector<PuzzlerFull> {
-        if (action.type === Type.DISPLAY_PUZZLER) {
-            const {puzzlerId, token, choiceCodes} = action as DisplayPuzzler;
+        const displayPuzzler = typedOrUndefined<DisplayPuzzler>(Type.DISPLAY_PUZZLER, action);
+        if (displayPuzzler) {
             return Vector.of<PuzzlerFull>(
                 {
-                    id: puzzlerId,
-                    token,
-                    choiceCodes,
+                    id: displayPuzzler.puzzlerId,
+                    token: displayPuzzler.token,
+                    choiceCodes: displayPuzzler.choiceCodes,
                     answer: undefined,
                 }
             ).appendAll(puzzlers);
         }
 
-        if (action.type === Type.DISPLAY_ANSWER) {
-            const {puzzlerId, userChoice, correctChoice} = action as DisplayAnswer;
+        const displayAnswer = typedOrUndefined<DisplayAnswer>(Type.DISPLAY_ANSWER, action);
+        if (displayAnswer) {
             const [puzzler, i] = puzzlers.zipWithIndex()
-                .find(([p, _]) => p.id === puzzlerId)
+                .find(([p, _]) => p.id === displayAnswer.puzzlerId)
                 .getOrThrow();
             const updatedPuzzler = {
                 ...puzzler,
                 answer: {
-                    userChoice,
-                    correctChoice,
+                    userChoice: displayAnswer.userChoice,
+                    correctChoice: displayAnswer.correctChoice,
                 }
             };
             return puzzlers.replace(i, updatedPuzzler);
@@ -86,11 +86,9 @@ const rootReducer = combineReducers({
     },
 
     correctAnswers: function(correctAnswers: number = initialState.correctAnswers, action: Action): number {
-        if (action.type === Type.DISPLAY_ANSWER) {
-            const {userChoice, correctChoice} = action as DisplayAnswer;
-            if (userChoice === correctChoice) {
-                return correctAnswers + 1;
-            }
+        const displayAnswer = typedOrUndefined<DisplayAnswer>(Type.DISPLAY_ANSWER, action);
+        if (displayAnswer && displayAnswer.userChoice === displayAnswer.correctChoice) {
+            return correctAnswers + 1;
         }
 
         return correctAnswers;
