@@ -10,10 +10,10 @@ export enum Type {
     NAV_PREV_PUZZLER = 'NAV_PREV_PUZZLER',
 }
 
-type InferType<A> = A extends Action<infer T> ? (T extends Type ? T : never) : never;
+type TypeOfAction<A> = A extends Action<infer T> ? (T extends Type ? T : never) : never;
 
-export function typedOrUndefined<A extends Action>(type: InferType<A>, action: Action): A | undefined {
-    return action.type === type ? action as A : undefined;
+export function isOfType<A extends Action>(type: TypeOfAction<A>, action: Action): action is A {
+    return action.type === type;
 }
 
 export interface LoadNextPuzzler extends Action<Type.LOAD_NEXT_PUZZLER> {

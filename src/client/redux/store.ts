@@ -1,5 +1,5 @@
 import { ChoiceCode } from '../../shared/api';
-import { DisplayAnswer, DisplayPuzzler, typedOrUndefined, Type } from './actions';
+import { DisplayAnswer, DisplayPuzzler, isOfType, NavNextPuzzler, NavPrevPuzzler, Type } from './actions';
 import { Action, applyMiddleware, combineReducers, createStore } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import { rootSaga } from './saga';
@@ -33,28 +33,26 @@ export const initialState: State = {
 
 const rootReducer = combineReducers({
     puzzlers: function(puzzlers: Vector<PuzzlerFull> = initialState.puzzlers, action: Action): Vector<PuzzlerFull> {
-        const displayPuzzler = typedOrUndefined<DisplayPuzzler>(Type.DISPLAY_PUZZLER, action);
-        if (displayPuzzler) {
+        if (isOfType<DisplayPuzzler>(Type.DISPLAY_PUZZLER, action)) {
             return Vector.of<PuzzlerFull>(
                 {
-                    id: displayPuzzler.puzzlerId,
-                    token: displayPuzzler.token,
-                    choiceCodes: displayPuzzler.choiceCodes,
+                    id: action.puzzlerId,
+                    token: action.token,
+                    choiceCodes: action.choiceCodes,
                     answer: undefined,
                 }
             ).appendAll(puzzlers);
         }
 
-        const displayAnswer = typedOrUndefined<DisplayAnswer>(Type.DISPLAY_ANSWER, action);
-        if (displayAnswer) {
+        if (isOfType<DisplayAnswer>(Type.DISPLAY_ANSWER, action)) {
             const [puzzler, i] = puzzlers.zipWithIndex()
-                .find(([p, _]) => p.id === displayAnswer.puzzlerId)
+                .find(([p, _]) => p.id === action.puzzlerId)
                 .getOrThrow();
             const updatedPuzzler = {
                 ...puzzler,
                 answer: {
-                    userChoice: displayAnswer.userChoice,
-                    correctChoice: displayAnswer.correctChoice,
+                    userChoice: action.userChoice,
+                    correctChoice: action.correctChoice,
                 }
             };
             return puzzlers.replace(i, updatedPuzzler);
@@ -64,21 +62,21 @@ const rootReducer = combineReducers({
     },
 
     current: function(current: number = initialState.current, action: Action): number {
-        if (action.type === Type.DISPLAY_PUZZLER) {
+        if (isOfType<DisplayPuzzler>(Type.DISPLAY_PUZZLER, action)) {
             if (current === -1 || current === 0) {
                 return 0;
             }
             throw new Error('Current=' + current);
         }
 
-        if (action.type === Type.NAV_NEXT_PUZZLER) {
+        if (isOfType<NavNextPuzzler>(Type.NAV_NEXT_PUZZLER, action)) {
             if (current > 0) {
                 return current - 1;
             }
             throw new Error('Current=' + current);
         }
 
-        if (action.type === Type.NAV_PREV_PUZZLER) {
+        if (isOfType<NavPrevPuzzler>(Type.NAV_PREV_PUZZLER, action)) {
             return current + 1;
         }
 
@@ -86,8 +84,7 @@ const rootReducer = combineReducers({
     },
 
     correctAnswers: function(correctAnswers: number = initialState.correctAnswers, action: Action): number {
-        const displayAnswer = typedOrUndefined<DisplayAnswer>(Type.DISPLAY_ANSWER, action);
-        if (displayAnswer && displayAnswer.userChoice === displayAnswer.correctChoice) {
+        if (isOfType<DisplayAnswer>(Type.DISPLAY_ANSWER, action) && action.userChoice === action.correctChoice) {
             return correctAnswers + 1;
         }
 
