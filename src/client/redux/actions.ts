@@ -1,9 +1,10 @@
-import { ChoiceCode } from '../../shared/api';
+import { Region } from '../model/region';
 import { Action } from 'redux';
+import { Vector } from 'prelude-ts';
 
 export enum Type {
-    LOAD_NEXT_PUZZLER = 'LOAD_NEXT_PUZZLER',
-    DISPLAY_PUZZLER = 'DISPLAY_PUZZLER',
+    GEN_NEW_PUZZLER = 'GEN_NEW_PUZZLER',
+    DISPLAY_NEW_PUZZLER = 'DISPLAY_NEW_PUZZLER',
     CHECK_CHOICE = 'CHECK_CHOICE',
     DISPLAY_ANSWER = 'DISPLAY_ANSWER',
     NAV_NEXT_PUZZLER = 'NAV_NEXT_PUZZLER',
@@ -16,27 +17,24 @@ export function isOfType<A extends Action>(type: TypeOfAction<A>, action: Action
     return action.type === type;
 }
 
-export interface LoadNextPuzzler extends Action<Type.LOAD_NEXT_PUZZLER> {
-    type: Type.LOAD_NEXT_PUZZLER,
+export interface GenNewPuzzler extends Action<Type.GEN_NEW_PUZZLER> {
+    type: Type.GEN_NEW_PUZZLER,
     diffHint: boolean,
 }
 
-export interface DisplayPuzzler extends Action<Type.DISPLAY_PUZZLER> {
-    puzzlerId: string,
-    token: string,
-    choiceCodes: ChoiceCode[],
+export interface DisplayNewPuzzler extends Action<Type.DISPLAY_NEW_PUZZLER> {
+    source: string,
+    choiceCodes: Vector<Vector<Region[]>>,
+    correctChoice: number,
 }
 
 export interface CheckChoice extends Action<Type.CHECK_CHOICE> {
-    puzzlerId: string,
-    token: string,
-    choice: number,
+    userChoice: number,
 }
 
 export interface DisplayAnswer extends Action<Type.DISPLAY_ANSWER> {
-    puzzlerId: string,
     userChoice: number,
-    correctChoice: number,
+    isCorrect: boolean,
 }
 
 export interface NavNextPuzzler extends Action<Type.NAV_NEXT_PUZZLER> {

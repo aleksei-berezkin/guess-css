@@ -1,20 +1,20 @@
 import React, { ReactElement, useEffect } from 'react';
-import { ChoiceCode, Region } from '../../shared/api';
-import { getPuzzlerUrl } from '../clientApi';
-import * as R from 'ramda';
+import { Region } from '../model/region';
 import { useDispatch, useSelector } from 'react-redux';
-import { Answer, State } from '../redux/store';
-import { CheckChoice, LoadNextPuzzler, NavNextPuzzler, NavPrevPuzzler, Type } from '../redux/actions';
+import { State } from '../redux/store';
+import { CheckChoice, GenNewPuzzler, NavNextPuzzler, NavPrevPuzzler, Type } from '../redux/actions';
 import { Dispatch } from 'redux';
+import { range } from '../util';
+import { Vector } from 'prelude-ts';
 
 export function Puzzler(): ReactElement {
-    const initialized = useSelector((state: State) => !state.puzzlers.isEmpty());
-    const dispatch: Dispatch<LoadNextPuzzler> = useDispatch();
+    const initialized = useSelector((state: State) => !state.puzzlerViews.isEmpty());
+    const dispatch: Dispatch<GenNewPuzzler> = useDispatch();
 
     useEffect(() => {
         if (!initialized) {
             dispatch({
-                type: Type.LOAD_NEXT_PUZZLER,
+                type: Type.GEN_NEW_PUZZLER,
                 diffHint: true,
             });
         }
@@ -42,7 +42,7 @@ function Score() {
 
 function DonePuzzler() {
     const isHistory = useSelector((st: State) => st.current > 0);
-    const historyPuzzlerPos = useSelector((st: State) => st.puzzlers.length() - st.current);
+    const historyPuzzlerPos = useSelector((st: State) => st.puzzlerViews.length() - st.current);
     const donePuzzlersNum = useSelector(getDonePuzzlersNum);
 
     return <>{
@@ -52,34 +52,33 @@ function DonePuzzler() {
 }
 
 function getDonePuzzlersNum(st: State) {
-    if (st.puzzlers.isEmpty()) {
+    if (st.puzzlerViews.isEmpty()) {
         return 0;
     }
-    if (st.puzzlers.head().filter(p => p.answer != null).isSome()) {
-        return st.puzzlers.length();
+    if (st.puzzlerViews.head().filter(p => p.userChoice != null).isSome()) {
+        return st.puzzlerViews.length();
     }
-    return st.puzzlers.length() - 1;
+    return st.puzzlerViews.length() - 1;
 }
 
 function LayoutFrame() {
-    const [id, token] = useSelector((st: State) =>
-        st.puzzlers.get(st.current)
-            .map<[string?, string?]>(p => [p.id, p.token])
-            .getOrElse([undefined, undefined])
+    const source = useSelector((st: State) =>
+        st.puzzlerViews.get(st.current)
+            .map(p => p.source)
+            .getOrUndefined()
     );
 
     return <div className='puzzler-top'>
         <PrevButton/>
         <>{
-            id && token &&
-            <iframe className='layout' src={ getPuzzlerUrl(id, token) }/>
+            source && <iframe className='layout' srcDoc={ source }/>
         }</>
         <NextButton/>
     </div>;
 }
 
 function PrevButton() {
-    const hasPrev = useSelector((st: State) => st.current < st.puzzlers.length() - 1);
+    const hasPrev = useSelector((st: State) => st.current < st.puzzlerViews.length() - 1);
     const dispatch: Dispatch<NavPrevPuzzler> = useDispatch();
 
     function handlePrev() {
@@ -94,15 +93,15 @@ function PrevButton() {
 
 function NextButton() {
     const hasNext = useSelector((st: State) => st.current > 0);
-    const answer = useSelector((st: State) => st.puzzlers.get(st.current).map(p => p.answer).getOrElse(undefined));
-    const dispatch: Dispatch<NavNextPuzzler | LoadNextPuzzler> = useDispatch();
+    const isAnswered = useSelector((st: State) => st.puzzlerViews.get(st.current).mapNullable(p => p.userChoice).isSome());
+    const dispatch: Dispatch<NavNextPuzzler | GenNewPuzzler> = useDispatch();
 
     function handleNext() {
         if (hasNext) {
             dispatch({type: Type.NAV_NEXT_PUZZLER});
-        } else if (answer) {
+        } else if (isAnswered) {
             dispatch({
-                type: Type.LOAD_NEXT_PUZZLER,
+                type: Type.GEN_NEW_PUZZLER,
                 diffHint: false,
             });
         } else {
@@ -110,23 +109,25 @@ function NextButton() {
         }
     }
 
-    const active = (hasNext || answer) ? 'active' : '';
+    const active = (hasNext || isAnswered) ? 'active' : '';
     return <div onClick={ handleNext } className={ `nav-puzzlers ${ active } next` } />;
 }
 
 function Choices(): ReactElement {
-    const [id, choicesCount] = useSelector((st: State) =>
-        st.puzzlers.get(st.current)
-            .map<[string?, number?]>(p => [p.id, p.choiceCodes.length])
-            .getOrElse([undefined, undefined])
+    const keyBase = useSelector((st: State) => `${st.current}_${st.puzzlerViews.length()}`);
+
+    const choicesCount = useSelector((st: State) =>
+        st.puzzlerViews.get(st.current)
+            .map(p => p.choiceCodes.length())
+            .getOrUndefined()
     );
 
     return <div className='choices'>{
-        id && choicesCount &&
-        R.range(0, choicesCount)
+        choicesCount &&
+        range(0, choicesCount)
             .map((choice: number) =>
                 <Choice
-                    key={ id + '_' + choice }
+                    key={ `${keyBase}_${choice}` }
                     choice={ choice }
                 />
             )
@@ -134,23 +135,27 @@ function Choices(): ReactElement {
 }
 
 function Choice(p: {choice: number}): ReactElement {
-    const [puzzlerId, token, choiceCode, answer] = useSelector((st: State) =>
-        st.puzzlers.get(st.current)
-            .map<[string?, string?, ChoiceCode?, Answer?]>(puz => [puz.id, puz.token, puz.choiceCodes[p.choice], puz.answer])
-            .getOrElse([undefined, undefined, undefined, undefined])
+    const [choiceCode, correctChoice, userChoice] = useSelector((st: State) =>
+        st.puzzlerViews.get(st.current)
+            .map<[Vector<Region[]>?, number?, number?]>(puz => [
+                puz.choiceCodes.get(p.choice).getOrUndefined(),
+                puz.correctChoice,
+                puz.userChoice,
+            ])
+            .getOrElse([undefined, undefined, undefined])
     );
 
     const highlight = (() => {
-        if (answer?.correctChoice === p.choice) {
+        if (userChoice !== undefined && correctChoice === p.choice) {
             return 'correct';
         }
-        if (answer?.userChoice === p.choice) {
+        if (userChoice === p.choice) {
             return 'incorrect';
         }
         return '';
     })();
     const outline = (() => {
-        if (answer?.userChoice === p.choice) {
+        if (userChoice === p.choice) {
             return 'user-choice';
         }
         return '';
@@ -159,23 +164,20 @@ function Choice(p: {choice: number}): ReactElement {
     const dispatch: Dispatch<CheckChoice> = useDispatch();
 
     function handleClick() {
-        if (!answer) {
+        if (userChoice === undefined) {
             dispatch({
                 type: Type.CHECK_CHOICE,
-                puzzlerId: puzzlerId!,
-                token: token!,
-                choice: p.choice,
+                userChoice: p.choice,
             });
         }
     }
 
-    const active = answer ? '' : 'active';
+    const active = userChoice === undefined ? 'active' : '';
     return <div className={ `choice ${ highlight } ${ outline } ${ active }` }
                 onClick={ handleClick }>{
         choiceCode &&
-        choiceCode.map(
-            (regions, i) =>
-                <Line key={ i } regions={ regions } />
+        choiceCode.zipWithIndex().map(
+            ([regions, i]) => <Line key={ i } regions={ regions } />
         )
     }</div>;
 }

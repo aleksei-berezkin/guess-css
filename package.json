@@ -4,9 +4,7 @@
   "description": "CSS puzzler game",
   "main": "src/client/index.tsx",
   "scripts": {
-    "dev": "npm-run-all --parallel dev:server dev:client",
-    "dev:server": "ts-node-dev --no-notify src/server/runDevApiServer.ts",
-    "dev:client": "ts-node-dev --no-notify src/server/runDevWebServer.ts",
+    "dev": "ts-node-dev --no-notify src/server/runDevServer.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prod-in-dev:build": "NODE_ENV=development webpack --config webpack.config.prod.js",
     "prod-in-dev:start": "ts-node-dev --no-notify src/server/runProdServer.ts",
@@ -17,10 +15,8 @@
   "license": "ISC",
   "repository": "https://github.com/aleksei-berezkin/css-puzzler",
   "devDependencies": {
-    "@types/cors": "^2.8.6",
     "@types/webpack-dev-middleware": "^3.7.0",
     "clean-webpack-plugin": "^3.0.0",
-    "cors": "^2.8.5",
     "css-loader": "^3.4.2",
     "html-webpack-plugin": "^3.2.0",
     "html-webpack-template": "^6.2.0",

@@ -1,6 +1,6 @@
 import { Node, TagNode, TextNode } from './nodes';
 import { genCssRulesChoices } from './genCss';
-import { randomBounded, randomVectorItem } from '../../shared/util';
+import { randomBounded, randomItem } from '../util';
 import { Puzzler } from './puzzler';
 import { Vector } from 'prelude-ts';
 
@@ -87,7 +87,7 @@ class CssClasses {
     }
 
     private randomClass(): string {
-        return randomVectorItem(this.classes);
+        return randomItem(this.classes);
     }
 }
 

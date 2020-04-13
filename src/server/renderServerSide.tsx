@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
-import { Puzzler } from './model/puzzler';
-import { genPuzzler } from './model/genPuzzler';
-import { theRegistry } from './registry';
+import { Puzzler } from '../client/model/puzzler';
+import { genPuzzler } from '../client/model/genPuzzler';
 import { createAppStoreWithMiddleware, State } from '../client/redux/store';
 import { renderToString } from 'react-dom/server';
 import { Provider } from 'react-redux';
@@ -10,8 +9,10 @@ import React from 'react';
 import { readFile } from 'fs';
 import path from 'path';
 // @ts-ignore
-import { ROOT_EL_ID, ROOT_EL_TEXT, PRELOADED_STATE_ID } from '../shared/appWideConst';
+import { ROOT_EL_ID, ROOT_EL_TEXT } from '../shared/appWideConst';
 import { Vector } from 'prelude-ts';
+import { PRELOADED_STATE_ID } from '../shared/preloadedStateId';
+import { toSerializable } from '../client/redux/stateSerialization';
 
 const indexHtmlParts = new Promise<[string, string]>((resolve, reject) => {
     readFile(path.resolve(__dirname, '..', '..', 'dist', 'index.html'), (err, data) => {
@@ -36,15 +37,12 @@ const indexHtmlParts = new Promise<[string, string]>((resolve, reject) => {
 
 export function sendRenderedApp(req: Request, res: Response) {
     const puzzler: Puzzler = genPuzzler();
-    const {id, token} = theRegistry.putPuzzler(puzzler);
-
     const state: State = {
-        puzzlers: Vector.of(
+        puzzlerViews: Vector.of(
             {
-                id,
-                token,
+                source: puzzler.html,
                 choiceCodes: puzzler.getChoiceCodes(true),
-                answer: undefined,
+                correctChoice: puzzler.correctChoice,
             },
         ),
         current: 0,
@@ -62,7 +60,7 @@ export function sendRenderedApp(req: Request, res: Response) {
             `${ before }
             <div id="${ ROOT_EL_ID }">${ appHtml }</div>
             <script>
-                window.${ PRELOADED_STATE_ID } = ${ JSON.stringify(state).replace(/</g, '\\u003c') };
+                window.${ PRELOADED_STATE_ID } = ${ JSON.stringify(toSerializable(state)).replace(/</g, '\\u003c') };
             </script>
             ${ after }`
         );

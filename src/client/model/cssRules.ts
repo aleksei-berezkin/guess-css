@@ -1,4 +1,4 @@
-import { Region, RegionKind } from '../../shared/api';
+import { Region, RegionKind } from './region';
 import { Indent } from './indent';
 import { Vector } from 'prelude-ts';
 

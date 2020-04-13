@@ -1,4 +1,4 @@
-import { randomVectorItem, twoElementVariationsInOrder, xprod } from '../../shared/util';
+import { randomItem, twoElementVariationsInOrder, xprod } from '../util';
 import { TagNode } from './nodes';
 import {
     ChildCombinator,
@@ -59,7 +59,7 @@ function getDeepestSingleChildSubtree(root: TagNode): SingleChildSubtree {
         .map(([_, s]) => s)
         .getOrThrow();
 
-    return randomVectorItem(deepestChildren).createWithParent(root);
+    return randomItem(deepestChildren).createWithParent(root);
 }
 
 class SingleChildSubtree {
@@ -94,7 +94,7 @@ function getSiblingsSubtree(root: TagNode): SiblingsSubtree | null {
         .filter(s => s != null) as Vector<SiblingsSubtree>
 
     if (childrenSubtrees.length()) {
-        return randomVectorItem(childrenSubtrees).createWithParent(root);
+        return randomItem(childrenSubtrees).createWithParent(root);
     }
 
     if (root.tagChildren.length() > 1) {

@@ -1,6 +1,6 @@
 import { Node, TagNode } from './nodes';
 import { Rule } from './cssRules';
-import { ChoiceCode, Region, RegionKind } from '../../shared/api';
+import { Region, RegionKind } from './region';
 import { Indent } from './indent';
 import { Vector } from 'prelude-ts';
 
@@ -20,10 +20,9 @@ export class Puzzler {
         return `<html><head><style>${ styleText }</style></head>${ this.body.toUnformattedCode() }</html>`;
     }
 
-    getChoiceCodes(diffHint: boolean): ChoiceCode[] {
+    getChoiceCodes(diffHint: boolean): Vector<Vector<Region[]>> {
         return this.rulesChoices
-            .map(choice => this.choiceCode(choice, diffHint).toArray())
-            .toArray();
+            .map(choice => this.choiceCode(choice, diffHint));
     };
 
     private choiceCode(choice: Vector<Rule>, diffHint: boolean): Vector<Region[]> {

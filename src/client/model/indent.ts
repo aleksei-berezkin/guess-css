@@ -1,4 +1,4 @@
-import { Region, RegionKind } from '../../shared/api';
+import { Region, RegionKind } from './region';
 import * as R from 'ramda';
 import { Vector } from 'prelude-ts';
 
