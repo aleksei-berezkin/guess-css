@@ -1,7 +1,20 @@
 import { Option, Vector } from 'prelude-ts';
 
-export function randomItem<T>(items: Vector<T>): T {
-    return items.get(randomBounded(items.length())).getOrThrow();
+export function randomItem<T>(items: Vector<T>): T;
+export function randomItem<T>(items: T[]): T;
+export function randomItem<T>(items: Vector<T> | T[]): T {
+    if (items instanceof Vector) {
+        return items.get(randomBounded(items.length())).getOrThrow();
+    }
+    return items[randomBounded(items.length)];
+}
+
+export function randomNumericalEnum(enm: {[k: number]: string}): number {
+    return randomItem(
+        Vector.ofIterable(Object.getOwnPropertyNames(enm))
+            .map(k => parseInt(k))
+            .filter(n => !Number.isNaN(n))
+    );
 }
 
 export function randomBounded(bound: number): number {

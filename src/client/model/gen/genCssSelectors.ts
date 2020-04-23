@@ -1,5 +1,5 @@
-import { randomItem, twoElementVariationsInOrder, xprod } from '../util';
-import { TagNode } from './nodes';
+import { randomItem, twoElementVariationsInOrder, xprod } from '../../util';
+import { TagNode } from '../nodes';
 import {
     ChildCombinator,
     ClassSelector,
@@ -8,19 +8,16 @@ import {
     Rule,
     Selector,
     TypeSelector
-} from './cssRules';
+} from '../cssRules';
 import { Option, Vector } from 'prelude-ts';
-
-const constantRule = new Rule(
-    new TypeSelector('div'),
-    Vector.of(['padding', '6px'], ['border', '1px solid black'])
-);
+import { getSiblingsSubtree, SiblingsSubtree } from './siblingsSubtree';
+import { constantRule } from './constantRule';
 
 const RULES_CHOICES = 3;
 
 const colors = Vector.of('pink', 'lightgreen', 'lightblue', 'cyan', 'magenta', 'yellow', 'lightgrey');
 
-export function genCssRulesChoices(body: TagNode): Vector<Vector<Rule>> | null {
+export function genCssSelectorsRulesChoices(body: TagNode): Vector<Vector<Rule>> | null {
     const [deepStyle, siblingsStyle] = colors
         .shuffle()
         .take(2)
@@ -81,59 +78,6 @@ class SingleChildSubtree {
             this.root,
             n => Option.of(n).map(n => [n, n.tagChildren.single().getOrUndefined()])
         );
-    }
-}
-
-function getSiblingsSubtree(root: TagNode): SiblingsSubtree | null {
-    if (!root.tagChildren.length) {
-        return null;
-    }
-
-    const childrenSubtrees = root.tagChildren
-        .map(getSiblingsSubtree)
-        .filter(s => s != null) as Vector<SiblingsSubtree>
-
-    if (childrenSubtrees.length()) {
-        return randomItem(childrenSubtrees).createWithParent(root);
-    }
-
-    if (root.tagChildren.length() > 1) {
-        return new SiblingsSubtree(root);
-    }
-
-    return null;
-}
-
-class SiblingsSubtree {
-    constructor(readonly root: TagNode, readonly depth: number = 1) {
-        if (depth < 1) {
-            throw new Error('Bad ' + depth);
-        } else if (depth === 1) {
-            if (root.children.length() < 2) {
-                throw new Error('Siblings expected on the deepest level: ' + root.children);
-            }
-        } else {
-            if (root.children.length() !== 1) {
-                throw new Error('Siblings cannot be on levels other than deeper: ' + root.children);
-            }
-        }
-    }
-
-    createWithParent(parent: TagNode): SiblingsSubtree {
-        return new SiblingsSubtree(parent.copyWithSingleChild(this.root), this.depth + 1);
-    }
-
-    unfold(): {path: Vector<TagNode>, siblings: Vector<TagNode>} {
-        const path = Vector.unfoldRight<TagNode | undefined, TagNode>(
-            this.root,
-            n => Option.of(n).map(n => [n, n.tagChildren.single().getOrUndefined()])
-        );
-
-        if (path.isEmpty()) {
-            return {path: Vector.empty(), siblings: Vector.empty()};
-        }
-
-        return {path, siblings: path.last().getOrThrow().tagChildren};
     }
 }
 

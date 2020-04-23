@@ -6,7 +6,7 @@ import {
     GenNewPuzzler,
     Type
 } from './actions';
-import { genPuzzler } from '../model/genPuzzler';
+import { genPuzzler } from '../model/gen/genPuzzler';
 import { State } from './store';
 
 export function* rootSaga() {

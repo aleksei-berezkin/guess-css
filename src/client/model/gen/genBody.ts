@@ -1,22 +1,20 @@
-import { Node, TagNode, TextNode } from './nodes';
-import { genCssRulesChoices } from './genCss';
-import { randomBounded, randomItem } from '../util';
-import { Puzzler } from './puzzler';
+import { Topic } from './topic';
+import { Node, TagNode, TextNode } from '../nodes';
 import { Vector } from 'prelude-ts';
+import { randomItem } from '../../util';
 
-export function genPuzzler(): Puzzler {
-    const body = new TagNode(
+export function genBody(topic: Topic) {
+    const classes = (() => { switch (topic) {
+        case Topic.SELECTORS: return new RandomClasses();
+        case Topic.DISPLAY: return new UniqueClasses();
+    }})();
+    const texts = new Texts(4);
+
+    return new TagNode(
         'body',
         Vector.empty(),
-        Vector.ofIterable(genSiblings('div', { classes: new CssClasses(), texts: new Texts(4) }, 1))
+        Vector.ofIterable(genSiblings('div', { classes, texts }, 1))
     );
-
-    const rulesChoices = genCssRulesChoices(body);
-    if (rulesChoices) {
-        return new Puzzler(body, rulesChoices, randomBounded(rulesChoices.length()));
-    }
-
-    return genPuzzler();
 }
 
 function *genSiblings(name: string, ctx: Context, level: number, i = 0): IterableIterator<Node> {
@@ -45,11 +43,26 @@ const childrenProbabilities: number[] = [
 ];
 
 interface Context {
-    classes: CssClasses;
+    classes: Classes;
     texts: Texts;
 }
 
-class CssClasses {
+interface Classes {
+    genClasses(): Vector<string>;
+}
+
+class UniqueClasses implements Classes {
+    current: number = 0;
+
+    constructor() {
+    }
+
+    genClasses(): Vector<string> {
+        return Vector.of(String.fromCharCode('a'.charCodeAt(0) + this.current++));
+    }
+}
+
+class RandomClasses implements Classes {
     classes: Vector<string> = Vector.of('a', 'b', 'c');
 
     constructor() {
