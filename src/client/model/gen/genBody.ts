@@ -13,34 +13,55 @@ export function genBody(topic: Topic) {
     return new TagNode(
         'body',
         Vector.empty(),
-        Vector.ofIterable(genSiblings('div', { classes, texts }, 1))
+        Vector.ofIterable(genSiblings(topic, 'div', { classes, texts }, 1))
     );
 }
 
-function *genSiblings(name: string, ctx: Context, level: number, i = 0): IterableIterator<Node> {
-    if (Math.random() < siblingsProbabilities[level][i] && ctx.texts.hasNext()) {
-        const children = Math.random() < childrenProbabilities[level]
-            ? Vector.ofIterable(genSiblings(name, ctx, level + 1))
+function *genSiblings(topic: Topic, name: string, ctx: Context, level: number, i = 0): IterableIterator<Node> {
+    if (Math.random() < probabilities[topic].siblings[level][i] && ctx.texts.hasNext()) {
+        const children = Math.random() < probabilities[topic].children[level]
+            ? Vector.ofIterable(genSiblings(topic, name, ctx, level + 1))
             : Vector.of(new TextNode(ctx.texts.next()));
 
         yield new TagNode(name, ctx.classes.genClasses(), children);
 
-        yield *genSiblings(name, ctx, level, i + 1);
+        yield *genSiblings(topic, name, ctx, level, i + 1);
     }
 }
 
-const siblingsProbabilities: number[][] = [
-    [1, 0],   // Not actually used on level 0 (body)
-    [1, .9, .4, .15, 0],
-    [1, .7, .1, 0],
-    [1, .8, .6, .05, 0],
-    [0],
-];
+type Probabilities = {
+    siblings: number[][];
+    children: number[];
+};
 
-const childrenProbabilities: number[] = [
-    1,      // Not actually used on level 0 (body)
-    .5, .5, 0
-];
+const probabilities: {[k in Topic]: Probabilities} = {
+    [Topic.SELECTORS]: {
+        siblings: [
+            [1, 0],   // Not actually used on level 0 (body)
+            [1, .9, .4, .15, 0],
+            [1, .7, .1, 0],
+            [1, .8, .6, .05, 0],
+            [0],
+        ],
+        children: [
+            1,      // Not actually used on level 0 (body)
+            .5, .5, 0
+        ],
+    },
+    [Topic.DISPLAY]: {
+        siblings: [
+            [1, 0],
+            [1, .9, .4, .15, 0],
+            [1, .7, .1, 0],
+            [1, .8, .6, .05, 0],
+            [0],
+        ],
+        children: [
+            1,
+            .5, .5, 0
+        ],
+    },
+};
 
 interface Context {
     classes: Classes;
