@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "ts-node-dev --no-notify src/server/runDevServer.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prod-in-dev:build": "NODE_ENV=development webpack --config webpack.config.prod.js",
+    "prod-in-dev:build": "NODE_ENV=development webpack --config webpackConfProd.js",
     "prod-in-dev:start": "ts-node-dev --no-notify src/server/runProdServer.ts",
-    "build": "NODE_ENV=production webpack --config webpack.config.prod.js",
+    "build": "NODE_ENV=production webpack --config webpackConfProd.js",
     "start": "NODE_ENV=production ts-node src/server/runProdServer.ts"
   },
   "author": "Aleksei Berezkin",

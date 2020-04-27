@@ -1,8 +1,7 @@
 import express, { Express } from 'express';
 import path from 'path';
 import { sendRenderedApp } from './renderServerSide';
-// @ts-ignore
-import { WEB_DEV_PORT } from './ports.config';
+import { WEB_DEV_PORT } from './portsConfig';
 
 if (process.env.NODE_ENV === 'development') {
     console.warn('WARNING: Production runs in dev mode');

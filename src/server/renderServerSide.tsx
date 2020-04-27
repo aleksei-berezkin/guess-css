@@ -8,7 +8,6 @@ import { Puzzler as PuzzlerComponent } from '../client/components/Puzzler';
 import React from 'react';
 import { readFile } from 'fs';
 import path from 'path';
-// @ts-ignore
 import { ROOT_EL_ID, ROOT_EL_TEXT } from '../shared/appWideConst';
 import { Vector } from 'prelude-ts';
 import { PRELOADED_STATE_ID } from '../shared/preloadedStateId';

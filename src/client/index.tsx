@@ -3,8 +3,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Puzzler } from './components/Puzzler';
 import { Provider } from 'react-redux';
-import { createAppStore, initialState, State } from './redux/store';
-// @ts-ignore
+import { createAppStore, initialState } from './redux/store';
 import { ROOT_EL_ID } from '../shared/appWideConst';
 import { fromSerializable, SerializedState } from './redux/stateSerialization';
 import { PRELOADED_STATE_ID } from '../shared/preloadedStateId';
