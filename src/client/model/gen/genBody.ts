@@ -18,8 +18,9 @@ export function genBody(topic: Topic) {
 }
 
 function *genSiblings(topic: Topic, name: string, ctx: Context, level: number, i = 0): IterableIterator<Node> {
-    if (Math.random() < probabilities[topic].siblings[level][i] && ctx.texts.hasNext()) {
-        const children = Math.random() < probabilities[topic].children[level]
+    const prob = probabilities[topic];
+    if (ctx.texts.hasNext() && i < prob.siblings[level].length && Math.random() < prob.siblings[level][i]) {
+        const children = level < prob.children.length && Math.random() < prob.children[level]
             ? Vector.ofIterable(genSiblings(topic, name, ctx, level + 1))
             : Vector.of(new TextNode(ctx.texts.next()));
 
@@ -37,28 +38,25 @@ type Probabilities = {
 const probabilities: {[k in Topic]: Probabilities} = {
     [Topic.SELECTORS]: {
         siblings: [
-            [1, 0],   // Not actually used on level 0 (body)
-            [1, .9, .4, .15, 0],
-            [1, .7, .1, 0],
-            [1, .8, .6, .05, 0],
-            [0],
+            [1],   // Not actually used on level 0 (body)
+            [1, .9, .4, .15],
+            [1, .7, .1],
+            [1, .8, .6, .05],
         ],
         children: [
             1,      // Not actually used on level 0 (body)
-            .5, .5, 0
+            .5, .5,
         ],
     },
     [Topic.DISPLAY]: {
         siblings: [
-            [1, 0],
-            [1, .9, .4, .15, 0],
-            [1, .7, .1, 0],
-            [1, .8, .6, .05, 0],
-            [0],
+            [1],
+            [1, .9, .4, .15],
+            [1, .7, .1],
+            [1, .8, .6, .05],
         ],
         children: [
-            1,
-            .5, .5, 0
+            1, .5, .5
         ],
     },
 };
