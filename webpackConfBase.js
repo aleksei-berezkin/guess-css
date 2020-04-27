@@ -8,7 +8,9 @@ const { ROOT_EL_ID, ROOT_EL_TEXT } = require('./src/shared/appWideConst');
 
 module.exports = {
     mode: process.env.NODE_ENV,
-    entry: './src/client/index.tsx',
+    entry: [
+        './src/client/index.tsx',
+    ],
     plugins: [
         new HtmlWebpackPlugin({
             title: 'CSS Puzzler',
@@ -22,7 +24,6 @@ module.exports = {
         }),
     ],
     output: {
-        filename: '[name].[contenthash].js',
         publicPath: '',
     },
     module: {
