@@ -1,4 +1,5 @@
 export enum Topic {
     SELECTORS,
-    DISPLAY,
+    DISPLAY_SIMPLE,
+    DISPLAY_WITH_PARENT,
 }

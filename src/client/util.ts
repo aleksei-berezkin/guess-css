@@ -1,4 +1,4 @@
-import { Option, Vector } from 'prelude-ts';
+import { Option, Ordering, Vector } from 'prelude-ts';
 
 export function randomItem<T>(items: Vector<T>): T;
 export function randomItem<T>(items: T[]): T;
@@ -17,8 +17,30 @@ export function randomNumericalEnum(enm: {[k: number]: string}): number {
     );
 }
 
-export function randomBounded(bound: number): number {
-    return Math.floor(Math.random() * bound);
+export function randomBounded(bound: number): number;
+export function randomBounded(start: number, bound: number): number;
+export function randomBounded(lhs: number, rhs?: number) {
+    if (rhs != undefined) {
+        return lhs + Math.floor(Math.random() * (rhs - lhs));
+    }
+    return Math.floor(Math.random() * lhs);
+}
+
+export function randomItemsInOrder<T>(items: Vector<T>, n: number): Vector<T> {
+    if (n > items.length()) {
+        throw Error(n + '>' + items.length());
+    }
+    if (n === 0) {
+        return Vector.empty();
+    }
+    if (n === items.length()) {
+        return items;
+    }
+    return range(0, items.length())
+        .shuffle()
+        .take(n)
+        .sortOn(i => i)
+        .map(i => items.get(i).getOrThrow());
 }
 
 export function twoElementVariationsInOrder<T>(items: Vector<T>): Vector<[T, T]> {

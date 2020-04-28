@@ -6,7 +6,8 @@ import { randomItem } from '../../util';
 export function genBody(topic: Topic) {
     const classes = (() => { switch (topic) {
         case Topic.SELECTORS: return new RandomClasses();
-        case Topic.DISPLAY: return new UniqueClasses();
+        case Topic.DISPLAY_SIMPLE:
+        case Topic.DISPLAY_WITH_PARENT: return new UniqueClasses();
     }})();
     const texts = new Texts(4);
 
@@ -48,15 +49,24 @@ const probabilities: {[k in Topic]: Probabilities} = {
             .5, .5,
         ],
     },
-    [Topic.DISPLAY]: {
+    [Topic.DISPLAY_SIMPLE]: {
         siblings: [
             [1],
-            [1, .9, .4, .15],
-            [1, .7, .1],
-            [1, .8, .6, .05],
+            [1],
+            [1, 1, .9, .5, .5],
         ],
         children: [
-            1, .5, .5
+            1, 1,
+        ],
+    },
+    [Topic.DISPLAY_WITH_PARENT]: {
+        siblings: [
+            [1],
+            [1],
+            [1, 1, .5, .5],
+        ],
+        children: [
+            1, 1,
         ],
     },
 };

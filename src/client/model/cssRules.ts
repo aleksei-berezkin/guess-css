@@ -4,13 +4,13 @@ import { Vector } from 'prelude-ts';
 
 export class Rule {
     constructor(
-        private readonly selectorsGroup: Selector | Combinator,
-        private readonly declarations: Vector<[string, string]>,
+        private readonly selectors: Selector | Vector<Selector>,
+        private readonly declarations: Vector<[string, string, boolean?]>,
         private readonly selectorsDiffering: boolean = false) {
     }
 
     toUnformattedCode() {
-        return this.selectorsGroup.toString() + '{' + this.declarationsToString() + '}';
+        return this.selectorsToString() + '{' + this.declarationsToString() + '}';
     }
 
     private declarationsToString(): string {
@@ -19,11 +19,20 @@ export class Rule {
             .mkString(' ');
     }
 
+    private selectorsToString() {
+        if (this.selectors instanceof Vector) {
+            return this.selectors
+                .map(sel => sel.toString())
+                .mkString(', ');
+        }
+        return this.selectors.toString();
+    }
+
     toRegions(indent: Indent): Vector<Region[]> {
         return Vector.of<Region[]>(
             [
                 indent,
-                {kind: RegionKind.Selector, text: this.selectorsGroup.toString(), differing: this.selectorsDiffering},
+                {kind: RegionKind.Selector, text: this.selectorsToString(), differing: this.selectorsDiffering},
                 {kind: RegionKind.Default, text: ' {'},
             ])
             .appendAll(this.declarationsToRegions(indent.indent()))
@@ -36,16 +45,16 @@ export class Rule {
 
     private declarationsToRegions(indent: Indent): Vector<Region[]> {
         return this.declarations
-            .map(([name, value]): Region[] =>
+            .map(([name, value, differing]): Region[] =>
                 [
                     indent,
                     {kind: RegionKind.DeclName, text: name},
                     {kind: RegionKind.Default, text: ': '},
                     ((): Region => {
                         if (name === 'background-color') {
-                            return {kind: RegionKind.DeclValue, text: value, backgroundColor: value};
+                            return {kind: RegionKind.DeclValue, text: value, backgroundColor: value, differing};
                         }
-                        return {kind: RegionKind.DeclValue, text: value};
+                        return {kind: RegionKind.DeclValue, text: value, differing};
                     })(),
                     {kind: RegionKind.Default, text: ';'},
                 ]
@@ -60,6 +69,8 @@ export abstract class Selector {
 }
 
 export class TypeSelector extends Selector {
+    // noinspection JSUnusedLocalSymbols
+    private readonly _n_ts: any;
     constructor(public readonly type: string) {
         super();
     }
@@ -69,6 +80,8 @@ export class TypeSelector extends Selector {
 }
 
 export class ClassSelector extends Selector {
+    // noinspection JSUnusedLocalSymbols
+    private readonly _n_cs: any;
     constructor(public readonly clazz: string) {
         super();
     }
@@ -78,6 +91,8 @@ export class ClassSelector extends Selector {
 }
 
 export class PseudoClassSelector extends Selector {
+    // noinspection JSUnusedLocalSymbols
+    private readonly _n_pcs: any;
     constructor(public readonly base: TypeSelector | ClassSelector, public readonly pseudoClass: string) {
         super();
     }
@@ -86,14 +101,7 @@ export class PseudoClassSelector extends Selector {
     }
 }
 
-export abstract class Combinator {
-    // noinspection JSUnusedLocalSymbols
-    private readonly _nominal: any;
-    abstract toString(): string;
-}
-
-
-export class DescendantCombinator extends Combinator {
+export class DescendantCombinator extends Selector {
     private readonly selectors: Vector<Selector>;
     constructor(...selectors: Selector[]) {
         super();
@@ -104,7 +112,7 @@ export class DescendantCombinator extends Combinator {
     }
 }
 
-export class ChildCombinator extends Combinator {
+export class ChildCombinator extends Selector {
     private readonly selectors: Vector<Selector>;
     constructor(...selectors: Selector[]) {
         super();

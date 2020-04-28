@@ -1,42 +1,73 @@
 import { TagNode } from '../nodes';
 import { Vector } from 'prelude-ts';
 import { ChildCombinator, ClassSelector, Rule, Selector, TypeSelector } from '../cssRules';
-import { randomBounded, randomItem } from '../../util';
-import { getSiblingsSubtree, SiblingsSubtree } from './siblingsSubtree';
+import { randomBounded, randomItemsInOrder } from '../../util';
+import { getSiblingsSubtree } from './siblingsSubtree';
 import { constantRule } from './constantRule';
 
-export function genCssDisplayRulesChoices(body: TagNode): Vector<Vector<Rule>> | null {
-    const siblingsSubtree = getSiblingsSubtree(body);
-    if (!siblingsSubtree) {
-        return null;
-    }
+export function genCssDisplaySimple(body: TagNode): Vector<Vector<Rule>> | null {
+    const {path, siblings} = getSiblingsSubtree(body)!.unfold();
+    const {displaysShuffled, displaysShuffledDifferently} = getDisplaysShuffled();
 
-    return genSiblingsDisplayRules(siblingsSubtree)
+    const allChildrenSelector = new ChildCombinator(getSelector(path.last().getOrThrow()), new TypeSelector('*'));
+    const mainRules = displaysShuffled
+        .map(d => new Rule(allChildrenSelector, Vector.of(['display', d, true], ['width', '25%'])));
+
+    const someChildrenSelectors = randomItemsInOrder(siblings, randomBounded(1, siblings.length())).map(getSelector);
+    const someChildrenRules = displaysShuffledDifferently
+        .map(d => new Rule(someChildrenSelectors, Vector.of(['display', d, true])));
+
+    return mainRules.zip(someChildrenRules).map(([main, child]) => Vector.of(constantRule, main, child));
 }
 
-function genSiblingsDisplayRules(siblingsSubtree: SiblingsSubtree): Vector<Vector<Rule>> {
-    const {path, siblings} = siblingsSubtree.unfold();
-    const parentSel = getSelector(path.last().getOrThrow());
-    const childrenSel = new ChildCombinator(parentSel, new TypeSelector('*'));
+export function genCssDisplayWithParent(body: TagNode): Vector<Vector<Rule>> | null {
+    const {path, siblings} = getSiblingsSubtree(body)!.unfold();
+    const {displaysShuffled, displaysShuffledDifferently} = getDisplaysShuffled();
 
-    // TODO 3 different child rules
-    const childRule = new Rule(getSelector(randomItem(siblings)), Vector.of(['display', 'block']));
+    const parentSelector = getSelector(path.last().getOrThrow());
+    const parentRules = displaysShuffled
+        .map(d => new Rule(parentSelector, Vector.of(
+            ['display', d, true],
+            ['background-color', 'pink']
+        )));
 
-    // TODO parent rules
-    // TODO deeper trees
-    // TODO Width 50%
-    const mainRules = Vector.of(
-        new Rule(parentSel, Vector.of(['display', 'flex'])),
-        new Rule(childrenSel, Vector.of(['display', 'inline'])),
-        new Rule(childrenSel, Vector.of(['display', 'inline-block'])),
-    ).shuffle();
-    const indexToAddChildRule = randomBounded(mainRules.length());
-    return mainRules.zipWithIndex().map(([mainRule, i]) =>
-        i === indexToAddChildRule
-            ? Vector.of(constantRule, mainRule, childRule)
-            : Vector.of(constantRule, mainRule)
-    );
+    const someChildren = randomItemsInOrder(siblings, randomBounded(1, siblings.length()));
+    const otherChildren = siblings.filter(n => someChildren.find(m => n === m).isNone());
+
+    const someChildrenSelectors = someChildren.map(getSelector);
+    const someChildrenRules = displaysShuffledDifferently
+        .map(d => new Rule(someChildrenSelectors, Vector.of(
+            ['display', d, true],
+            ['border', '4px solid blue']
+        )));
+
+    const otherChildrenSelectors = otherChildren.map(getSelector);
+    const width = `${ 5 * randomBounded(6, 17) }%`;
+    const otherChildrenRules = displaysShuffled.shuffle()
+        .map(d => new Rule(otherChildrenSelectors, Vector.of(
+            ['display', d, true],
+            ['border', '4px solid blue'],
+            ['width', width]
+        )));
+
+    return parentRules.zip(someChildrenRules).zip(otherChildrenRules)
+        .map(([[parent, child], otherChild]) => Vector.of(parent, child, otherChild));
 }
+
+const displays = Vector.of('inline', 'block', 'inline-block');
+
+export function getDisplaysShuffled() {
+    const displaysShuffled = displays.shuffle();
+    const displaysShuffledDifferently = (function shuffleDifferently(): Vector<string> {
+        const _shuffled = displays.shuffle();
+        if (displaysShuffled.zip(_shuffled).find(([a, b]) => a === b).isSome()) {
+            return shuffleDifferently();
+        }
+        return _shuffled;
+    })();
+    return { displaysShuffled, displaysShuffledDifferently };
+}
+
 
 function getSelector(node: TagNode): Selector {
     if (node.name === 'body') {
