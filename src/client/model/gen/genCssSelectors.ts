@@ -11,8 +11,14 @@ import {
 } from '../cssRules';
 import { Option, Vector } from 'prelude-ts';
 import { getSiblingsSubtree, SiblingsSubtree } from './siblingsSubtree';
-import { constantRule } from './constantRule';
 
+const constantRule = new Rule(
+    new TypeSelector('div'),
+    Vector.of(
+        ['padding', '6px'],
+        ['border', '1px solid black'],
+    )
+);
 const RULES_CHOICES = 3;
 
 const colors = Vector.of('pink', 'lightgreen', 'lightblue', 'cyan', 'magenta', 'yellow', 'lightgrey');
