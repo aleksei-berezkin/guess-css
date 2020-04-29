@@ -3,6 +3,7 @@ export interface Region {
     text: string,
     differing?: boolean,
     backgroundColor?: string,
+    color?: string,
 }
 
 export enum RegionKind {

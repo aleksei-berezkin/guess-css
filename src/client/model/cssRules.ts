@@ -50,15 +50,24 @@ export class Rule {
                     indent,
                     {kind: RegionKind.DeclName, text: name},
                     {kind: RegionKind.Default, text: ': '},
-                    ((): Region => {
-                        if (name === 'background-color') {
-                            return {kind: RegionKind.DeclValue, text: value, backgroundColor: value, differing};
-                        }
-                        return {kind: RegionKind.DeclValue, text: value, differing};
-                    })(),
+                    ...Rule.valueToRegions(name, value, differing),
                     {kind: RegionKind.Default, text: ';'},
                 ]
             );
+    }
+
+    private static valueToRegions(name: string, value: string, differing?: boolean): Region[] {
+        if (name === 'background-color') {
+            return [{kind: RegionKind.DeclValue, text: value, backgroundColor: value, differing}];
+        }
+        if (name === 'border') {
+            const [thickness, style, color] = value.split(' ');
+            return [
+                {kind: RegionKind.DeclValue, text: `${ thickness } ${ style } `, differing},
+                {kind: RegionKind.DeclValue, text: color, differing, backgroundColor: color, color: 'white'},
+            ]
+        }
+        return [{kind: RegionKind.DeclValue, text: value, differing}];
     }
 }
 

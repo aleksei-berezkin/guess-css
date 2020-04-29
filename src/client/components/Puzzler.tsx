@@ -190,12 +190,23 @@ function Line(p: {regions: Region[]}) {
                     ? reg.kind + ' differing'
                     : reg.kind;
 
-                const style = reg.backgroundColor
-                    ? {backgroundColor: reg.backgroundColor}
-                    : undefined;
-
-                return <span key={ i } className={ className } style={ style }>{ reg.text }</span>;
+                return <span key={ i } className={ className } style={ getStyle(reg) }>{ reg.text }</span>;
             }
         )
     }</pre>
+}
+
+function getStyle(reg: Region) {
+    if (reg.backgroundColor) {
+        if (reg.color) {
+            return {
+                backgroundColor: reg.backgroundColor,
+                color: reg.color,
+            }
+        }
+        return {
+            backgroundColor: reg.backgroundColor,
+        }
+    }
+    return undefined;
 }
