@@ -65,3 +65,31 @@ export function range(from: number, bound: number): Vector<number> {
 export function xprod<T>(a: Vector<T>, b: Vector<T>): Vector<[T, T]> {
     return a.flatMap(a => b.map(b => [a, b]));
 }
+
+export function getNShuffled(items: Vector<string>, n: number): Vector<Vector<string>> {
+    if (n > 3) {
+        throw Error('n=' + n);
+    }
+    const shuffled1 = items.shuffle();
+    const shuffled2 = (function shuffle2(): Vector<string> {
+        const _shuffled2 = items.shuffle();
+        if (shuffled1.equals(_shuffled2)) {
+            return shuffle2();
+        }
+        return _shuffled2;
+    })();
+
+    if (n === 2) {
+        return Vector.of(shuffled1, shuffled2);
+    }
+
+    const shuffled3 = (function shuffle3(): Vector<string> {
+        const _shuffled3 = items.shuffle();
+        if (shuffled1.equals(_shuffled3) || shuffled2.equals(_shuffled3)) {
+            return shuffle3();
+        }
+        return _shuffled3;
+    })();
+
+    return Vector.of(shuffled1, shuffled2, shuffled3);
+}

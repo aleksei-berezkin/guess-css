@@ -2,10 +2,16 @@ import { Region, RegionKind } from './region';
 import { Indent } from './indent';
 import { Vector } from 'prelude-ts';
 
+export type Declaration = [
+    string,
+    string,
+    boolean?
+];
+
 export class Rule {
     constructor(
         private readonly selectors: Selector | Vector<Selector>,
-        private readonly declarations: Vector<[string, string, boolean?]>,
+        private readonly declarations: Vector<Declaration>,
         private readonly selectorsDiffering: boolean = false) {
     }
 

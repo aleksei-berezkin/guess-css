@@ -1,8 +1,8 @@
-import { randomItem, twoElementVariationsInOrder, xprod } from '../../util';
+import { twoElementVariationsInOrder, xprod } from '../../util';
 import { TagNode } from '../nodes';
 import {
     ChildCombinator,
-    ClassSelector,
+    ClassSelector, Declaration,
     DescendantCombinator,
     PseudoClassSelector,
     Rule,
@@ -11,6 +11,7 @@ import {
 } from '../cssRules';
 import { Option, Vector } from 'prelude-ts';
 import { getSiblingsSubtree, SiblingsSubtree } from './siblingsSubtree';
+import { getDeepestSingleChildSubtree, SingleChildSubtree } from './singleChildSubtree';
 
 const constantRule = new Rule(
     new TypeSelector('div'),
@@ -27,7 +28,7 @@ export function genCssSelectorsRulesChoices(body: TagNode): Vector<Vector<Rule>>
     const [deepStyle, siblingsStyle] = colors
         .shuffle()
         .take(2)
-        .map(color => Vector.of<[string, string]>(['background-color', color]));
+        .map(color => Vector.of<Declaration>(['background-color', color]));
 
     const deepest: SingleChildSubtree = getDeepestSingleChildSubtree(body);
     const deepChildRules = genDeepChildRules(deepest, deepStyle);
@@ -50,44 +51,7 @@ export function genCssSelectorsRulesChoices(body: TagNode): Vector<Vector<Rule>>
         .map(([deepRule, siblingRule]) => Vector.of(constantRule, deepRule, siblingRule))
 }
 
-function getDeepestSingleChildSubtree(root: TagNode): SingleChildSubtree {
-    if (root.tagChildren.isEmpty()) {
-        return new SingleChildSubtree(root);
-    }
-
-    const deepestChildren: Vector<SingleChildSubtree> = root.tagChildren
-        .map(getDeepestSingleChildSubtree)
-        .groupBy(subtree => subtree.depth)
-        .reduce(([d1, s1], [d2, s2]) => d1 > d2 ? [d1, s1] : [d2, s2])
-        .map(([_, s]) => s)
-        .getOrThrow();
-
-    return randomItem(deepestChildren).createWithParent(root);
-}
-
-class SingleChildSubtree {
-    constructor(readonly root: TagNode, readonly depth: number = 1) {
-        if (depth < 1) {
-            throw new Error('Bad ' + depth);
-        }
-        if (root.children.length() > 1) {
-            throw new Error('Not single child: ' + root.children);
-        }
-    }
-
-    createWithParent(parent: TagNode): SingleChildSubtree {
-        return new SingleChildSubtree(parent.copyWithSingleChild(this.root), this.depth + 1);
-    }
-
-    unfold(): Vector<TagNode> {
-        return Vector.unfoldRight<TagNode | undefined, TagNode>(
-            this.root,
-            n => Option.of(n).map(n => [n, n.tagChildren.single().getOrUndefined()])
-        );
-    }
-}
-
-function genDeepChildRules(deepest: SingleChildSubtree, style: Vector<[string, string]>): Vector<Rule> {
+function genDeepChildRules(deepest: SingleChildSubtree, style: Vector<Declaration>): Vector<Rule> {
     const path: Vector<TagNode> = deepest.unfold().filter(n => n.name !== 'body');
 
     if (path.length() === 0) {
@@ -110,7 +74,7 @@ function genDeepChildRules(deepest: SingleChildSubtree, style: Vector<[string, s
         ));
 }
 
-function *genSiblingsRules(siblingsSubtree: SiblingsSubtree, style: Vector<[string, string]>): IterableIterator<Rule> {
+function *genSiblingsRules(siblingsSubtree: SiblingsSubtree, style: Vector<Declaration>): IterableIterator<Rule> {
     const pathAndSiblings = siblingsSubtree.unfold();
     const path = pathAndSiblings.path.filter(n => n.name !== 'body');
     const siblings = pathAndSiblings.siblings;
