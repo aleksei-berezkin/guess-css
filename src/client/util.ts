@@ -93,3 +93,24 @@ export function getNShuffled(items: Vector<string>, n: number): Vector<Vector<st
 
     return Vector.of(shuffled1, shuffled2, shuffled3);
 }
+
+export function transpose<T>(matrix: Vector<Vector<T>>): Vector<Vector<T>> {
+    if (matrix.isEmpty()) {
+        throw new Error('Outer empty');
+    }
+
+    const innerSize = matrix.head().getOrThrow().length();
+    if (innerSize === 0) {
+        throw new Error('Inner empty')
+    }
+
+    return range(0, innerSize)
+        .map(j => matrix.map(
+            row => {
+                if (row.length() !== innerSize) {
+                    throw new Error('Jagged vector');
+                }
+                return row.get(j).getOrThrow();
+            })
+        );
+}

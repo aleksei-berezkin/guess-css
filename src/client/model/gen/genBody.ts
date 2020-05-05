@@ -62,7 +62,7 @@ const probabilities: {[k in Topic]: Probabilities} = {
     [Topic.POSITION]: {
         siblings: [
             [1],
-            [1, .8, .5],
+            [1],
             [1, 1, .5, .5],
         ],
         children: [
