@@ -1,33 +1,21 @@
 import { TagNode } from '../nodes';
 import { Vector } from 'prelude-ts';
-import { ChildCombinator, ClassSelector, Rule, Selector, TypeSelector } from '../cssRules';
+import { ChildCombinator, ClassSelector, Declaration, Rule, Selector, TypeSelector } from '../cssRules';
 import { getDeepestSingleChildSubtree } from './singleChildSubtree';
 import { transpose } from '../../util';
 
-const outerPositions = Vector.of('static', 'relative', 'absolute');
-const innerPositions = Vector.of('static', 'relative', 'absolute', 'fixed');
-
-const colors = Vector.of('#f8ab', '#0a0b', '#89fb', '#cccb');
+const colors = Vector.of('#f8a8', '#0a08', '#89f8', '#ccc8');
 
 export function genCssPosition(body: TagNode): Vector<Vector<Rule>> | null {
-    // TODO disallowed static>static, better random
-    // TODO unfold rejects body tag
     const [outer, inner] = getDeepestSingleChildSubtree(body).unfold().tail().getOrThrow();
     const [outerColor, innerColor] = colors.shuffle();
-    const choicesPositions = transpose(
-        Vector.of(
-            outerPositions.shuffle().take(3),
-            innerPositions.shuffle().take(3),
-        )
-    );
 
-    return choicesPositions.map(([outerPosition, innerPosition]) =>
-        Vector.of(
+    return transpose(innerOuterPositionsShuffled()).map(([outerPosition, innerPosition]) =>
+        Vector.of<Rule>(
             new Rule(
-                new ChildCombinator(new TypeSelector('div'), new TypeSelector('div')),
+                new ChildCombinator(getClassSelector(outer), new TypeSelector('*')),
                 Vector.of(
-                    ['padding', '6px'],
-                    ['border', '1px solid black'],
+                    ['padding', '.5em'],
                 )
             )
         ).appendAll(
@@ -41,8 +29,7 @@ export function genCssPosition(body: TagNode): Vector<Vector<Rule>> | null {
                         Vector.of(
                             ['position', position, true],
                             ['background-color', color],
-                            // TODO random position
-                            ['left', '30px'],
+                            ['left', '3em'],
                         )
                     )
                 )
@@ -52,4 +39,21 @@ export function genCssPosition(body: TagNode): Vector<Vector<Rule>> | null {
 
 function getClassSelector(node: TagNode): Selector {
     return new ClassSelector(node.classes.single().getOrThrow());
+}
+
+
+type Position = 'static' | 'relative' | 'absolute' | 'fixed';
+
+const outerPositions = Vector.of<Position>('static', 'relative', 'absolute');
+const innerPositions = Vector.of<Position>('static', 'relative', 'absolute', 'fixed');
+
+function innerOuterPositionsShuffled(): Vector<Vector<Position>> {
+    const outerShuffled = outerPositions.shuffle().take(3);
+    const innerShuffled = innerPositions.shuffle().take(3);
+    if (outerShuffled.equals(innerShuffled)
+        || outerShuffled.zip(innerShuffled)
+            .find(([outer, inner]) => outer === 'static' && inner === 'static').isSome()) {
+        return innerOuterPositionsShuffled();
+    }
+    return Vector.of(outerShuffled, innerShuffled);
 }
