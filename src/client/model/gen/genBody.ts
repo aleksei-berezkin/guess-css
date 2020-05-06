@@ -8,6 +8,7 @@ export function genBody(topic: Topic) {
         case Topic.SELECTORS: return new RandomClasses();
         case Topic.DISPLAY: return new UniqueClasses();
         case Topic.POSITION: return new UniqueClasses();
+        case Topic.FLEXBOX: return new UniqueClasses();
     }})();
     const texts = new Texts(4);
 
@@ -69,6 +70,18 @@ const probabilities: {[k in Topic]: Probabilities} = {
             1, 1,
         ],
     },
+    [Topic.FLEXBOX]: {
+        siblings: [
+            [1],
+            [1, .9, .4, .15],
+            [1, .7, .1],
+            [1, .8, .6, .05],
+        ],
+        children: [
+            1,
+            .9, .5,
+        ]
+    }
 };
 
 interface Context {
