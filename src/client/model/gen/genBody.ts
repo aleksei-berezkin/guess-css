@@ -73,13 +73,10 @@ const probabilities: {[k in Topic]: Probabilities} = {
     [Topic.FLEXBOX]: {
         siblings: [
             [1],
-            [1, .9, .4, .15],
-            [1, .7, .1],
-            [1, .8, .6, .05],
+            [1, 1, .5, .5],
         ],
         children: [
             1,
-            .9, .5,
         ]
     }
 };
