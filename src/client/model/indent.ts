@@ -1,6 +1,5 @@
 import { Region, RegionKind } from './region';
-import * as R from 'ramda';
-import { Vector } from 'prelude-ts';
+import { Stream, Vector } from 'prelude-ts';
 
 const indentSize = 2;
 
@@ -9,7 +8,7 @@ export class Indent implements Region {
     readonly text: string;
 
     constructor(indent: number = 0) {
-        this.text = Vector.ofIterable(R.repeat(' ', indent)).mkString('');
+        this.text = Stream.continually(() => ' ').take(indent).mkString('');
     }
 
     indent(): Indent {
