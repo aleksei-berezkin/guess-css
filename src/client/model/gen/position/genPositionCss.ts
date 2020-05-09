@@ -1,12 +1,12 @@
-import { TagNode } from '../nodes';
+import { TagNode } from '../../nodes';
 import { Vector } from 'prelude-ts';
-import { ChildCombinator, ClassSelector, Declaration, Rule, Selector, TypeSelector } from '../cssRules';
-import { getDeepestSingleChildSubtree } from './singleChildSubtree';
-import { transpose } from '../../util';
+import { ChildCombinator, ClassSelector, Rule, Selector, TypeSelector } from '../../cssRules';
+import { getDeepestSingleChildSubtree } from '../singleChildSubtree';
+import { transpose } from '../../../util';
 
 const colors = Vector.of('#f8a8', '#0a08', '#89f8', '#ccc8');
 
-export function genCssPosition(body: TagNode): Vector<Vector<Rule>> | null {
+export function genPositionCss(body: TagNode): Vector<Vector<Rule>> {
     const [outer, inner] = getDeepestSingleChildSubtree(body).unfold().tail().getOrThrow();
     const [outerColor, innerColor] = colors.shuffle();
 

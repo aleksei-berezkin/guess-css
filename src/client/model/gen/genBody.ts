@@ -6,7 +6,7 @@ export function genBody(topic: Topic) {
     const classes = (() => { switch (topic) {
         case Topic.SELECTORS: throw new Error();
         case Topic.DISPLAY: throw new Error();
-        case Topic.POSITION: return new UniqueClasses();
+        case Topic.POSITION: throw new Error();
         case Topic.FLEXBOX: return new UniqueClasses();
     }})();
     const texts = new Texts(4);
@@ -48,14 +48,9 @@ const probabilities: {[k in Topic]: Probabilities} = {
         children: [],
     },
     [Topic.POSITION]: {
-        siblings: [
-            [1],
-            [1],
-            [1, 1, .5, .5],
-        ],
-        children: [
-            1, 1,
-        ],
+        // TODO remove
+        siblings: [],
+        children: [],
     },
     [Topic.FLEXBOX]: {
         siblings: [

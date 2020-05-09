@@ -5,6 +5,7 @@ import { genBody } from './genBody';
 import { genCssRulesChoices } from './genCss';
 import { genSelectorsPuzzler } from './selectors/genSelectorsPuzzler';
 import { genDisplayPuzzler } from './display/genDisplayPuzzler';
+import { genPositionPuzzler } from './position/genPositionPuzzler';
 
 export function genPuzzler(): Puzzler {
     const topic = randomNumericalEnum(Topic);
@@ -13,6 +14,9 @@ export function genPuzzler(): Puzzler {
     }
     if (topic === Topic.DISPLAY) {
         return genDisplayPuzzler();
+    }
+    if (topic === Topic.POSITION) {
+        return genPositionPuzzler()
     }
 
     const body = genBody(topic);
