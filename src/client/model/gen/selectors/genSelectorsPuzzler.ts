@@ -83,11 +83,7 @@ class Classes {
                 .take(2);
         }
 
-        if (p < .9) {
-            return Vector.of(this.randomClass());
-        }
-
-        return Vector.empty();
+        return Vector.of(this.randomClass());
     }
 
     private addOneClass() {

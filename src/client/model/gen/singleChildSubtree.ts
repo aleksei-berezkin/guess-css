@@ -16,7 +16,6 @@ export class SingleChildSubtree {
         return new SingleChildSubtree(parent.copyWithSingleChild(this.root), this.depth + 1);
     }
 
-    // TODO should reject body
     unfold(): Vector<TagNode> {
         return Vector.unfoldRight<TagNode | undefined, TagNode>(
             this.root,

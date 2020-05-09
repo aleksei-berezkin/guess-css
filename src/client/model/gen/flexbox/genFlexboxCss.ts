@@ -1,10 +1,10 @@
-import { TagNode } from '../nodes';
+import { TagNode } from '../../nodes';
 import { Vector } from 'prelude-ts';
-import { Declaration, Rule, TypeSelector } from '../cssRules';
-import { randomItem, transpose } from '../../util';
-import { getSiblingsSubtree } from './siblingsSubtree';
+import { Declaration, Rule, TypeSelector } from '../../cssRules';
+import { randomItem, transpose } from '../../../util';
+import { getSiblingsSubtree } from '../siblingsSubtree';
 
-export function genCssFlexbox(body: TagNode): Vector<Vector<Rule>> | null {
+export function genFlexboxCss(body: TagNode): Vector<Vector<Rule>> {
     const direction = randomItem(Vector.of('row', 'column', 'row-reverse', 'column-reverse'));
     const wrap = getSiblingsSubtree(body)!.unfold().siblings.length() > 2 && Math.random() < .7;
     const alignName = wrap && Math.random() < .5 ? 'align-content' : 'align-items';
