@@ -4,11 +4,15 @@ import { Topic } from './topic';
 import { genBody } from './genBody';
 import { genCssRulesChoices } from './genCss';
 import { genSelectorsPuzzler } from './selectors/genSelectorsPuzzler';
+import { genDisplayPuzzler } from './display/genDisplayPuzzler';
 
 export function genPuzzler(): Puzzler {
     const topic = randomNumericalEnum(Topic);
     if (topic === Topic.SELECTORS) {
         return genSelectorsPuzzler();
+    }
+    if (topic === Topic.DISPLAY) {
+        return genDisplayPuzzler();
     }
 
     const body = genBody(topic);

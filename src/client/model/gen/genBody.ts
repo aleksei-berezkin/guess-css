@@ -5,7 +5,7 @@ import { Vector } from 'prelude-ts';
 export function genBody(topic: Topic) {
     const classes = (() => { switch (topic) {
         case Topic.SELECTORS: throw new Error();
-        case Topic.DISPLAY: return new UniqueClasses();
+        case Topic.DISPLAY: throw new Error();
         case Topic.POSITION: return new UniqueClasses();
         case Topic.FLEXBOX: return new UniqueClasses();
     }})();
@@ -43,14 +43,9 @@ const probabilities: {[k in Topic]: Probabilities} = {
         children: [],
     },
     [Topic.DISPLAY]: {
-        siblings: [
-            [1],
-            [1],
-            [1, 1, .5, .5],
-        ],
-        children: [
-            1, 1,
-        ],
+        // TODO remove
+        siblings: [],
+        children: [],
     },
     [Topic.POSITION]: {
         siblings: [

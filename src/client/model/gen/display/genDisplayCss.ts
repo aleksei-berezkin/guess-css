@@ -1,12 +1,12 @@
-import { TagNode } from '../nodes';
+import { TagNode } from '../../nodes';
 import { Vector } from 'prelude-ts';
-import { ClassSelector, Declaration, Rule, Selector } from '../cssRules';
-import { getNShuffled, randomBounded, randomItemsInOrder } from '../../util';
-import { getSiblingsSubtree } from './siblingsSubtree';
+import { ClassSelector, Declaration, Rule, Selector } from '../../cssRules';
+import { getNShuffled, randomBounded, randomItemsInOrder } from '../../../util';
+import { getSiblingsSubtree } from '../siblingsSubtree';
 
 const displays = Vector.of('inline', 'block', 'inline-block');
 
-export function genCssDisplay(body: TagNode): Vector<Vector<Rule>> | null {
+export function genDisplayCss(body: TagNode): Vector<Vector<Rule>> {
     const {path, siblings} = getSiblingsSubtree(body)!.unfold();
     const [displays1, displays2, displays3] = getNShuffled(displays, 3);
 
