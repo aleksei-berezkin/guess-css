@@ -1,11 +1,10 @@
 import { Topic } from './topic';
 import { Node, TagNode, TextNode } from '../nodes';
 import { Vector } from 'prelude-ts';
-import { randomItem } from '../../util';
 
 export function genBody(topic: Topic) {
     const classes = (() => { switch (topic) {
-        case Topic.SELECTORS: return new RandomClasses();
+        case Topic.SELECTORS: throw new Error();
         case Topic.DISPLAY: return new UniqueClasses();
         case Topic.POSITION: return new UniqueClasses();
         case Topic.FLEXBOX: return new UniqueClasses();
@@ -39,16 +38,9 @@ type Probabilities = {
 
 const probabilities: {[k in Topic]: Probabilities} = {
     [Topic.SELECTORS]: {
-        siblings: [
-            [1],   // Not actually used on level 0 (body)
-            [1, .9, .4, .15],
-            [1, .7, .1],
-            [1, .8, .6, .05],
-        ],
-        children: [
-            1,      // Not actually used on level 0 (body)
-            .5, .5,
-        ],
+        // TODO remove
+        siblings: [],
+        children: [],
     },
     [Topic.DISPLAY]: {
         siblings: [
@@ -98,48 +90,6 @@ class UniqueClasses implements Classes {
 
     genClasses(): Vector<string> {
         return Vector.of(String.fromCharCode('a'.charCodeAt(0) + this.current++));
-    }
-}
-
-class RandomClasses implements Classes {
-    classes: Vector<string> = Vector.of('a', 'b', 'c');
-
-    constructor() {
-    }
-
-    genClasses(): Vector<string> {
-        if (Math.random() < .8 / this.classes.length()) {
-            this.addOneClass();
-        }
-
-        const p = Math.random();
-        if (p < .05) {
-            return this.classes
-                .shuffle()
-                .take(2);
-        }
-
-        if (p < .9) {
-            return Vector.of(this.randomClass());
-        }
-
-        return Vector.empty();
-    }
-
-    private addOneClass() {
-        if (this.classes.last().contains('z')) {
-            return;
-        }
-
-        this.classes = this.classes.append(
-            String.fromCharCode(
-                this.classes.last().map(c => c.charCodeAt(0) + 1).getOrThrow()
-            )
-        );
-    }
-
-    private randomClass(): string {
-        return randomItem(this.classes);
     }
 }
 

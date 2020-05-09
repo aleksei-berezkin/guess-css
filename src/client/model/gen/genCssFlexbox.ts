@@ -7,8 +7,7 @@ import { getSiblingsSubtree } from './siblingsSubtree';
 export function genCssFlexbox(body: TagNode): Vector<Vector<Rule>> | null {
     const direction = randomItem(Vector.of('row', 'column', 'row-reverse', 'column-reverse'));
     const wrap = getSiblingsSubtree(body)!.unfold().siblings.length() > 2 && Math.random() < .7;
-    // TODO puzzle this?
-    const alignName = wrap && Math.random() < .8 ? 'align-content' : 'align-items';
+    const alignName = wrap && Math.random() < .5 ? 'align-content' : 'align-items';
 
     return transpose(Vector.of(getJustifyContents(), getAlignItems()))
         .map(([justifyContent, alignItems]) =>

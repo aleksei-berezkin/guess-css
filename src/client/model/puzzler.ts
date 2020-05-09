@@ -3,12 +3,19 @@ import { Rule } from './cssRules';
 import { Region, RegionKind } from './region';
 import { Indent } from './indent';
 import { Vector } from 'prelude-ts';
+import { randomBounded } from '../util';
 
 export class Puzzler {
+    readonly correctChoice: number;
+
     constructor(
-        private readonly body: TagNode,
-        private readonly rulesChoices: Vector<Vector<Rule>>,
-        readonly correctChoice: number) {
+            private readonly body: TagNode,
+            private readonly rulesChoices: Vector<Vector<Rule>>,
+            _correctChoice?: number
+    ) {
+        this.correctChoice = _correctChoice != undefined
+            ? _correctChoice
+            : randomBounded(rulesChoices.length());
     }
 
     get html(): string {

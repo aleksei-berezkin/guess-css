@@ -1,5 +1,5 @@
-import { twoElementVariationsInOrder, xprod } from '../../util';
-import { TagNode } from '../nodes';
+import { twoElementVariationsInOrder, xprod } from '../../../util';
+import { TagNode } from '../../nodes';
 import {
     ChildCombinator,
     ClassSelector, Declaration,
@@ -8,10 +8,10 @@ import {
     Rule,
     Selector,
     TypeSelector
-} from '../cssRules';
+} from '../../cssRules';
 import { Option, Vector } from 'prelude-ts';
-import { getSiblingsSubtree, SiblingsSubtree } from './siblingsSubtree';
-import { getDeepestSingleChildSubtree, SingleChildSubtree } from './singleChildSubtree';
+import { getSiblingsSubtree, SiblingsSubtree } from '../siblingsSubtree';
+import { getDeepestSingleChildSubtree, SingleChildSubtree } from '../singleChildSubtree';
 
 const constantRule = new Rule(
     new TypeSelector('div'),
@@ -24,7 +24,7 @@ const RULES_CHOICES = 3;
 
 const colors = Vector.of('pink', 'lightgreen', 'lightblue', 'cyan', 'magenta', 'yellow', 'lightgrey');
 
-export function genCssSelectorsRulesChoices(body: TagNode): Vector<Vector<Rule>> | null {
+export function genRulesChoices(body: TagNode): Vector<Vector<Rule>> | null {
     const [deepStyle, siblingsStyle] = colors
         .shuffle()
         .take(2)
