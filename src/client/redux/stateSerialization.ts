@@ -11,6 +11,7 @@ export type SerializedState = KeysToArray<State>;
 
 export function fromSerialized(state: SerializedState): State {
     return {
+        topics: Vector.ofIterable(state.topics),
         puzzlerViews: Vector.ofIterable(state.puzzlerViews)
             .map(view => ({
                 source: view.source,

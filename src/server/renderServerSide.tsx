@@ -11,6 +11,7 @@ import path from 'path';
 import { ROOT_EL_ID, ROOT_EL_TEXT } from '../shared/appWideConst';
 import { Vector } from 'prelude-ts';
 import { PRELOADED_STATE_ID } from '../shared/preloadedStateId';
+import { getRandomizedTopics } from '../client/model/gen/topic';
 
 const indexHtmlParts = new Promise<[string, string]>((resolve, reject) => {
     readFile(path.resolve(__dirname, '..', '..', 'dist', 'index.html'), (err, data) => {
@@ -34,8 +35,10 @@ const indexHtmlParts = new Promise<[string, string]>((resolve, reject) => {
 
 
 export function sendRenderedApp(req: Request, res: Response) {
-    const puzzler: Puzzler = genPuzzler();
+    const topics = getRandomizedTopics();
+    const puzzler: Puzzler = genPuzzler(topics.head().getOrThrow());
     const state: State = {
+        topics,
         puzzlerViews: Vector.of(
             {
                 source: puzzler.html,

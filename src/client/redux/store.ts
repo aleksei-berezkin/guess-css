@@ -1,12 +1,21 @@
 import { Region } from '../model/region';
-import { DisplayAnswer, DisplayNewPuzzler, isOfType, NavNextPuzzler, NavPrevPuzzler, Type } from './actions';
+import {
+    DisplayAnswer,
+    DisplayNewPuzzler,
+    isOfType,
+    NavNextPuzzler,
+    NavPrevPuzzler, SetTopics,
+    Type
+} from './actions';
 import { Action, applyMiddleware, combineReducers, createStore } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import { rootSaga } from './saga';
 import { Vector } from 'prelude-ts';
+import { Topic } from '../model/gen/topic';
 
 
 export type State = {
+    topics: Vector<Topic>,
     // head is the most recent, tail is history
     puzzlerViews: Vector<PuzzlerView>,
     current: number,
@@ -21,12 +30,20 @@ export type PuzzlerView = {
 }
 
 export const initialState: State = {
+    topics: Vector.empty(),
     puzzlerViews: Vector.empty(),
     current: -1,
     correctAnswers: 0,
 };
 
 const rootReducer = combineReducers({
+    topics: function(topics: Vector<Topic> = initialState.topics, action: Action): Vector<Topic> {
+        if (isOfType<SetTopics>(Type.SET_TOPICS, action)) {
+            return action.topics;
+        }
+        return topics;
+    },
+
     puzzlerViews: function(puzzlerViews: Vector<PuzzlerView> = initialState.puzzlerViews, action: Action): Vector<PuzzlerView> {
         if (isOfType<DisplayNewPuzzler>(Type.DISPLAY_NEW_PUZZLER, action)) {
             return Vector.of<PuzzlerView>(

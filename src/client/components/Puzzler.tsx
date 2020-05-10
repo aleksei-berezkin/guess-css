@@ -2,20 +2,26 @@ import React, { ReactElement, useEffect } from 'react';
 import { Region } from '../model/region';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from '../redux/store';
-import { CheckChoice, GenNewPuzzler, NavNextPuzzler, NavPrevPuzzler, Type } from '../redux/actions';
+import {
+    CheckChoice,
+    GenNewPuzzler,
+    InitClient,
+    NavNextPuzzler,
+    NavPrevPuzzler,
+    Type
+} from '../redux/actions';
 import { Dispatch } from 'redux';
 import { range } from '../util';
 import { Vector } from 'prelude-ts';
 
 export function Puzzler(): ReactElement {
     const initialized = useSelector((state: State) => !state.puzzlerViews.isEmpty());
-    const dispatch: Dispatch<GenNewPuzzler> = useDispatch();
+    const dispatch: Dispatch<InitClient> = useDispatch();
 
     useEffect(() => {
         if (!initialized) {
             dispatch({
-                type: Type.GEN_NEW_PUZZLER,
-                diffHint: true,
+                type: Type.INIT_CLIENT,
             });
         }
     }, [initialized]);
