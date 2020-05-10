@@ -11,7 +11,6 @@ import path from 'path';
 import { ROOT_EL_ID, ROOT_EL_TEXT } from '../shared/appWideConst';
 import { Vector } from 'prelude-ts';
 import { PRELOADED_STATE_ID } from '../shared/preloadedStateId';
-import { toSerializable } from '../client/redux/stateSerialization';
 
 const indexHtmlParts = new Promise<[string, string]>((resolve, reject) => {
     readFile(path.resolve(__dirname, '..', '..', 'dist', 'index.html'), (err, data) => {
@@ -59,9 +58,16 @@ export function sendRenderedApp(req: Request, res: Response) {
             `${ before }
             <div id="${ ROOT_EL_ID }">${ appHtml }</div>
             <script>
-                window.${ PRELOADED_STATE_ID } = ${ JSON.stringify(toSerializable(state)).replace(/</g, '\\u003c') };
+                window.${ PRELOADED_STATE_ID } = ${ JSON.stringify(state, replacer) };
             </script>
             ${ after }`
         );
     })
+}
+
+function replacer(key: string, value: any): any {
+    if (value instanceof Vector) {
+        return value.toArray();
+    }
+    return value;
 }

@@ -9,24 +9,7 @@ type KeysToArray<T> = {
 
 export type SerializedState = KeysToArray<State>;
 
-export function toSerializable(state: State): SerializedState {
-    return {
-        puzzlerViews: state.puzzlerViews
-            .map(view => ({
-                source: view.source,
-                choiceCodes: view.choiceCodes
-                    .map(choiceCode => choiceCode.toArray())
-                    .toArray(),
-                userChoice: view.userChoice,
-                correctChoice: view.correctChoice,
-            }))
-            .toArray(),
-        current: state.current,
-        correctAnswers: state.correctAnswers,
-    };
-}
-
-export function fromSerializable(state: SerializedState): State {
+export function fromSerialized(state: SerializedState): State {
     return {
         puzzlerViews: Vector.ofIterable(state.puzzlerViews)
             .map(view => ({
