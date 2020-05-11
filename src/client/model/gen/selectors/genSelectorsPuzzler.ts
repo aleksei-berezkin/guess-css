@@ -21,13 +21,14 @@ export function genSelectorsPuzzler(): Puzzler {
 function *genSiblings(ctx: Context, level: number, i = 0): IterableIterator<Node> {
     if (ctx.hasQuotaLeft() && i < prob.siblings[level].length && Math.random() < prob.siblings[level][i]) {
         const classes = ctx.classes.genClasses();
+        const text = classes.mkString(' ');
         const hasChildren = level < prob.children.length && Math.random() < prob.children[level];
 
         if (hasChildren) {
-            yield new TagNode('div', classes, Vector.ofIterable(genSiblings(ctx, level + 1)));
+            yield new TagNode('div', classes, Vector.of(new TextNode(text + ' '), ...genSiblings(ctx, level + 1)));
         } else {
             ctx.acquire();
-            yield new TagNode('div', classes, Vector.of(new TextNode(classes.mkString(' '))));
+            yield new TagNode('div', classes, Vector.of(new TextNode(text)));
         }
 
         yield *genSiblings(ctx, level, i + 1);

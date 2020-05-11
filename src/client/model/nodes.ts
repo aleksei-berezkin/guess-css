@@ -121,6 +121,6 @@ export class TextNode implements Node {
     }
 
     toTextRegion(): Region {
-        return {kind: RegionKind.Default, text: this.text};
+        return {kind: RegionKind.Text, text: this.text};
     }
 }

@@ -16,7 +16,8 @@ import { getDeepestSingleChildSubtree, SingleChildSubtree } from '../singleChild
 const constantRule = new Rule(
     new TypeSelector('div'),
     Vector.of(
-        ['padding', '6px'],
+        ['display', 'inline-block'],
+        ['padding', '.5em'],
         ['border', '1px solid black'],
     )
 );
@@ -41,7 +42,8 @@ export function genRulesChoices(body: TagNode): Vector<Vector<Rule>> | null {
         return null;
     }
 
-    const siblingsRules = Vector.ofIterable(genSiblingsRules(siblingsSubtree, siblingsStyle));
+    const siblingsRules = Vector.ofIterable(genSiblingsRules(siblingsSubtree, siblingsStyle))
+        .distinctBy(r => r.selectorsString);
     if (siblingsRules.length() < RULES_CHOICES) {
         return null;
     }
@@ -71,7 +73,8 @@ function genDeepChildRules(deepest: SingleChildSubtree, style: Vector<Declaratio
         .flatMap(([ancestorSelector, descendantSelector]) => Vector.of(
             new Rule(new DescendantCombinator(ancestorSelector, descendantSelector), style, true),
             new Rule(new ChildCombinator(ancestorSelector, descendantSelector), style, true)
-        ));
+        ))
+        .distinctBy(r => r.selectorsString);
 }
 
 function *genSiblingsRules(siblingsSubtree: SiblingsSubtree, style: Vector<Declaration>): IterableIterator<Rule> {

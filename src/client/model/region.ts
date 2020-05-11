@@ -8,6 +8,7 @@ export interface Region {
 
 export enum RegionKind {
     Default = 'default',
+    Text = 'text',
     Tag = 'tag',
     AttrName = 'attr-name',
     AttrValue = 'attr-value',

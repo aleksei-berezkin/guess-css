@@ -9,6 +9,8 @@ export type Declaration = [
 ];
 
 export class Rule {
+    private _selectorsString?: string;
+
     constructor(
         private readonly selectors: Selector | Vector<Selector>,
         private readonly declarations: Vector<Declaration>,
@@ -16,7 +18,7 @@ export class Rule {
     }
 
     toUnformattedCode() {
-        return this.selectorsToString() + '{' + this.declarationsToString() + '}';
+        return this.selectorsString + '{' + this.declarationsToString() + '}';
     }
 
     private declarationsToString(): string {
@@ -25,20 +27,24 @@ export class Rule {
             .mkString(' ');
     }
 
-    private selectorsToString() {
-        if (this.selectors instanceof Vector) {
-            return this.selectors
-                .map(sel => sel.toString())
-                .mkString(', ');
+    get selectorsString() {
+        if (this._selectorsString == undefined) {
+            if (this.selectors instanceof Vector) {
+                this._selectorsString = this.selectors
+                    .map(sel => sel.toString())
+                    .mkString(', ');
+            } else {
+                this._selectorsString = this.selectors.toString();
+            }
         }
-        return this.selectors.toString();
+        return this._selectorsString;
     }
 
     toRegions(indent: Indent): Vector<Region[]> {
         return Vector.of<Region[]>(
             [
                 indent,
-                {kind: RegionKind.Selector, text: this.selectorsToString(), differing: this.selectorsDiffering},
+                {kind: RegionKind.Selector, text: this.selectorsString, differing: this.selectorsDiffering},
                 {kind: RegionKind.Default, text: ' {'},
             ])
             .appendAll(this.declarationsToRegions(indent.indent()))
