@@ -3,7 +3,7 @@ import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 import webpack from 'webpack';
 
-import config from '../../webpackConfDev';
+import config from '../../webpackDev';
 import { WEB_DEV_PORT } from './portsConfig';
 
 if (process.env.NODE_ENV !== 'development') {

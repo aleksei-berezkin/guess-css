@@ -2,11 +2,10 @@
   "compilerOptions": {
     "strict": true,
     "noImplicitAny": true,
-    "downlevelIteration": true,
 
     "sourceMap": true,
 
-    "target": "es5",
+    "target": "ESNext",
     "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
@@ -15,9 +14,7 @@
 
     "lib": [
       "dom",
-      "es5",
-      "scripthost",
-      "es2015.promise"
+      "es6"
     ]
   },
   "exclude": [

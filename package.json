@@ -6,10 +6,11 @@
   "scripts": {
     "dev": "ts-node-dev --no-notify src/server/runDevServer.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prod-in-dev:build": "NODE_ENV=development webpack --config webpackConfProd.js",
+    "prod-in-dev:build": "NODE_ENV=development webpack --config webpackProd.js",
     "prod-in-dev:start": "ts-node-dev --no-notify src/server/runProdServer.ts",
-    "build": "NODE_ENV=production webpack --config webpackConfProd.js",
-    "start": "NODE_ENV=production ts-node src/server/runProdServer.ts"
+    "build": "NODE_ENV=production webpack --config webpackProd.js",
+    "start": "NODE_ENV=production ts-node src/server/runProdServer.ts",
+    "analyze": "NODE_ENV=production webpack --config webpackAnalyze.js"
   },
   "author": "Aleksei Berezkin",
   "license": "ISC",
@@ -29,6 +30,7 @@
     "ts-loader": "^6.2.2",
     "ts-node-dev": "^1.0.0-pre.44",
     "webpack": "^4.43.0",
+    "webpack-bundle-analyzer": "^3.8.0",
     "webpack-cli": "^3.3.11",
     "webpack-dev-middleware": "^3.7.2",
     "webpack-hot-middleware": "^2.25.0"

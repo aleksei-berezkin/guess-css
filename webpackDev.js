@@ -1,4 +1,4 @@
-const baseConfig = require('./webpackConfBase');
+const baseConfig = require('./webpackBase');
 const { HotModuleReplacementPlugin } = require('webpack');
 
 module.exports = {
