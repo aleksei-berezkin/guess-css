@@ -14,7 +14,6 @@ module.exports = {
     plugins: [
         new HtmlWebpackPlugin({
             title: 'CSS Puzzler',
-            inject: false,
             template: require('html-webpack-template'),
             appMountId: ROOT_EL_ID,
             appMountHtmlSnippet: ROOT_EL_TEXT,
