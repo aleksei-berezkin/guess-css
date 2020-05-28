@@ -13,7 +13,6 @@ import { isAction } from './actionUtils';
 
 export type State = {
     topics: Vector<Topic>,
-    // head is the most recent, tail is history
     puzzlerViews: Vector<{
         source: string,
         choiceCodes: Vector<Vector<Region[]>>,
@@ -32,65 +31,52 @@ export const initialState: State = {
 };
 
 const rootReducer = combineReducers({
-    topics: function(topics: State['topics'] = initialState.topics, action: Action): State['topics'] {
+    topics: function(state: State['topics'] = initialState.topics, action: Action): State['topics'] {
         if (isAction(setTopics, action)) {
             return action.topics;
         }
-        return topics;
+        return state;
     },
 
-    puzzlerViews: function(puzzlerViews: State['puzzlerViews'] = initialState.puzzlerViews, action: Action): State['puzzlerViews'] {
+    puzzlerViews: function(state: State['puzzlerViews'] = initialState.puzzlerViews, action: Action): State['puzzlerViews'] {
         if (isAction(displayNewPuzzler, action)) {
-            return Vector.of(
-                {
-                    source: action.source,
-                    choiceCodes: action.choiceCodes,
-                    correctChoice: action.correctChoice,
-                    userChoice: undefined as number | undefined,
-                }
-            ).appendAll(puzzlerViews);
+            return state.append({
+                source: action.source,
+                choiceCodes: action.choiceCodes,
+                correctChoice: action.correctChoice,
+                userChoice: undefined as number | undefined,
+            });
         }
 
         if (isAction(displayAnswer, action)) {
-            const headView = puzzlerViews.head().getOrThrow();
-            const updatedView = {
-                ...headView,
-                userChoice: action.userChoice as number | undefined,
-            };
-            return Vector.of(updatedView).appendAll(puzzlerViews.tail().getOrThrow());
+            return state.init()
+                .append({
+                    ...state.last().getOrThrow(),
+                    userChoice: action.userChoice,
+                });
         }
 
-        return puzzlerViews;
+        return state;
     },
 
-    current: function(current: State['current'] = initialState.current, action: Action): State['current'] {
-        if (isAction(displayNewPuzzler, action)) {
-            if (current === -1 || current === 0) {
-                return 0;
-            }
-            throw new Error('Current=' + current);
-        }
-
-        if (isAction(navNextPuzzler, action)) {
-            if (current > 0) {
-                return current - 1;
-            }
-            throw new Error('Current=' + current);
+    current: function(state: State['current'] = initialState.current, action: Action): State['current'] {
+        if (isAction(displayNewPuzzler, action) || isAction(navNextPuzzler, action)) {
+            return state + 1;
         }
 
         if (isAction(navPrevPuzzler, action)) {
-            return current + 1;
+            return state - 1;
         }
 
-        return current;
+        return state;
     },
 
-    correctAnswers: function(correctAnswers: State['correctAnswers'] = initialState.correctAnswers, action: Action): State['correctAnswers'] {
+    correctAnswers: function(state: State['correctAnswers'] = initialState.correctAnswers, action: Action): State['correctAnswers'] {
         if (isAction(displayAnswer, action) && action.isCorrect) {
-            return correctAnswers + 1;
+            return state + 1;
         }
 
-        return correctAnswers;
+        return state;
     }
 });
 

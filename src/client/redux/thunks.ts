@@ -28,7 +28,7 @@ export function genNewPuzzler(diffHint: boolean): MyThunk {
 
 export function checkChoice(userChoice: number): MyThunk {
     return function(dispatch, getState) {
-        const correctChoice = getState().puzzlerViews.head().getOrThrow().correctChoice;
+        const correctChoice = getState().puzzlerViews.last().getOrThrow().correctChoice;
         dispatch(displayAnswer(userChoice, correctChoice === userChoice));
     }
 }

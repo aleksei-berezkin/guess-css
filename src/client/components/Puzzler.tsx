@@ -26,7 +26,7 @@ export function Puzzler(): ReactElement {
 }
 
 function Score() {
-    const isLast = useSelector((st: State) => st.current === 0);
+    const isLast = useSelector((st: State) => st.current === st.puzzlerViews.length() - 1);
     const correctAnswers = useSelector((st: State) => st.correctAnswers);
     const donePuzzlersNum = useSelector(getDonePuzzlersNum)
 
@@ -37,8 +37,8 @@ function Score() {
 }
 
 function DonePuzzler() {
-    const isHistory = useSelector((st: State) => st.current > 0);
-    const historyPuzzlerPos = useSelector((st: State) => st.puzzlerViews.length() - st.current);
+    const isHistory = useSelector((st: State) => st.current < st.puzzlerViews.length() - 1);
+    const historyPuzzlerPos = useSelector((st: State) => st.current + 1);
     const donePuzzlersNum = useSelector(getDonePuzzlersNum);
 
     return <>{
@@ -51,7 +51,7 @@ function getDonePuzzlersNum(st: State) {
     if (st.puzzlerViews.isEmpty()) {
         return 0;
     }
-    if (st.puzzlerViews.head().filter(p => p.userChoice != null).isSome()) {
+    if (st.puzzlerViews.last().filter(p => p.userChoice != null).isSome()) {
         return st.puzzlerViews.length();
     }
     return st.puzzlerViews.length() - 1;
@@ -74,7 +74,7 @@ function LayoutFrame() {
 }
 
 function PrevButton() {
-    const hasPrev = useSelector((st: State) => st.current < st.puzzlerViews.length() - 1);
+    const hasPrev = useSelector((st: State) => st.current > 0);
     const dispatch: Dispatch = useDispatch();
 
     function handlePrev() {
@@ -88,7 +88,7 @@ function PrevButton() {
 }
 
 function NextButton() {
-    const hasNext = useSelector((st: State) => st.current > 0);
+    const hasNext = useSelector((st: State) => st.current < st.puzzlerViews.length() - 1);
     const isAnswered = useSelector((st: State) => st.puzzlerViews.get(st.current).mapNullable(p => p.userChoice).isSome());
     const dispatch = useDispatch();
 
@@ -107,7 +107,7 @@ function NextButton() {
 }
 
 function Choices(): ReactElement {
-    const keyBase = useSelector((st: State) => `${st.current}_${st.puzzlerViews.length()}`);
+    const keyBase = useSelector((st: State) => `${st.current}_`);
 
     const choicesCount = useSelector((st: State) =>
         st.puzzlerViews.get(st.current)
