@@ -51,7 +51,7 @@ function getDonePuzzlersNum(st: State) {
     if (st.puzzlerViews.isEmpty()) {
         return 0;
     }
-    if (st.puzzlerViews.last().filter(p => p.userChoice != null).isSome()) {
+    if (st.puzzlerViews.last().getOrUndefined()?.userChoice != null) {
         return st.puzzlerViews.length();
     }
     return st.puzzlerViews.length() - 1;
@@ -89,7 +89,7 @@ function PrevButton() {
 
 function NextButton() {
     const hasNext = useSelector((st: State) => st.current < st.puzzlerViews.length() - 1);
-    const isAnswered = useSelector((st: State) => st.puzzlerViews.get(st.current).mapNullable(p => p.userChoice).isSome());
+    const isAnswered = useSelector((st: State) => st.puzzlerViews.get(st.current).getOrUndefined()?.userChoice != null);
     const dispatch = useDispatch();
 
     function handleNext() {
@@ -139,7 +139,7 @@ function Choice(p: {choice: number}): ReactElement {
     );
 
     const highlight = (() => {
-        if (userChoice !== undefined && correctChoice === p.choice) {
+        if (userChoice != null && correctChoice === p.choice) {
             return 'correct';
         }
         if (userChoice === p.choice) {
@@ -157,12 +157,12 @@ function Choice(p: {choice: number}): ReactElement {
     const dispatch = useDispatch();
 
     function handleClick() {
-        if (userChoice === undefined) {
+        if (userChoice == null) {
             dispatch(checkChoice(p.choice));
         }
     }
 
-    const active = userChoice === undefined ? 'active' : '';
+    const active = userChoice == null ? 'active' : '';
     return <div className={ `choice ${ highlight } ${ outline } ${ active }` }
                 onClick={ handleClick }>{
         choiceCode &&
