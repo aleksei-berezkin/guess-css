@@ -1,32 +1,27 @@
 import { Region } from '../model/region';
 import {
-    DisplayAnswer,
-    DisplayNewPuzzler,
-    isOfType,
-    NavNextPuzzler,
-    NavPrevPuzzler, SetTopics,
-    Type
+    displayAnswer,
+    displayNewPuzzler, navNextPuzzler, navPrevPuzzler,
+    setTopics,
 } from './actions';
 import { Action, applyMiddleware, combineReducers, createStore } from 'redux';
-import createSagaMiddleware from 'redux-saga';
-import { rootSaga } from './saga';
+import thunkMiddleware, { ThunkMiddleware } from 'redux-thunk';
 import { Vector } from 'prelude-ts';
 import { Topic } from '../model/gen/topic';
+import { isAction } from './actionUtils';
 
 
 export type State = {
     topics: Vector<Topic>,
     // head is the most recent, tail is history
-    puzzlerViews: Vector<PuzzlerView>,
+    puzzlerViews: Vector<{
+        source: string,
+        choiceCodes: Vector<Vector<Region[]>>,
+        correctChoice: number,
+        userChoice: number | undefined,
+    }>,
     current: number,
     correctAnswers: number,
-}
-
-export type PuzzlerView = {
-    source: string,
-    choiceCodes: Vector<Vector<Region[]>>,
-    correctChoice: number,
-    userChoice?: number,
 }
 
 export const initialState: State = {
@@ -37,29 +32,30 @@ export const initialState: State = {
 };
 
 const rootReducer = combineReducers({
-    topics: function(topics: Vector<Topic> = initialState.topics, action: Action): Vector<Topic> {
-        if (isOfType<SetTopics>(Type.SET_TOPICS, action)) {
+    topics: function(topics: State['topics'] = initialState.topics, action: Action): State['topics'] {
+        if (isAction(setTopics, action)) {
             return action.topics;
         }
         return topics;
     },
 
-    puzzlerViews: function(puzzlerViews: Vector<PuzzlerView> = initialState.puzzlerViews, action: Action): Vector<PuzzlerView> {
-        if (isOfType<DisplayNewPuzzler>(Type.DISPLAY_NEW_PUZZLER, action)) {
-            return Vector.of<PuzzlerView>(
+    puzzlerViews: function(puzzlerViews: State['puzzlerViews'] = initialState.puzzlerViews, action: Action): State['puzzlerViews'] {
+        if (isAction(displayNewPuzzler, action)) {
+            return Vector.of(
                 {
                     source: action.source,
                     choiceCodes: action.choiceCodes,
                     correctChoice: action.correctChoice,
+                    userChoice: undefined as number | undefined,
                 }
             ).appendAll(puzzlerViews);
         }
 
-        if (isOfType<DisplayAnswer>(Type.DISPLAY_ANSWER, action)) {
+        if (isAction(displayAnswer, action)) {
             const headView = puzzlerViews.head().getOrThrow();
-            const updatedView: PuzzlerView = {
+            const updatedView = {
                 ...headView,
-                userChoice: action.userChoice,
+                userChoice: action.userChoice as number | undefined,
             };
             return Vector.of(updatedView).appendAll(puzzlerViews.tail().getOrThrow());
         }
@@ -67,30 +63,30 @@ const rootReducer = combineReducers({
         return puzzlerViews;
     },
 
-    current: function(current: number = initialState.current, action: Action): number {
-        if (isOfType<DisplayNewPuzzler>(Type.DISPLAY_NEW_PUZZLER, action)) {
+    current: function(current: State['current'] = initialState.current, action: Action): State['current'] {
+        if (isAction(displayNewPuzzler, action)) {
             if (current === -1 || current === 0) {
                 return 0;
             }
             throw new Error('Current=' + current);
         }
 
-        if (isOfType<NavNextPuzzler>(Type.NAV_NEXT_PUZZLER, action)) {
+        if (isAction(navNextPuzzler, action)) {
             if (current > 0) {
                 return current - 1;
             }
             throw new Error('Current=' + current);
         }
 
-        if (isOfType<NavPrevPuzzler>(Type.NAV_PREV_PUZZLER, action)) {
+        if (isAction(navPrevPuzzler, action)) {
             return current + 1;
         }
 
         return current;
     },
 
-    correctAnswers: function(correctAnswers: number = initialState.correctAnswers, action: Action): number {
-        if (isOfType<DisplayAnswer>(Type.DISPLAY_ANSWER, action) && action.isCorrect) {
+    correctAnswers: function(correctAnswers: State['correctAnswers'] = initialState.correctAnswers, action: Action): State['correctAnswers'] {
+        if (isAction(displayAnswer, action) && action.isCorrect) {
             return correctAnswers + 1;
         }
 
@@ -99,13 +95,10 @@ const rootReducer = combineReducers({
 });
 
 export function createAppStore(state: State) {
-    const sagaMiddleware = createSagaMiddleware();
-    const store = createAppStoreWithMiddleware(state, sagaMiddleware);
-    sagaMiddleware.run(rootSaga);
-    return store;
+    return createAppStoreWithMiddleware(state, thunkMiddleware);
 }
 
-export function createAppStoreWithMiddleware(state: State, middleware?: any) {
+export function createAppStoreWithMiddleware(state: State, middleware?: ThunkMiddleware) {
     return createStore(
         rootReducer,
         state,

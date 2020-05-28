@@ -3,28 +3,18 @@ import { Region } from '../model/region';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from '../redux/store';
 import {
-    CheckChoice,
-    GenNewPuzzler,
-    InitClient,
-    NavNextPuzzler,
-    NavPrevPuzzler,
-    Type
+    navNextPuzzler,
+    navPrevPuzzler
 } from '../redux/actions';
 import { Dispatch } from 'redux';
 import { range } from '../util';
 import { Vector } from 'prelude-ts';
+import { checkChoice, genNewPuzzler, initClient } from '../redux/thunks';
 
 export function Puzzler(): ReactElement {
-    const initialized = useSelector((state: State) => !state.puzzlerViews.isEmpty());
-    const dispatch: Dispatch<InitClient> = useDispatch();
+    const dispatch = useDispatch();
 
-    useEffect(() => {
-        if (!initialized) {
-            dispatch({
-                type: Type.INIT_CLIENT,
-            });
-        }
-    }, [initialized]);
+    useEffect(() => {dispatch(initClient())}, ['const']);
 
     return <>
         <h1>Guess the code snippet which produces this layout</h1>
@@ -85,11 +75,11 @@ function LayoutFrame() {
 
 function PrevButton() {
     const hasPrev = useSelector((st: State) => st.current < st.puzzlerViews.length() - 1);
-    const dispatch: Dispatch<NavPrevPuzzler> = useDispatch();
+    const dispatch: Dispatch = useDispatch();
 
     function handlePrev() {
         if (hasPrev) {
-            dispatch({type: Type.NAV_PREV_PUZZLER});
+            dispatch(navPrevPuzzler());
         }
     }
 
@@ -100,16 +90,13 @@ function PrevButton() {
 function NextButton() {
     const hasNext = useSelector((st: State) => st.current > 0);
     const isAnswered = useSelector((st: State) => st.puzzlerViews.get(st.current).mapNullable(p => p.userChoice).isSome());
-    const dispatch: Dispatch<NavNextPuzzler | GenNewPuzzler> = useDispatch();
+    const dispatch = useDispatch();
 
     function handleNext() {
         if (hasNext) {
-            dispatch({type: Type.NAV_NEXT_PUZZLER});
+            dispatch(navNextPuzzler());
         } else if (isAnswered) {
-            dispatch({
-                type: Type.GEN_NEW_PUZZLER,
-                diffHint: false,
-            });
+            dispatch(genNewPuzzler(false));
         } else {
             throw new Error('Cannot dispatch');
         }
@@ -167,14 +154,11 @@ function Choice(p: {choice: number}): ReactElement {
         return '';
     })();
 
-    const dispatch: Dispatch<CheckChoice> = useDispatch();
+    const dispatch = useDispatch();
 
     function handleClick() {
         if (userChoice === undefined) {
-            dispatch({
-                type: Type.CHECK_CHOICE,
-                userChoice: p.choice,
-            });
+            dispatch(checkChoice(p.choice));
         }
     }
 

@@ -39,13 +39,12 @@ export function sendRenderedApp(req: Request, res: Response) {
     const puzzler: Puzzler = genPuzzler(topics.head().getOrThrow());
     const state: State = {
         topics,
-        puzzlerViews: Vector.of(
-            {
-                source: puzzler.html,
-                choiceCodes: puzzler.getChoiceCodes(true),
-                correctChoice: puzzler.correctChoice,
-            },
-        ),
+        puzzlerViews: Vector.of({
+            source: puzzler.html,
+            choiceCodes: puzzler.getChoiceCodes(true),
+            correctChoice: puzzler.correctChoice,
+            userChoice: undefined as number | undefined,
+        }),
         current: 0,
         correctAnswers: 0,
     };
