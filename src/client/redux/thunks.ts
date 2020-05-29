@@ -8,7 +8,11 @@ import { Action } from 'redux';
 type MyThunk = ThunkAction<void, State, never, Action<string>>;
 
 export function initClient(): MyThunk {
-    return function(dispatch) {
+    return function(dispatch, getState) {
+        if (!getState().puzzlerViews.isEmpty()) {
+            // Already initialized
+            return;
+        }
         dispatch(setTopics(getRandomizedTopics()));
         dispatch(genNewPuzzler(true));
     };

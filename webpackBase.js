@@ -14,9 +14,9 @@ module.exports = {
     plugins: [
         new HtmlWebpackPlugin({
             title: 'CSS Puzzler',
-            template: require('html-webpack-template'),
-            appMountId: ROOT_EL_ID,
-            appMountHtmlSnippet: ROOT_EL_TEXT,
+            template: './template.ejs',
+            rootElementId: ROOT_EL_ID,
+            initText: ROOT_EL_TEXT,
         }),
         new MiniCssExtractPlugin({
             filename: '[name].[contenthash].css',

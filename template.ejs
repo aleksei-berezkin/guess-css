@@ -1,0 +1,13 @@
+<% 
+    // noinspection JSUnresolvedVariable
+    var options = htmlWebpackPlugin.options
+%><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title><%= options.title %></title>
+</head>
+<body>
+    <div id="<%= options.rootElementId %>"><%= options.initText %></div>
+</body>
+</html>
