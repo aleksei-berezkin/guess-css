@@ -32,6 +32,15 @@ export class Puzzler {
             .map(choice => this.choiceCode(choice, diffHint));
     };
 
+    getStyleCodes(diffHint: boolean): Vector<Vector<Region[]>> {
+        return this.rulesChoices
+            .map(choice => new StylesNode(choice, diffHint).toRegions(new Indent()));
+    }
+
+    getBodyInnerCode(): Vector<Region[]> {
+        return this.body.children.flatMap(n => n.toRegions(new Indent()));
+    }
+
     private choiceCode(choice: Vector<Rule>, diffHint: boolean): Vector<Region[]> {
         return new TagNode('html', Vector.empty(), Vector.of(
             new TagNode('head', Vector.empty(), Vector.of(

@@ -1,5 +1,4 @@
 import React, { ReactElement, useEffect } from 'react';
-import { Region } from '../model/region';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from '../redux/store';
 import {
@@ -7,9 +6,12 @@ import {
     navPrevPuzzler
 } from '../redux/actions';
 import { Dispatch } from 'redux';
+import { checkChoice, genNewPuzzler, initClient } from '../redux/thunks';
 import { range } from '../util';
 import { Vector } from 'prelude-ts';
-import { checkChoice, genNewPuzzler, initClient } from '../redux/thunks';
+import { Region } from '../model/region';
+import { Lines } from './lines';
+import { Body } from './body';
 
 export function Puzzler(): ReactElement {
     const dispatch = useDispatch();
@@ -22,6 +24,7 @@ export function Puzzler(): ReactElement {
         <DonePuzzler/>
         <LayoutFrame/>
         <Choices/>
+        <Body/>
     </>
 }
 
@@ -163,40 +166,7 @@ function Choice(p: {choice: number}): ReactElement {
     }
 
     const active = userChoice == null ? 'active' : '';
-    return <div className={ `choice ${ highlight } ${ outline } ${ active }` }
-                onClick={ handleClick }>{
-        choiceCode &&
-        choiceCode.zipWithIndex().map(
-            ([regions, i]) => <Line key={ i } regions={ regions } />
-        )
-    }</div>;
-}
-
-function Line(p: {regions: Region[]}) {
-    return <pre>{
-        p.regions.map(
-            (reg, i) => {
-                const className = reg.differing
-                    ? reg.kind + ' differing'
-                    : reg.kind;
-
-                return <span key={ i } className={ className } style={ getStyle(reg) }>{ reg.text }</span>;
-            }
-        )
-    }</pre>
-}
-
-function getStyle(reg: Region) {
-    if (reg.backgroundColor) {
-        if (reg.color) {
-            return {
-                backgroundColor: reg.backgroundColor,
-                color: reg.color,
-            }
-        }
-        return {
-            backgroundColor: reg.backgroundColor,
-        }
-    }
-    return undefined;
+    return <div className={ `code ${ highlight } ${ outline } ${ active }` } onClick={ handleClick }>
+        <Lines lines={choiceCode}/>
+    </div>;
 }

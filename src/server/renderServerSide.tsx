@@ -4,7 +4,7 @@ import { genPuzzler } from '../client/model/gen/genPuzzler';
 import { createAppStoreWithMiddleware, State } from '../client/redux/store';
 import { renderToString } from 'react-dom/server';
 import { Provider } from 'react-redux';
-import { Puzzler as PuzzlerComponent } from '../client/components/Puzzler';
+import { Puzzler as PuzzlerComponent } from '../client/components/puzzler';
 import React from 'react';
 import { readFile } from 'fs';
 import path from 'path';
@@ -42,6 +42,8 @@ export function sendRenderedApp(req: Request, res: Response) {
         puzzlerViews: Vector.of({
             source: puzzler.html,
             choiceCodes: puzzler.getChoiceCodes(true),
+            styleCodes: puzzler.getStyleCodes(true),
+            bodyInnerCode: puzzler.getBodyInnerCode(),
             correctChoice: puzzler.correctChoice,
             userChoice: undefined as number | undefined,
         }),

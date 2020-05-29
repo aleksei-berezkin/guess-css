@@ -1,7 +1,7 @@
 import './styles.less';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Puzzler } from './components/Puzzler';
+import { Puzzler } from './components/puzzler';
 import { Provider } from 'react-redux';
 import { createAppStore, initialState } from './redux/store';
 import { ROOT_EL_ID } from '../shared/appWideConst';

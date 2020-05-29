@@ -69,94 +69,95 @@ body {
 .choices {
     display: flex;
 
-    .choice {
-        border: 1px solid white;
-        border-radius: .25em;
+}
 
-        &.active {
-            cursor: pointer;
-            transition: all .3s;
+.code {
+    border: 1px solid white;
+    border-radius: .25em;
 
-            &:hover {
-                background-color: #f5f5f5;
-            }
+    &.active {
+        cursor: pointer;
+        transition: all .3s;
+
+        &:hover {
+            background-color: #f5f5f5;
         }
+    }
 
-        &.correct {
-            .answer-color(#e0ffe0, darkgreen);
+    &.correct {
+        .answer-color(#e0ffe0, darkgreen);
+    }
+
+    &.incorrect {
+        .answer-color(#ffe0e0, darkred);
+    }
+
+    .answer-color(@bg; @border) {
+        background-color: @bg;
+        border-color: @bg;
+        transition: all .4s;
+
+        &.user-choice {
+            border-color: @border;
         }
+    }
 
-        &.incorrect {
-            .answer-color(#ffe0e0, darkred);
-        }
+    &.correct::before {
+        .answer-mark("✓", darkgreen);
+    }
 
-        .answer-color(@bg; @border) {
-            background-color: @bg;
-            border-color: @bg;
-            transition: all .4s;
+    &.incorrect::before {
+        .answer-mark("✗", darkred);
+    }
 
-            &.user-choice {
-                border-color: @border;
-            }
-        }
+    .answer-mark(@content, @color) {
+        float: right;
+        margin: 10px;
+        content: @content;
+        color: @color;
+    }
 
-        &.correct::before {
-            .answer-mark("✓", darkgreen);
-        }
+    pre {
+        margin: 0;
+        font-family: Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace;
+        font-size: 12px;
+    }
 
-        &.incorrect::before {
-            .answer-mark("✗", darkred);
-        }
+    .text {
+        color: #000000;
+        background-color: #f2f2f2;
+    }
 
-        .answer-mark(@content, @color) {
-            float: right;
-            margin: 10px;
-            content: @content;
-            color: @color;
-        }
+    .tag {
+        color: #0000c0;
+    }
 
-        pre {
-            margin: 0;
-            font-family: Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace;
-            font-size: 12px;
-        }
+    .attr-name {
+        color: #0000ff;
+    }
 
-        .text {
-            color: #000000;
-            background-color: #f2f2f2;
-        }
+    .attr-value {
+        color: #008000;
+    }
 
-        .tag {
-            color: #0000c0;
-        }
+    .operator {
+        color: #008000;
+    }
 
-        .attr-name {
-            color: #0000ff;
-        }
+    .selector {
+        color: #000080;
+    }
 
-        .attr-value {
-            color: #008000;
-        }
+    .decl-name {
+        color: #000000;
+    }
 
-        .operator {
-            color: #008000;
-        }
+    .comment {
+        color: #808080;
+        font-style: italic;
+    }
 
-        .selector {
-            color: #000080;
-        }
-
-        .decl-name {
-            color: #000000;
-        }
-
-        .comment {
-            color: #808080;
-            font-style: italic;
-        }
-
-        .differing {
-            font-weight: bold;
-        }
+    .differing {
+        font-weight: bold;
     }
 }

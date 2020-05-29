@@ -26,7 +26,7 @@ export function genNewPuzzler(diffHint: boolean): MyThunk {
             .getOrThrow()
 
         const puzzler = genPuzzler(topic);
-        dispatch(displayNewPuzzler(puzzler.html, puzzler.getChoiceCodes(diffHint), puzzler.correctChoice));
+        dispatch(displayNewPuzzler(puzzler, diffHint));
     }
 }
 

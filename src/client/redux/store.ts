@@ -16,6 +16,8 @@ export type State = {
     puzzlerViews: Vector<{
         source: string,
         choiceCodes: Vector<Vector<Region[]>>,
+        styleCodes: Vector<Vector<Region[]>>,
+        bodyInnerCode: Vector<Region[]>,
         correctChoice: number,
         userChoice: number | undefined,
     }>,
@@ -43,6 +45,8 @@ const rootReducer = combineReducers({
             return state.append({
                 source: action.source,
                 choiceCodes: action.choiceCodes,
+                styleCodes: action.styleCodes,
+                bodyInnerCode: action.bodyInnerCode,
                 correctChoice: action.correctChoice,
                 userChoice: undefined as number | undefined,
             });
