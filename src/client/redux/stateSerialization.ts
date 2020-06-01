@@ -15,8 +15,6 @@ export function fromSerialized(state: SerializedState): State {
         puzzlerViews: Vector.ofIterable(state.puzzlerViews)
             .map(view => ({
                 source: view.source,
-                choiceCodes: Vector.ofIterable(view.choiceCodes)
-                    .map(choiceCode => Vector.ofIterable(choiceCode)),
                 styleCodes: Vector.ofIterable(view.styleCodes)
                     .map(choiceCode => Vector.ofIterable(choiceCode)),
                 bodyInnerCode: Vector.ofIterable(view.bodyInnerCode),

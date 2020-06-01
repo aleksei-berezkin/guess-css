@@ -15,7 +15,6 @@ export type State = {
     topics: Vector<Topic>,
     puzzlerViews: Vector<{
         source: string,
-        choiceCodes: Vector<Vector<Region[]>>,
         styleCodes: Vector<Vector<Region[]>>,
         bodyInnerCode: Vector<Region[]>,
         correctChoice: number,
@@ -42,14 +41,7 @@ const rootReducer = combineReducers({
 
     puzzlerViews: function(state: State['puzzlerViews'] = initialState.puzzlerViews, action: Action): State['puzzlerViews'] {
         if (isAction(displayNewPuzzler, action)) {
-            return state.append({
-                source: action.source,
-                choiceCodes: action.choiceCodes,
-                styleCodes: action.styleCodes,
-                bodyInnerCode: action.bodyInnerCode,
-                correctChoice: action.correctChoice,
-                userChoice: undefined as number | undefined,
-            });
+            return state.append(action.puzzlerView);
         }
 
         if (isAction(displayAnswer, action)) {

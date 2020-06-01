@@ -6,5 +6,5 @@ import { genFlexboxCss } from './genFlexboxCss';
 
 export function genFlexboxPuzzler(): Puzzler {
     const body = new TagNode('body', Vector.of(), genClassedDivs(2, 4));
-    return new Puzzler(body, genFlexboxCss(body));
+    return new Puzzler(body, genFlexboxCss(body), true);
 }

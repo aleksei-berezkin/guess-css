@@ -106,3 +106,5 @@ export function transpose<T>(matrix: Vector<Vector<T>>): Vector<Vector<T>> {
             })
         );
 }
+
+export type InferVectorType<T> = T extends Vector<infer E> ? E : never;

@@ -41,9 +41,8 @@ export function sendRenderedApp(req: Request, res: Response) {
         topics,
         puzzlerViews: Vector.of({
             source: puzzler.html,
-            choiceCodes: puzzler.getChoiceCodes(true),
             styleCodes: puzzler.getStyleCodes(true),
-            bodyInnerCode: puzzler.getBodyInnerCode(),
+            bodyInnerCode: puzzler.getBodyCode(),
             correctChoice: puzzler.correctChoice,
             userChoice: undefined as number | undefined,
         }),

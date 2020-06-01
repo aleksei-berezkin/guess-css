@@ -19,7 +19,7 @@ export function Puzzler(): ReactElement {
     useEffect(() => {dispatch(initClient())}, ['const']);
 
     return <>
-        <h1>Guess the code snippet which produces this layout</h1>
+        <h1>Guess CSS!</h1>
         <Score/>
         <DonePuzzler/>
         <LayoutFrame/>
@@ -114,7 +114,7 @@ function Choices(): ReactElement {
 
     const choicesCount = useSelector((st: State) =>
         st.puzzlerViews.get(st.current)
-            .map(p => p.choiceCodes.length())
+            .map(p => p.styleCodes.length())
             .getOrUndefined()
     );
 
@@ -134,7 +134,7 @@ function Choice(p: {choice: number}): ReactElement {
     const [choiceCode, correctChoice, userChoice] = useSelector((st: State) =>
         st.puzzlerViews.get(st.current)
             .map<[Vector<Region[]>?, number?, number?]>(puz => [
-                puz.choiceCodes.get(p.choice).getOrUndefined(),
+                puz.styleCodes.get(p.choice).getOrUndefined(),
                 puz.correctChoice,
                 puz.userChoice,
             ])

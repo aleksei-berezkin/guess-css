@@ -11,11 +11,10 @@ export class Puzzler {
     constructor(
             private readonly body: TagNode,
             private readonly rulesChoices: Vector<Vector<Rule>>,
-            _correctChoice?: number
+            private readonly showBodyTag = false,
+            
     ) {
-        this.correctChoice = _correctChoice != undefined
-            ? _correctChoice
-            : randomBounded(rulesChoices.length());
+        this.correctChoice = randomBounded(rulesChoices.length());
     }
 
     get html(): string {
@@ -27,32 +26,16 @@ export class Puzzler {
         return `<html><head><style>${ styleText }</style></head>${ this.body.toUnformattedCode() }</html>`;
     }
 
-    getChoiceCodes(diffHint: boolean): Vector<Vector<Region[]>> {
-        return this.rulesChoices
-            .map(choice => this.choiceCode(choice, diffHint));
-    };
-
     getStyleCodes(diffHint: boolean): Vector<Vector<Region[]>> {
         return this.rulesChoices
             .map(choice => new StylesNode(choice, diffHint).toRegions(new Indent()));
     }
 
-    getBodyInnerCode(): Vector<Region[]> {
+    getBodyCode(): Vector<Region[]> {
+        if (this.showBodyTag) {
+            return this.body.toRegions(new Indent());
+        }
         return this.body.children.flatMap(n => n.toRegions(new Indent()));
-    }
-
-    private choiceCode(choice: Vector<Rule>, diffHint: boolean): Vector<Region[]> {
-        return new TagNode('html', Vector.empty(), Vector.of(
-            new TagNode('head', Vector.empty(), Vector.of(
-                new TagNode('style', Vector.empty(), Vector.of(
-                    new StylesNode(
-                        choice,
-                        diffHint,
-                    )
-                ))
-            )),
-            this.body,
-        )).toRegions(new Indent());
     }
 }
 
