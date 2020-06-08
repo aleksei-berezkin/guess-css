@@ -1,49 +1,50 @@
 import { Region, RegionKind } from './region';
 import { Indent } from './indent';
-import { Vector } from 'prelude-ts';
+import { stream, streamOf } from '../stream/stream';
 
 export interface Node {
-    readonly children: Vector<Node>;
+    readonly children: Node[];
     copyWithSingleChild(child: Node): Node;
-    toRegions(indent: Indent): Vector<Region[]>;
+    toRegions(indent: Indent): Region[][];
     toUnformattedCode(): string;
 }
 
 export class TagNode implements Node {
     name: string;
-    classes: Vector<string>;
-    children: Vector<Node>;
+    classes: string[];
+    children: Node[];
 
-    private _tagChildren: Vector<TagNode> | undefined;
+    private _tagChildren: TagNode[] | undefined;
 
-    constructor(name: string, classes: Vector<string>, children: Vector<Node>) {
+    constructor(name: string, classes: string[], children: Node[]) {
         this.name = name;
         this.classes = classes;
         this.children = children;
     }
 
-    get tagChildren(): Vector<TagNode> {
+    get tagChildren(): TagNode[] {
         if (!this._tagChildren) {
-            this._tagChildren = this.children.filter(c => c instanceof TagNode) as Vector<TagNode>;
+            this._tagChildren = this.children.filter(c => c instanceof TagNode) as TagNode[];
         }
         return this._tagChildren;
     }
 
     copyWithSingleChild(child: Node): TagNode {
-        return new TagNode(this.name, this.classes, Vector.of(child));
+        return new TagNode(this.name, this.classes, [child]);
     }
 
-    toRegions(indent: Indent): Vector<Region[]> {
-        if (this.children.single().filter(c => c instanceof TextNode).isSome()) {
-            const textNode = this.children.single().getOrThrow() as TextNode;
-            return Vector.of(
+    toRegions(indent: Indent): Region[][] {
+        if (this.children.length === 1 && this.children[0] instanceof TextNode) {
+            const textNode = this.children[0] as TextNode;
+            return [
                 [indent, ...this.openTagToRegions(), textNode.toTextRegion(), this.closeTagToRegion()]
-            );
+            ];
         }
 
-        return Vector.of([indent, ...this.openTagToRegions()])
+        return streamOf([indent, ...this.openTagToRegions()])
             .appendAll(this.childrenToRegions(indent.indent()))
-            .append([indent, this.closeTagToRegion()]);
+            .append([indent, this.closeTagToRegion()])
+            .toArray();
     }
 
     private openTagToRegions(): Region[] {
@@ -60,7 +61,7 @@ export class TagNode implements Node {
     }
 
     private classesToRegions(): Region[] {
-        if (this.classes.isEmpty()) {
+        if (!this.classes.length) {
             return [];
         }
 
@@ -68,7 +69,7 @@ export class TagNode implements Node {
             {kind: RegionKind.Default, text: ' '},
             {kind: RegionKind.AttrName, text: 'class'},
             {kind: RegionKind.Operator, text: '="'},
-            {kind: RegionKind.AttrValue, text: this.classes.mkString(' ')},
+            {kind: RegionKind.AttrValue, text: this.classes.join(' ')},
             {kind: RegionKind.Operator, text: '"'},
         ];
     }
@@ -77,8 +78,10 @@ export class TagNode implements Node {
         return {kind: RegionKind.Tag, text: `</${this.name}>`};
     }
 
-    private childrenToRegions(indent: Indent): Vector<Region[]> {
-        return this.children.flatMap(node => node.toRegions(indent));
+    private childrenToRegions(indent: Indent): Region[][] {
+        return stream(this.children)
+            .flatMap(node => node.toRegions(indent))
+            .toArray();
     }
 
     toUnformattedCode(): string {
@@ -86,22 +89,22 @@ export class TagNode implements Node {
     }
 
     private classesAttrToString(): string {
-        if (this.classes.isEmpty()) {
+        if (!this.classes.length) {
             return '';
         }
 
-        return ` class="${this.classes.mkString(' ')}"`;
+        return ` class="${this.classes.join(' ')}"`;
     }
 
     private childrenToUnformattedCode(): string {
         return this.children
             .map(node => node.toUnformattedCode())
-            .mkString('');
+            .join('');
     }
 }
 
 export class TextNode implements Node {
-    readonly children = Vector.empty<Node>();
+    readonly children = [];
 
     constructor(public text: string) {
     }
@@ -114,10 +117,10 @@ export class TextNode implements Node {
         return this.text;
     }
 
-    toRegions(indent: Indent): Vector<Region[]> {
-        return Vector.of(
+    toRegions(indent: Indent): Region[][] {
+        return [
             [indent, this.toTextRegion()]
-        );
+        ];
     }
 
     toTextRegion(): Region {

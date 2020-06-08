@@ -9,31 +9,31 @@ import {
     Selector,
     TypeSelector
 } from '../../cssRules';
-import { Option, Vector } from 'prelude-ts';
 import { getSiblingsSubtree, SiblingsSubtree } from '../siblingsSubtree';
 import { getDeepestSingleChildSubtree, SingleChildSubtree } from '../singleChildSubtree';
+import { optional, Optional, stream } from '../../../stream/stream';
 
 const constantRule = new Rule(
     new TypeSelector('div'),
-    Vector.of(
+    [
         ['display', 'inline-block'],
         ['padding', '.5em'],
         ['border', '1px solid black'],
-    )
+    ]
 );
 const RULES_CHOICES = 3;
 
-const colors = Vector.of('pink', 'lightgreen', 'lightblue', 'cyan', 'magenta', 'yellow', 'lightgrey');
+const colors = ['pink', 'lightgreen', 'lightblue', 'cyan', 'magenta', 'yellow', 'lightgrey'];
 
-export function genRulesChoices(body: TagNode): Vector<Vector<Rule>> | null {
-    const [deepStyle, siblingsStyle] = colors
+export function genRulesChoices(body: TagNode): Rule[][] | null {
+    const [deepStyle, siblingsStyle] = stream(colors)
         .shuffle()
-        .take(2)
-        .map(color => Vector.of<Declaration>(['background-color', color]));
+        .map((color): Declaration[] => [['background-color', color]])
+        .take(2);
 
     const deepest: SingleChildSubtree = getDeepestSingleChildSubtree(body);
     const deepChildRules = genDeepChildRules(deepest, deepStyle);
-    if (deepChildRules.length() < RULES_CHOICES) {
+    if (deepChildRules.length < RULES_CHOICES) {
         return null;
     }
 
@@ -42,56 +42,61 @@ export function genRulesChoices(body: TagNode): Vector<Vector<Rule>> | null {
         return null;
     }
 
-    const siblingsRules = Vector.ofIterable(genSiblingsRules(siblingsSubtree, siblingsStyle))
-        .distinctBy(r => r.selectorsString);
-    if (siblingsRules.length() < RULES_CHOICES) {
+    const siblingsRules = stream(genSiblingsRules(siblingsSubtree, siblingsStyle))
+        .distinctBy(r => r.selectorsString)
+        .toArray();
+    if (siblingsRules.length < RULES_CHOICES) {
         return null;
     }
 
-    return deepChildRules.shuffle().take(RULES_CHOICES)
-        .zip(siblingsRules.shuffle().take(RULES_CHOICES))
-        .map(([deepRule, siblingRule]) => Vector.of(constantRule, deepRule, siblingRule))
+    return stream(deepChildRules).shuffle().take(RULES_CHOICES)
+        .zip(stream(siblingsRules).shuffle().take(RULES_CHOICES))
+        .map(([deepRule, siblingRule]) => [constantRule, deepRule, siblingRule])
+        .toArray();
 }
 
-function genDeepChildRules(deepest: SingleChildSubtree, style: Vector<Declaration>): Vector<Rule> {
-    const path: Vector<TagNode> = deepest.unfold().filter(n => n.name !== 'body');
+function genDeepChildRules(deepest: SingleChildSubtree, style: Declaration[]): Rule[] {
+    const path: TagNode[] = deepest.unfold().filter(n => n.name !== 'body');
 
-    if (path.length() === 0) {
-        return Vector.empty();
+    if (!path.length) {
+        return [];
     }
 
-    if (path.length() === 1) {
-        return path.take(1)
+    if (path.length === 1) {
+        return stream(path)
+            .head()
             .flatMap(genAllPossibleSelectors)
-            .map(s => new Rule(s, style));
+            .map(s => new Rule(s, style))
+            .toArray();
     }
 
     return twoElementVariationsInOrder(path)
         .flatMap(([ancestor, descendant]) =>
             xprod(genAllPossibleSelectors(ancestor), genAllPossibleSelectors(descendant))
         )
-        .flatMap(([ancestorSelector, descendantSelector]) => Vector.of(
+        .flatMap(([ancestorSelector, descendantSelector]) => [
             new Rule(new DescendantCombinator(ancestorSelector, descendantSelector), style, true),
             new Rule(new ChildCombinator(ancestorSelector, descendantSelector), style, true)
-        ))
-        .distinctBy(r => r.selectorsString);
+        ])
+        .distinctBy(r => r.selectorsString)
+        .toArray();
 }
 
-function *genSiblingsRules(siblingsSubtree: SiblingsSubtree, style: Vector<Declaration>): IterableIterator<Rule> {
+function *genSiblingsRules(siblingsSubtree: SiblingsSubtree, style: Declaration[]): IterableIterator<Rule> {
     const pathAndSiblings = siblingsSubtree.unfold();
     const path = pathAndSiblings.path.filter(n => n.name !== 'body');
     const siblings = pathAndSiblings.siblings;
-    if (path.isEmpty() || siblings.isEmpty()) {
+    if (!path.length || !siblings.length) {
         return;
     }
 
-    const sameName = allSameName(siblings).getOrUndefined();
+    const sameName = allSameName(siblings).orElseUndefined();
     if (sameName) {
         const innerSelectors = genAllPossiblePseudoClassSelectors(sameName);
 
         yield *innerSelectors.map(s => new Rule(s, style, true));
 
-        yield *path
+        yield *stream(path)
             .flatMap(genAllPossibleSelectors)
             .flatMap(ancestorSelector =>
                 innerSelectors.map(innerSelector =>
@@ -100,35 +105,35 @@ function *genSiblingsRules(siblingsSubtree: SiblingsSubtree, style: Vector<Decla
             );
     }
 
-    yield *genAllPossibleSelectors(path.last().getOrThrow())
+    yield *genAllPossibleSelectors(stream(path).last().get())
         .map(selector => new Rule(new ChildCombinator(selector, new TypeSelector('*')), style, true));
 
-    yield *siblings
+    yield *stream(siblings)
         .flatMap(n => n.classes)
         .distinctBy(_ => _)
         .map(clazz => new Rule(new ClassSelector(clazz), style, true))
 }
 
-function genAllPossibleSelectors(node: TagNode): Vector<Selector> {
-    if (!node.classes.isEmpty()) {
+function genAllPossibleSelectors(node: TagNode): Selector[] {
+    if (node.classes.length) {
         return node.classes
             .map(c => new ClassSelector(c));
     }
 
-    return Vector.of(new TypeSelector(node.name));
+    return [new TypeSelector(node.name)];
 }
 
-function genAllPossiblePseudoClassSelectors(name: string): Vector<Selector> {
+function genAllPossiblePseudoClassSelectors(name: string): Selector[] {
     const baseSelector = new TypeSelector(name);
-    return Vector.of(
+    return [
         new PseudoClassSelector(baseSelector, 'first-child'),
         new PseudoClassSelector(baseSelector, 'last-child')
-    );
+    ];
 }
 
-function allSameName(nodes: Vector<TagNode>): Option<string> {
-    const firstName = nodes.head().getOrThrow().name;
-    return nodes.allMatch(n => n.name === firstName)
-        ? Option.of(firstName)
-        : Option.none();
+function allSameName(nodes: TagNode[]): Optional<string> {
+    const firstName = stream(nodes).head().get().name;
+    return stream(nodes).all(n => n.name === firstName)
+        ? optional([firstName])
+        : optional([]);
 }

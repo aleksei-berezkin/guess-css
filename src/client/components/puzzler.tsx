@@ -7,11 +7,9 @@ import {
 } from '../redux/actions';
 import { Dispatch } from 'redux';
 import { checkChoice, genNewPuzzler, initClient } from '../redux/thunks';
-import { range } from '../util';
-import { Vector } from 'prelude-ts';
-import { Region } from '../model/region';
 import { Lines } from './lines';
 import { Body } from './body';
+import { range, stream } from '../stream/stream';
 
 export function Puzzler(): ReactElement {
     const dispatch = useDispatch();
@@ -29,8 +27,8 @@ export function Puzzler(): ReactElement {
 }
 
 function Score() {
-    const isLast = useSelector((st: State) => st.current === st.puzzlerViews.length() - 1);
-    const correctAnswers = useSelector((st: State) => st.correctAnswers);
+    const isLast = useSelector(state => state.current === state.puzzlerViews.length - 1);
+    const correctAnswers = useSelector(state => state.correctAnswers);
     const donePuzzlersNum = useSelector(getDonePuzzlersNum)
 
     return <>{
@@ -40,8 +38,8 @@ function Score() {
 }
 
 function DonePuzzler() {
-    const isHistory = useSelector((st: State) => st.current < st.puzzlerViews.length() - 1);
-    const historyPuzzlerPos = useSelector((st: State) => st.current + 1);
+    const isHistory = useSelector(state => state.current < state.puzzlerViews.length - 1);
+    const historyPuzzlerPos = useSelector(state => state.current + 1);
     const donePuzzlersNum = useSelector(getDonePuzzlersNum);
 
     return <>{
@@ -50,22 +48,18 @@ function DonePuzzler() {
     }</>
 }
 
-function getDonePuzzlersNum(st: State) {
-    if (st.puzzlerViews.isEmpty()) {
+function getDonePuzzlersNum(state: State) {
+    if (!state.puzzlerViews.length) {
         return 0;
     }
-    if (st.puzzlerViews.last().getOrUndefined()?.userChoice != null) {
-        return st.puzzlerViews.length();
+    if (stream(state.puzzlerViews).last().orElseUndefined()?.userChoice != null) {
+        return state.puzzlerViews.length;
     }
-    return st.puzzlerViews.length() - 1;
+    return state.puzzlerViews.length - 1;
 }
 
 function LayoutFrame() {
-    const source = useSelector((st: State) =>
-        st.puzzlerViews.get(st.current)
-            .map(p => p.source)
-            .getOrUndefined()
-    );
+    const source = useSelector(state => state.puzzlerViews[state.current]?.source);
 
     return <div className='puzzler-top'>
         <PrevButton/>
@@ -77,7 +71,7 @@ function LayoutFrame() {
 }
 
 function PrevButton() {
-    const hasPrev = useSelector((st: State) => st.current > 0);
+    const hasPrev = useSelector(state => state.current > 0);
     const dispatch: Dispatch = useDispatch();
 
     function handlePrev() {
@@ -91,8 +85,8 @@ function PrevButton() {
 }
 
 function NextButton() {
-    const hasNext = useSelector((st: State) => st.current < st.puzzlerViews.length() - 1);
-    const isAnswered = useSelector((st: State) => st.puzzlerViews.get(st.current).getOrUndefined()?.userChoice != null);
+    const hasNext = useSelector(state => state.current < state.puzzlerViews.length - 1);
+    const isAnswered = useSelector(state => state.puzzlerViews[state.current]?.userChoice != null);
     const dispatch = useDispatch();
 
     function handleNext() {
@@ -110,13 +104,8 @@ function NextButton() {
 }
 
 function Choices(): ReactElement {
-    const keyBase = useSelector((st: State) => `${st.current}_`);
-
-    const choicesCount = useSelector((st: State) =>
-        st.puzzlerViews.get(st.current)
-            .map(p => p.styleCodes.length())
-            .getOrUndefined()
-    );
+    const keyBase = useSelector(state => `${state.current}_`);
+    const choicesCount = useSelector(state => state.puzzlerViews[state.current]?.styleCodes.length);
 
     return <div className='choices'>{
         choicesCount &&
@@ -127,19 +116,14 @@ function Choices(): ReactElement {
                     choice={ choice }
                 />
             )
+            .toArray()
     }</div>
 }
 
 function Choice(p: {choice: number}): ReactElement {
-    const [choiceCode, correctChoice, userChoice] = useSelector((st: State) =>
-        st.puzzlerViews.get(st.current)
-            .map<[Vector<Region[]>?, number?, number?]>(puz => [
-                puz.styleCodes.get(p.choice).getOrUndefined(),
-                puz.correctChoice,
-                puz.userChoice,
-            ])
-            .getOrElse([undefined, undefined, undefined])
-    );
+    const choiceCode = useSelector(state => state.puzzlerViews[state.current]?.styleCodes[p.choice]);
+    const correctChoice = useSelector(state => state.puzzlerViews[state.current]?.correctChoice);
+    const userChoice = useSelector(state => state.puzzlerViews[state.current]?.userChoice);
 
     const highlight = (() => {
         if (userChoice != null && correctChoice === p.choice) {

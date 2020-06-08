@@ -1,5 +1,4 @@
-import { Vector } from 'prelude-ts';
-import { Stream } from 'prelude-ts/dist/src/Stream';
+import { continually, stream } from '../../stream/stream';
 
 export enum Topic {
     DISPLAY = 'DISPLAY',
@@ -8,9 +7,11 @@ export enum Topic {
     SELECTORS = 'SELECTORS',
 }
 
-export function getRandomizedTopics(): Vector<Topic> {
-    return Stream.continually(() => Vector.ofIterable(Object.keys(Topic)).shuffle() as Vector<Topic>)
+const TOPIC_KEYS = Object.keys(Topic) as Topic[];
+
+export function getRandomizedTopics(): Topic[] {
+    return continually(() => stream(TOPIC_KEYS).shuffle())
         .take(5)
-        .toVector()
-        .flatMap(v => v);
+        .flatMap(v => v)
+        .toArray();
 }

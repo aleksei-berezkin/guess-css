@@ -1,16 +1,21 @@
 import { randomBounded } from '../../util';
-import { Stream, Vector } from 'prelude-ts';
 import { TagNode, TextNode } from '../nodes';
+import { stream } from '../../stream/stream';
 
-const abcStream = Stream.iterate('a', c => String.fromCharCode(c.charCodeAt(0) + 1));
+const abcGen = function* () {
+    let code = 'a'.charCodeAt(0);
+    for ( ; ; ) {
+        yield String.fromCharCode(code++);
+    }
+}
 
-export function genClassedDivs(min: number, max: number): Vector<TagNode> {
+export function genClassedDivs(min: number, max: number): TagNode[] {
     if (min < 1 || max < min) {
         throw new Error();
     }
 
-    return abcStream
-        .map(clazz => new TagNode('div', Vector.of(clazz), Vector.of(new TextNode(clazz))))
+    return stream(abcGen())
+        .map(clazz => new TagNode('div', [clazz], [new TextNode(clazz)]))
         .take(randomBounded(min, max + 1))
-        .toVector();
+        .toArray();
 }

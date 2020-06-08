@@ -1,14 +1,14 @@
 import { Puzzler } from '../../puzzler';
 import { Node, TagNode, TextNode } from '../../nodes';
-import { Vector } from 'prelude-ts';
 import { randomItem } from '../../../util';
 import { genRulesChoices } from './genSelectorsCss';
+import { stream } from '../../../stream/stream';
 
 export function genSelectorsPuzzler(): Puzzler {
     const body = new TagNode(
         'body',
-        Vector.empty(),
-        Vector.ofIterable(genSiblings(new Context(4), 1))
+        [],
+        [...genSiblings(new Context(4), 1)],
     );
     const rulesChoices = genRulesChoices(body);
     if (!rulesChoices) {
@@ -21,14 +21,14 @@ export function genSelectorsPuzzler(): Puzzler {
 function *genSiblings(ctx: Context, level: number, i = 0): IterableIterator<Node> {
     if (ctx.hasQuotaLeft() && i < prob.siblings[level].length && Math.random() < prob.siblings[level][i]) {
         const classes = ctx.classes.genClasses();
-        const text = classes.mkString(' ');
+        const text = classes.join(' ');
         const hasChildren = level < prob.children.length && Math.random() < prob.children[level];
 
         if (hasChildren) {
-            yield new TagNode('div', classes, Vector.of(new TextNode(text + ' '), ...genSiblings(ctx, level + 1)));
+            yield new TagNode('div', classes, [new TextNode(text + ' '), ...genSiblings(ctx, level + 1)]);
         } else {
             ctx.acquire();
-            yield new TagNode('div', classes, Vector.of(new TextNode(text)));
+            yield new TagNode('div', classes, [new TextNode(text)]);
         }
 
         yield *genSiblings(ctx, level, i + 1);
@@ -67,36 +67,36 @@ class Context {
 }
 
 class Classes {
-    classes: Vector<string> = Vector.of('a', 'b', 'c');
+    classes: string[] = ['a', 'b', 'c'];
 
     constructor() {
     }
 
-    genClasses(): Vector<string> {
-        if (Math.random() < .8 / this.classes.length()) {
+    genClasses(): string[] {
+        if (Math.random() < .8 / this.classes.length) {
             this.addOneClass();
         }
 
         const p = Math.random();
         if (p < .05) {
-            return this.classes
+            return stream(this.classes)
                 .shuffle()
-                .take(2);
+                .take(2)
+                .toArray();
         }
 
-        return Vector.of(this.randomClass());
+        return [this.randomClass()];
     }
 
     private addOneClass() {
-        if (this.classes.last().contains('z')) {
+        if (stream(this.classes).last().is('z')) {
             return;
         }
 
-        this.classes = this.classes.append(
-            String.fromCharCode(
-                this.classes.last().map(c => c.charCodeAt(0) + 1).getOrThrow()
-            )
-        );
+        this.classes = [
+            ...this.classes,
+            stream(this.classes).last().map(c => String.fromCharCode(c.charCodeAt(0) + 1)).get(),
+        ]; 
     }
 
     private randomClass(): string {

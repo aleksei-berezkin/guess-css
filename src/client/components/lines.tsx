@@ -1,11 +1,11 @@
 import React from 'react';
-import { Vector } from 'prelude-ts';
 import { Region } from '../model/region';
+import { stream } from '../stream/stream';
 
-export function Lines(p: {lines: Vector<Region[]> | undefined}) {
+export function Lines(p: {lines: Region[][] | undefined}) {
     return <>{
         p.lines &&
-        p.lines.zipWithIndex().map(
+        stream(p.lines).zipWithIndex().map(
             ([regions, i]) => <Line key={ i } regions={ regions }/>
         )
     }</>;

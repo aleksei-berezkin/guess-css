@@ -1,6 +1,6 @@
 import { Region, RegionKind } from './region';
 import { Indent } from './indent';
-import { Vector } from 'prelude-ts';
+import { streamOf } from '../stream/stream';
 
 export type Declaration = [
     string,
@@ -12,8 +12,8 @@ export class Rule {
     private _selectorsString?: string;
 
     constructor(
-        private readonly selectors: Selector | Vector<Selector>,
-        private readonly declarations: Vector<Declaration>,
+        private readonly selectors: Selector | Selector[],
+        private readonly declarations: Declaration[],
         private readonly selectorsDiffering: boolean = false) {
     }
 
@@ -24,15 +24,15 @@ export class Rule {
     private declarationsToString(): string {
         return this.declarations
             .map(([name, value]) => `${name}: ${value};`)
-            .mkString(' ');
+            .join(' ');
     }
 
     get selectorsString() {
         if (this._selectorsString == undefined) {
-            if (this.selectors instanceof Vector) {
+            if (Array.isArray(this.selectors)) {
                 this._selectorsString = this.selectors
                     .map(sel => sel.toString())
-                    .mkString(', ');
+                    .join(', ');
             } else {
                 this._selectorsString = this.selectors.toString();
             }
@@ -40,9 +40,8 @@ export class Rule {
         return this._selectorsString;
     }
 
-    toRegions(indent: Indent): Vector<Region[]> {
-        return Vector.of<Region[]>(
-            [
+    toRegions(indent: Indent): Region[][] {
+        return streamOf<Region[]>([
                 indent,
                 {kind: RegionKind.Selector, text: this.selectorsString, differing: this.selectorsDiffering},
                 {kind: RegionKind.Default, text: ' {'},
@@ -51,11 +50,12 @@ export class Rule {
             .append([
                 indent,
                 {kind: RegionKind.Default, text: '}'},
-            ]);
+            ])
+            .toArray();
     }
 
 
-    private declarationsToRegions(indent: Indent): Vector<Region[]> {
+    private declarationsToRegions(indent: Indent): Region[][] {
         return this.declarations
             .map(([name, value, differing]): Region[] =>
                 [
@@ -123,23 +123,23 @@ export class PseudoClassSelector extends Selector {
 }
 
 export class DescendantCombinator extends Selector {
-    private readonly selectors: Vector<Selector>;
+    private readonly selectors: Selector[];
     constructor(...selectors: Selector[]) {
         super();
-        this.selectors = Vector.ofIterable(selectors);
+        this.selectors = selectors;
     }
     toString(): string {
-        return this.selectors.mkString(' ');
+        return this.selectors.join(' ');
     }
 }
 
 export class ChildCombinator extends Selector {
-    private readonly selectors: Vector<Selector>;
+    private readonly selectors: Selector[];
     constructor(...selectors: Selector[]) {
         super();
-        this.selectors = Vector.ofIterable(selectors);
+        this.selectors = selectors;
     }
     toString(): string {
-        return this.selectors.mkString('>');
+        return this.selectors.join('>');
     }
 }

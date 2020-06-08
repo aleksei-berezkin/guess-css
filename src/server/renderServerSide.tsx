@@ -9,7 +9,6 @@ import React from 'react';
 import { readFile } from 'fs';
 import path from 'path';
 import { ROOT_EL_ID, ROOT_EL_TEXT } from '../shared/appWideConst';
-import { Vector } from 'prelude-ts';
 import { PRELOADED_STATE_ID } from '../shared/preloadedStateId';
 import { getRandomizedTopics } from '../client/model/gen/topic';
 
@@ -36,16 +35,16 @@ const indexHtmlParts = new Promise<[string, string]>((resolve, reject) => {
 
 export function sendRenderedApp(req: Request, res: Response) {
     const topics = getRandomizedTopics();
-    const puzzler: Puzzler = genPuzzler(topics.head().getOrThrow());
+    const puzzler: Puzzler = genPuzzler(topics[0]);
     const state: State = {
         topics,
-        puzzlerViews: Vector.of({
+        puzzlerViews: [{
             source: puzzler.html,
             styleCodes: puzzler.getStyleCodes(true),
             bodyInnerCode: puzzler.getBodyCode(),
             correctChoice: puzzler.correctChoice,
             userChoice: undefined as number | undefined,
-        }),
+        }],
         current: 0,
         correctAnswers: 0,
     };
@@ -61,16 +60,9 @@ export function sendRenderedApp(req: Request, res: Response) {
             `${ before }
             <div id="${ ROOT_EL_ID }">${ appHtml }</div>
             <script>
-                window.${ PRELOADED_STATE_ID } = ${ JSON.stringify(state, replacer) };
+                window.${ PRELOADED_STATE_ID } = ${ JSON.stringify(state) };
             </script>
             ${ after }`
         );
     })
-}
-
-function replacer(key: string, value: any): any {
-    if (value instanceof Vector) {
-        return value.toArray();
-    }
-    return value;
 }

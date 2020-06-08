@@ -1,5 +1,5 @@
 import { Region, RegionKind } from './region';
-import { Stream, Vector } from 'prelude-ts';
+import { same } from '../stream/stream';
 
 const indentSize = 2;
 
@@ -8,7 +8,7 @@ export class Indent implements Region {
     readonly text: string;
 
     constructor(indent: number = 0) {
-        this.text = Stream.continually(() => ' ').take(indent).mkString('');
+        this.text = same(' ').take(indent).join('');
     }
 
     indent(): Indent {

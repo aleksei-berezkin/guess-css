@@ -6,30 +6,35 @@ import {
 } from './actions';
 import { Action, applyMiddleware, combineReducers, createStore } from 'redux';
 import thunkMiddleware, { ThunkMiddleware } from 'redux-thunk';
-import { Vector } from 'prelude-ts';
 import { Topic } from '../model/gen/topic';
 import { isAction } from './actionUtils';
+import { stream } from '../stream/stream';
 
 
 export type State = {
-    topics: Vector<Topic>,
-    puzzlerViews: Vector<{
+    topics: Topic[],
+    puzzlerViews: {
         source: string,
-        styleCodes: Vector<Vector<Region[]>>,
-        bodyInnerCode: Vector<Region[]>,
+        styleCodes: Region[][][],
+        bodyInnerCode: Region[][],
         correctChoice: number,
         userChoice: number | undefined,
-    }>,
+    }[],
     current: number,
     correctAnswers: number,
 }
 
 export const initialState: State = {
-    topics: Vector.empty(),
-    puzzlerViews: Vector.empty(),
+    topics: [],
+    puzzlerViews: [],
     current: -1,
     correctAnswers: 0,
 };
+
+declare module 'react-redux' {
+    interface DefaultRootState extends State {
+    }
+}
 
 const rootReducer = combineReducers({
     topics: function(state: State['topics'] = initialState.topics, action: Action): State['topics'] {
@@ -41,15 +46,17 @@ const rootReducer = combineReducers({
 
     puzzlerViews: function(state: State['puzzlerViews'] = initialState.puzzlerViews, action: Action): State['puzzlerViews'] {
         if (isAction(displayNewPuzzler, action)) {
-            return state.append(action.puzzlerView);
+            return [...state, action.puzzlerView];
         }
 
         if (isAction(displayAnswer, action)) {
-            return state.init()
-                .append({
-                    ...state.last().getOrThrow(),
+            return [
+                ...stream(state).butLast(),
+                {
+                    ...stream(state).last().get(),
                     userChoice: action.userChoice,
-                });
+                }
+            ]
         }
 
         return state;

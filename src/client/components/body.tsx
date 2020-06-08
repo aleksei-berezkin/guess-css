@@ -4,7 +4,7 @@ import { State } from '../redux/store';
 import { Lines } from './lines';
 
 export function Body(): ReactElement {
-    const bodyInnerCode = useSelector((state: State) => state.puzzlerViews.get(state.current).getOrUndefined()?.bodyInnerCode);
+    const bodyInnerCode = useSelector((state: State) => state.puzzlerViews[state.current]?.bodyInnerCode);
     return <div className='code'>
         <Lines lines={ bodyInnerCode } />
     </div>;

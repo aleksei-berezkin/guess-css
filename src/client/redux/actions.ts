@@ -1,15 +1,14 @@
-import { Vector } from 'prelude-ts';
 import { Topic } from '../model/gen/topic';
 import { actionCreator } from './actionUtils';
 import { Puzzler } from '../model/puzzler';
 import { State } from './store';
-import { InferVectorType } from '../util';
+import { InferArrayType } from '../util';
 
 export const setTopics = actionCreator('setTopics', (
-    topics: Vector<Topic>,
+    topics: Topic[],
 ) => ({topics}));
 
-export const displayNewPuzzler = actionCreator('displayNewPuzzler', (puzzler: Puzzler, diffHint: boolean): { puzzlerView: InferVectorType<State['puzzlerViews']> } => ({
+export const displayNewPuzzler = actionCreator('displayNewPuzzler', (puzzler: Puzzler, diffHint: boolean): { puzzlerView: InferArrayType<State['puzzlerViews']> } => ({
     puzzlerView: {
         source: puzzler.html,
         styleCodes: puzzler.getStyleCodes(diffHint),

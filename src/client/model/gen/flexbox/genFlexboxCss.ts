@@ -1,61 +1,59 @@
 import { TagNode } from '../../nodes';
-import { Vector } from 'prelude-ts';
 import { Declaration, Rule, TypeSelector } from '../../cssRules';
-import { randomItem, transpose } from '../../../util';
+import { randomItem, transposeArray } from '../../../util';
 import { getSiblingsSubtree } from '../siblingsSubtree';
+import { stream, streamOf } from '../../../stream/stream';
 
-export function genFlexboxCss(body: TagNode): Vector<Vector<Rule>> {
-    const direction = randomItem(Vector.of('row', 'column', 'row-reverse', 'column-reverse'));
-    const wrap = getSiblingsSubtree(body)!.unfold().siblings.length() > 2 && Math.random() < .7;
+export function genFlexboxCss(body: TagNode): Rule[][] {
+    const direction = randomItem(['row', 'column', 'row-reverse', 'column-reverse']);
+    const wrap = getSiblingsSubtree(body)!.unfold().siblings.length > 2 && Math.random() < .7;
     const alignName = wrap && Math.random() < .5 ? 'align-content' : 'align-items';
 
-    return transpose(Vector.of(getJustifyContents(), getAlignItems()))
+    return transposeArray([getJustifyContents(), getAlignItems()])
         .map(([justifyContent, alignItems]) =>
-            Vector.of(
+            [
                 new Rule(
-                    Vector.of(new TypeSelector('html'), new TypeSelector('body')),
-                    Vector.of(
+                    [new TypeSelector('html'), new TypeSelector('body')],
+                    [
                         ['height', '100%'],
                         ['margin', '0'],
-                    ),
+                    ],
                 ),
                 new Rule(
-                    new TypeSelector('body'),
-                    Vector.of<Declaration>(['display', 'flex'])
-                        .transform(
-                            d => direction !== 'row'
-                                ? d.append(['flex-direction', direction])
-                                : d
+                    new TypeSelector('body'), 
+                    stream<Declaration>([['display', 'flex']])
+                        .appendIf(
+                            direction !== 'row',
+                            ['flex-direction', direction]
                         )
-                        .transform(
-                            d => wrap
-                                ? d.append(['flex-wrap', 'wrap'])
-                                : d
+                        .appendIf(
+                            wrap, ['flex-wrap', 'wrap']
                         )
                         .appendAll([
                             ['justify-content', justifyContent, true],
                             [alignName, alignItems, true],
-                        ]),
+                        ])
+                        .toArray(),
                 ),
                 new Rule(
                     new TypeSelector('div'),
-                    Vector.of(
+                    [
                         ['border', '1px solid black'],
                         wrap
                             ? ['flex-basis', '40%']
                             : ['padding', '.5em'],
-                    )
+                    ]
                 ),
-            )
+            ]
         );
 }
 
 function getJustifyContents() {
-    return Vector.of('flex-start', 'flex-end', 'center', 'space-between', 'space-around')
-        .shuffle().take(3);
+    return streamOf('flex-start', 'flex-end', 'center', 'space-between', 'space-around')
+        .shuffle().take(3).toArray();
 }
 
 function getAlignItems() {
-    return Vector.of('flex-start', 'flex-end', 'center', 'stretch')
-        .shuffle().take(3);
+    return streamOf('flex-start', 'flex-end', 'center', 'stretch')
+        .shuffle().take(3).toArray();
 }
