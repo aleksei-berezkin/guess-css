@@ -1,4 +1,4 @@
-import { filter, flatMap, map, RingBuffer } from './generators';
+import { RingBuffer } from './ringBuffer';
 
 export function stream<T>(input: Iterable<T>): Stream<T> {
     return new StreamImpl(input, Base._IDENTITY);
@@ -33,7 +33,7 @@ export function continually<T>(getItem: () => T): Stream<T> {
 }
 
 export function optional<T>(input: Iterable<T>): Optional<T> {
-    return new OptionalImpl(input, Base._IDENTITY);
+    return new OptionalImpl(trimIterable(input), Base._IDENTITY);
 }
 
 export function optionalOfNullable<T>(input: () => T | null | undefined): Optional<T> {
@@ -43,6 +43,13 @@ export function optionalOfNullable<T>(input: () => T | null | undefined): Option
             yield i;
         }
     }(), Base._IDENTITY);
+}
+
+function* trimIterable<T>(items: Iterable<T>): IterableIterator<T> {
+    const n = items[Symbol.iterator]().next();
+    if (!n.done) {
+        yield n.value;
+    }
 }
 
 type DetachedStream<I, T> = (input: Iterable<I>) => Stream<T>;
@@ -70,7 +77,11 @@ function _makeDetached<I, M>(base: Base<I, I>, made: M): DetachedType<I, M> {
                 'Did you return new Stream/Optional from builder?')
         }
         const attach = ((input: Iterable<I>) => {
-            base._attach(input);
+            if (base instanceof OptionalImpl) {
+                base._attach(trimIterable(input));
+            } else {
+                base._attach(input);
+            }
             return made;
         });
         return attach as any;
@@ -144,19 +155,15 @@ abstract class Base<P, T> implements Iterable<T> {
             throw new Error('Stream/Optional is not assigned input, call attach() first');
         }
         if (this.operation === Base._IDENTITY) {
-            return this.trimInOptional(this.parent as any);
+            return this.parent as any;
         }
         try {
-            return this.trimInOptional(this.operation(this.parent));
+            return this.operation(this.parent);
         } finally {
             if (this.attachable) {
                 this.parent = Base._DETACHED;
             }
         }
-    }
-
-    protected trimInOptional(itr: Iterable<T>): typeof itr {
-        return itr;
     }
 }
 
@@ -281,7 +288,13 @@ class StreamImpl<P, T> extends Base<P, T> implements Stream<T> {
     }
 
     filter(predicate: (item: T) => boolean) {
-        return new StreamImpl(this, filter(predicate));
+        return new StreamImpl(this, function* (items: Iterable<T>) {
+            for (const i of items) {
+                if (predicate(i)) {
+                    yield i;
+                }
+            }
+        });
     }
 
     find(predicate: (item: T) => boolean): Optional<T> {
@@ -296,7 +309,11 @@ class StreamImpl<P, T> extends Base<P, T> implements Stream<T> {
     }
 
     flatMap<U>(mapper: (item: T) => Iterable<U>): Stream<U> {
-        return new StreamImpl(this, flatMap(mapper));
+        return new StreamImpl(this, function* (items: Iterable<T>) {
+            for (const i of items) {
+                yield* mapper(i);
+            }
+        });
     }
 
     groupBy<K>(getKey: (item: T) => K): Stream<readonly [K, T[]]> {
@@ -306,7 +323,7 @@ class StreamImpl<P, T> extends Base<P, T> implements Stream<T> {
     }
 
     head(): Optional<T> {
-        return new OptionalImpl<T, T>(this, Base._IDENTITY);
+        return new OptionalImpl<T, T>(this, trimIterable);
     }
 
     join(delimiter: string): string {
@@ -349,7 +366,11 @@ class StreamImpl<P, T> extends Base<P, T> implements Stream<T> {
     }
 
     map<U>(mapper: (item: T) => U) {
-        return new StreamImpl(this, map(mapper));
+        return new StreamImpl(this, function* (items: Iterable<T>) {
+            for (const i of items) {
+                yield mapper(i);
+            }
+        });
     }
 
     randomItem(): Optional<T> {
@@ -520,7 +541,12 @@ class OptionalImpl<P, T> extends Base<P, T> implements Optional<T> {
     }
 
     filter(predicate: (item: T) => boolean): Optional<T> {
-        return new OptionalImpl(this, filter(predicate));
+        return new OptionalImpl(this, function* (items: Iterable<T>) {
+            const n = items[Symbol.iterator]().next();
+            if (!n.done && predicate(n.value)) {
+                yield n.value;
+            }
+        });
     }
 
     has(predicate: (item: T) => boolean): boolean {
@@ -534,7 +560,12 @@ class OptionalImpl<P, T> extends Base<P, T> implements Optional<T> {
     }
 
     flatMap<U>(mapper: (item: T) => Iterable<U>): Stream<U> {
-        return new StreamImpl(this, flatMap(mapper));
+        return new StreamImpl(this, function* (items: Iterable<T>) {
+            const n = items[Symbol.iterator]().next();
+            if (!n.done) {
+                yield* mapper(n.value);
+            }
+        });
     }
     
     flatMapTo<U>(mapper: (item: T) => Optional<U>): Optional<U> {
@@ -567,7 +598,12 @@ class OptionalImpl<P, T> extends Base<P, T> implements Optional<T> {
     }
 
     map<U>(mapper: (item: T) => U): Optional<U> {
-        return new OptionalImpl(this, map(mapper));
+        return new OptionalImpl(this, function* (items: Iterable<T>) {
+            const n = items[Symbol.iterator]().next();
+            if (!n.done) {
+                yield mapper(n.value);
+            }
+        });
     }
 
     mapNullable<U>(mapper: (item: T) => (U | null | undefined)): Optional<U> {
@@ -632,15 +668,6 @@ class OptionalImpl<P, T> extends Base<P, T> implements Optional<T> {
 
     toStream(): Stream<T> {
         return new StreamImpl(this, OptionalImpl._IDENTITY);
-    }
-
-    trimInOptional(itr: Iterable<T>): typeof itr {
-        return function* () {
-            const n = itr[Symbol.iterator]().next();
-            if (!n.done) {
-                yield n.value;
-            }
-        }();
     }
 }
 

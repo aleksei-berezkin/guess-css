@@ -1,29 +1,3 @@
-export function filter<T>(predicate: (item: T) => boolean) {
-    return function* (items: Iterable<T>) {
-        for (const i of items) {
-            if (predicate(i)) {
-                yield i;
-            }
-        }
-    }
-}
-
-export function flatMap<T, U>(mapper: (item: T) => Iterable<U>) {
-    return function* (items: Iterable<T>) {
-        for (const i of items) {
-            yield* mapper(i);
-        }
-    }
-}
-
-export function map<T,U>(mapper: (item: T) => U ) {
-    return function* (items: Iterable<T>) {
-        for (const i of items) {
-            yield mapper(i);
-        }
-    }
-}
-
 export class RingBuffer<T> implements Iterable<T>{
     private readonly a: T[];
     private readonly capacity: number;
