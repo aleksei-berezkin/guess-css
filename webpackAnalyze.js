@@ -1,4 +1,4 @@
-const prodConfig = require('./webpackProd');
+const prodConfig = require('./webpackDist');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {

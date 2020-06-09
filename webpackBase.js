@@ -8,6 +8,7 @@ const { ROOT_EL_ID, ROOT_EL_TEXT } = require('./src/shared/appWideConst');
 
 module.exports = {
     mode: process.env.NODE_ENV,
+    devtool: process.env.NODE_ENV === 'development' ? 'source-map' : false,
     entry: [
         './src/client/index.tsx',
     ],
@@ -44,5 +45,11 @@ module.exports = {
                 ],
             },
         ],
+    },
+    optimization: process.env.NODE_ENV === 'development' ? {} : {
+        splitChunks: {
+            chunks: 'all',
+            automaticNameDelimiter: '.',
+        }
     },
 };

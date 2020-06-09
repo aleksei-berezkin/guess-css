@@ -136,7 +136,7 @@ abstract class Base<P, T> implements Iterable<T> {
         if (Array.isArray(items) && items !== this._getSource()) {
             return items;
         }
-        return Array.from(items);
+        return [...items];
     }
 
     private getItemsTerminal(): Iterable<T> {

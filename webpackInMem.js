@@ -11,5 +11,4 @@ module.exports = {
         ...baseConfig.plugins,
         new HotModuleReplacementPlugin(),
     ],
-    devtool: 'inline-source-map',
 };
