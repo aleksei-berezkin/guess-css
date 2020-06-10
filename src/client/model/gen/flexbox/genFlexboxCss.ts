@@ -50,10 +50,10 @@ export function genFlexboxCss(body: TagNode): Rule[][] {
 
 function getJustifyContents() {
     return streamOf('flex-start', 'flex-end', 'center', 'space-between', 'space-around')
-        .shuffle().take(3).toArray();
+        .takeRandom(3).toArray();
 }
 
 function getAlignItems() {
     return streamOf('flex-start', 'flex-end', 'center', 'stretch')
-        .shuffle().take(3).toArray();
+        .takeRandom(3).toArray();
 }

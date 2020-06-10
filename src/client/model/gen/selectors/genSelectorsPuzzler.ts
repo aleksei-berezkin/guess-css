@@ -80,8 +80,7 @@ class Classes {
         const p = Math.random();
         if (p < .05) {
             return stream(this.classes)
-                .shuffle()
-                .take(2)
+                .takeRandom(2)
                 .toArray();
         }
 

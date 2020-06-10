@@ -48,8 +48,8 @@ const outerPositions: Position[] = ['static', 'relative', 'absolute'];
 const innerPositions: Position[] = ['static', 'relative', 'absolute', 'fixed'];
 
 function innerOuterPositionsShuffled(): Position[][] {
-    const outerShuffled = stream(outerPositions).shuffle().take(3).toArray();
-    const innerShuffled = stream(innerPositions).shuffle().take(3).toArray();
+    const outerShuffled = stream(outerPositions).takeRandom(3).toArray();
+    const innerShuffled = stream(innerPositions).takeRandom(3).toArray();
     const zipped = stream(outerShuffled).zip(innerShuffled);
     if (zipped.all(([o, i]) => o === i) || zipped.any(([o, i]) => o === 'static' && i === 'static')) {
         return innerOuterPositionsShuffled();

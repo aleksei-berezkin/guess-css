@@ -475,6 +475,19 @@ class StreamImpl<P, T> extends Base<P, T> implements Stream<T> {
         });
     }
 
+    takeRandom(n: number): Stream<T> {
+        return new StreamImpl(this, function* (items) {
+            const a = [...items];
+            for (let i = 0; i < Math.min(a.length - 1, n); i++) {
+                const j = i + Math.floor(Math.random() * (a.length - i));
+                if (i !== j) {
+                    [a[i], a[j]] = [a[j], a[i]];
+                }
+            }
+            yield *a.slice(0, Math.min(a.length, n));
+        })
+    }
+
     takeLast(n: number): Stream<T> {
         return new StreamImpl(this, function* (items) {
             if (Array.isArray(items)) {
@@ -701,6 +714,7 @@ export interface Stream<T> extends Iterable<T> {
     sortOn(getComparable: (item: T) => number | string | boolean): Stream<T>
     tail(): Stream<T>;
     take(n: number): Stream<T>;
+    takeRandom(n: number): Stream<T>;
     takeLast(n: number): Stream<T>;
     transform<U>(transformer: (s: Stream<T>) => U): U;
     toArray(): T[];
