@@ -1,6 +1,6 @@
 import { TagNode } from '../../nodes';
 import { Declaration, Rule, TypeSelector } from '../../cssRules';
-import { randomItem, transposeArray } from '../../../util';
+import { randomItem, transpose } from '../../../util';
 import { getSiblingsSubtree } from '../siblingsSubtree';
 import { stream, streamOf } from '../../../stream/stream';
 
@@ -9,7 +9,7 @@ export function genFlexboxCss(body: TagNode): Rule[][] {
     const wrap = getSiblingsSubtree(body)!.unfold().siblings.length > 2 && Math.random() < .7;
     const alignName = wrap && Math.random() < .5 ? 'align-content' : 'align-items';
 
-    return transposeArray([getJustifyContents(), getAlignItems()])
+    return transpose([getJustifyContents(), getAlignItems()])
         .map(([justifyContent, alignItems]) =>
             [
                 new Rule(

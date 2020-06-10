@@ -12,7 +12,7 @@ export class RingBuffer<T> implements Iterable<T>{
         const _this = this;
         this[Symbol.iterator] = function* () {
             for (let i = 0; i < _this.size; i++) {
-                yield _this.a[i % _this.capacity];
+                yield _this.a[(_this.start + i) % _this.capacity];
             }
         };
     }

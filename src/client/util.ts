@@ -1,4 +1,4 @@
-import { range as streamRange, Stream, stream } from './stream/stream';
+import { range, Stream, stream } from './stream/stream';
 export function randomItem<T>(items: T[]): T {
     return items[randomBounded(items.length)];
 }
@@ -22,7 +22,7 @@ export function randomItemsInOrder<T>(items: T[], n: number): T[] {
     if (n === items.length) {
         return items;
     }
-    return streamRange(0, items.length)
+    return range(0, items.length)
         .shuffle()
         .take(n)
         .sortOn(i => i)
@@ -35,8 +35,8 @@ export function twoElementVariationsInOrder<T>(items: T[]): Stream<readonly [T, 
         throw new Error('Bad items: ' + items);
     }
 
-    return streamRange(0, items.length)
-        .flatMap(i => streamRange(i + 1, items.length).map(
+    return range(0, items.length)
+        .flatMap(i => range(i + 1, items.length).map(
             j => [i, j]
         ))
         .map(([i, j]) => [items[i], items[j]] as const);
@@ -74,7 +74,7 @@ export function getNShuffled(items: string[], n: number): string[][] {
     return [shuffled1, shuffled2, shuffled3];
 }
 
-export function transposeArray<T>(m: T[][]): T[][] {
+export function transpose<T>(m: T[][]): T[][] {
     if (!m.length) {
         throw new Error('Outer empty');
     }
