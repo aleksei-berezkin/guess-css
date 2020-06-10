@@ -10,20 +10,53 @@ import { checkChoice, genNewPuzzler, initClient } from '../redux/thunks';
 import { Lines } from './lines';
 import { Body } from './body';
 import { range, stream } from '../stream/stream';
+import AppBar from '@material-ui/core/AppBar';
+import Grid from '@material-ui/core/Grid';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import makeStyles from '@material-ui/core/styles/makeStyles';
+
+const useStyles = makeStyles({
+    appBarContent: {
+        maxWidth: 640,
+    },
+});
 
 export function Puzzler(): ReactElement {
     const dispatch = useDispatch();
+    const classes = useStyles();
 
     useEffect(() => {dispatch(initClient())}, ['const']);
 
     return <>
-        <h1>Guess CSS!</h1>
-        <Score/>
-        <DonePuzzler/>
+        <MyAppBar classes={classes}/>
         <LayoutFrame/>
         <Choices/>
         <Body/>
     </>
+}
+
+function MyAppBar(props: {classes: ReturnType<typeof useStyles>}) {
+    return <>
+        <AppBar>
+            <Toolbar variant='dense'>
+                <Grid container justify='center' alignItems='center'>
+                    <Grid container className={props.classes.appBarContent} justify='space-between' alignItems='baseline'>
+                        <Grid item>
+                            <Typography variant="h6">
+                                Guess CSS!
+                            </Typography>
+                        </Grid>
+                        <Grid item>
+                            <Score/>
+                            <DonePuzzler/>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Toolbar>
+        </AppBar>
+        <Toolbar variant='dense'/>
+    </>;
 }
 
 function Score() {
@@ -33,7 +66,7 @@ function Score() {
 
     return <>{
         isLast &&
-        <div>Correct answers: { correctAnswers } of { donePuzzlersNum }</div>
+        <Typography>Score: { correctAnswers } of { donePuzzlersNum }</Typography>
     }</>;
 }
 
@@ -44,7 +77,7 @@ function DonePuzzler() {
 
     return <>{
         isHistory &&
-        <div>Done puzzler: { historyPuzzlerPos } of { donePuzzlersNum }</div>
+        <Typography>Done: { historyPuzzlerPos } of { donePuzzlersNum }</Typography>
     }</>
 }
 
