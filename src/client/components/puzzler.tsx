@@ -15,6 +15,9 @@ import Grid from '@material-ui/core/Grid';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import makeStyles from '@material-ui/core/styles/makeStyles';
+import IconButton from '@material-ui/core/IconButton';
+import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
+import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 
 const useStyles = makeStyles({
     appBarContent: {
@@ -30,9 +33,17 @@ export function Puzzler(): ReactElement {
 
     return <>
         <MyAppBar classes={classes}/>
-        <LayoutFrame/>
-        <Choices/>
-        <Body/>
+        <Grid container direction='column' alignItems='center'>
+            <Grid item>
+                <LayoutFrame/>
+            </Grid>
+            <Grid item>
+                <Choices/>
+            </Grid>
+            <Grid item>
+                <Body/>
+            </Grid>
+        </Grid>
     </>
 }
 
@@ -94,13 +105,17 @@ function getDonePuzzlersNum(state: State) {
 function LayoutFrame() {
     const source = useSelector(state => state.puzzlerViews[state.current]?.source);
 
-    return <div className='puzzler-top'>
-        <PrevButton/>
-        <>{
+    return <Grid container justify='center' alignItems='center'>
+        <Grid item>
+            <PrevButton/>
+        </Grid>
+        <Grid item>{
             source && <iframe className='layout' srcDoc={ source }/>
-        }</>
-        <NextButton/>
-    </div>;
+        }</Grid>
+        <Grid item>
+            <NextButton/>
+        </Grid>
+    </Grid>;
 }
 
 function PrevButton() {
@@ -110,16 +125,19 @@ function PrevButton() {
     function handlePrev() {
         if (hasPrev) {
             dispatch(navPrevPuzzler());
+        } else {
+            throw new Error('Cannot navPrev')
         }
     }
 
-    const active = hasPrev ? 'active' : '';
-    return <div onClick={ handlePrev } className={ `nav-puzzlers ${ active } prev` }/>;
+    return <IconButton onClick={ handlePrev } disabled={ !hasPrev }>
+        <KeyboardArrowLeft/>
+    </IconButton>;
 }
 
 function NextButton() {
     const hasNext = useSelector(state => state.current < state.puzzlerViews.length - 1);
-    const isAnswered = useSelector(state => state.puzzlerViews[state.current]?.userChoice != null);
+    const isAnswered = useSelector(state => state.puzzlerViews[state.puzzlerViews.length - 1]?.userChoice != null);
     const dispatch = useDispatch();
 
     function handleNext() {
@@ -128,29 +146,29 @@ function NextButton() {
         } else if (isAnswered) {
             dispatch(genNewPuzzler(false));
         } else {
-            throw new Error('Cannot dispatch');
+            throw new Error('Cannot navNext');
         }
     }
 
-    const active = (hasNext || isAnswered) ? 'active' : '';
-    return <div onClick={ handleNext } className={ `nav-puzzlers ${ active } next` } />;
+    return <IconButton onClick={ handleNext } disabled={ !hasNext && !isAnswered } color={ isAnswered ? 'primary' : 'default' }>
+        <KeyboardArrowRight/>
+    </IconButton>;
 }
 
 function Choices(): ReactElement {
     const keyBase = useSelector(state => `${state.current}_`);
     const choicesCount = useSelector(state => state.puzzlerViews[state.current]?.styleCodes.length);
 
-    return <div className='choices'>{
+    return <Grid container>{
         choicesCount &&
         range(0, choicesCount)
             .map((choice: number) =>
-                <Choice
-                    key={ `${keyBase}_${choice}` }
-                    choice={ choice }
-                />
+                <Grid item key={ `${keyBase}_${choice}` }>
+                    <Choice choice={ choice } />
+                </Grid>
             )
             .toArray()
-    }</div>
+    }</Grid>
 }
 
 function Choice(p: {choice: number}): ReactElement {
