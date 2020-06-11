@@ -18,6 +18,7 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import IconButton from '@material-ui/core/IconButton';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
+import Container from '@material-ui/core/Container';
 
 const useStyles = makeStyles({
     appBarContent: {
@@ -51,8 +52,8 @@ function MyAppBar(props: {classes: ReturnType<typeof useStyles>}) {
     return <>
         <AppBar>
             <Toolbar variant='dense'>
-                <Grid container justify='center' alignItems='center'>
-                    <Grid container className={props.classes.appBarContent} justify='space-between' alignItems='baseline'>
+                <Container maxWidth='sm'>
+                    <Grid container  justify='space-between' alignItems='baseline'>
                         <Grid item>
                             <Typography variant="h6">
                                 Guess CSS!
@@ -63,7 +64,7 @@ function MyAppBar(props: {classes: ReturnType<typeof useStyles>}) {
                             <DonePuzzler/>
                         </Grid>
                     </Grid>
-                </Grid>
+                </Container>
             </Toolbar>
         </AppBar>
         <Toolbar variant='dense'/>
