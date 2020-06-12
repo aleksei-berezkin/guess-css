@@ -3,39 +3,6 @@ body {
 }
 
 .code {
-    &.correct {
-        .answer-color(#e0ffe0, darkgreen);
-    }
-
-    &.incorrect {
-        .answer-color(#ffe0e0, darkred);
-    }
-
-    .answer-color(@bg; @border) {
-        background-color: @bg;
-        border-color: @bg;
-        transition: all .4s;
-
-        &.user-choice {
-            border-color: @border;
-        }
-    }
-
-    &.correct::before {
-        .answer-mark("✓", darkgreen);
-    }
-
-    &.incorrect::before {
-        .answer-mark("✗", darkred);
-    }
-
-    .answer-mark(@content, @color) {
-        float: right;
-        margin: 10px;
-        content: @content;
-        color: @color;
-    }
-
     pre {
         margin: 0;
         font-family: Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace;

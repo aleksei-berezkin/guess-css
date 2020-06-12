@@ -16,6 +16,19 @@ export function range(from: number, bound: number): Stream<number> {
     }(), Base._IDENTITY);
 }
 
+export function abc(): Stream<string> {
+    return new StreamImpl(function* () {
+        let i = 'a'.charCodeAt(0);
+        for ( ; ; ) {
+            const s = String.fromCharCode(i++);
+            yield s;
+            if (s === 'z') {
+                break;
+            }
+        }
+    }(), Base._IDENTITY);
+}
+
 export function same<T>(item: T): Stream<T> {
     return new StreamImpl(function* () {
         for ( ; ; ) {
