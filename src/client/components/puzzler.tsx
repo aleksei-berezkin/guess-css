@@ -1,14 +1,10 @@
 import React, { ReactElement, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from '../redux/store';
-import {
-    navNextPuzzler,
-    navPrevPuzzler
-} from '../redux/actions';
+import { navNextPuzzler, navPrevPuzzler } from '../redux/actions';
 import { Dispatch } from 'redux';
 import { checkChoice, genNewPuzzler, initClient } from '../redux/thunks';
 import { Lines } from './lines';
-import { Body } from './body';
 import { range, stream } from '../stream/stream';
 import AppBar from '@material-ui/core/AppBar';
 import Grid from '@material-ui/core/Grid';
@@ -19,36 +15,38 @@ import IconButton from '@material-ui/core/IconButton';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import Container from '@material-ui/core/Container';
+import Paper from '@material-ui/core/Paper';
 
-const useStyles = makeStyles({
-    appBarContent: {
-        maxWidth: 640,
+const useStyles = makeStyles(theme => ({
+    spaced: {
+        marginBottom: theme.spacing(1),
+        marginRight: theme.spacing(1),
     },
-});
+    padded: {
+        padding: theme.spacing(1),
+    },
+    iframe: {
+        width: 240,
+        height: 160,
+        border: 'none',
+    }
+}));
 
 export function Puzzler(): ReactElement {
     const dispatch = useDispatch();
-    const classes = useStyles();
-
     useEffect(() => {dispatch(initClient())}, ['const']);
 
     return <>
-        <MyAppBar classes={classes}/>
+        <MyAppBar/>
         <Grid container direction='column' alignItems='center'>
-            <Grid item>
-                <LayoutFrame/>
-            </Grid>
-            <Grid item>
-                <Choices/>
-            </Grid>
-            <Grid item>
-                <Body/>
-            </Grid>
+            <PuzzlerRendered/>
+            <Choices/>
+            <PuzzlerHtml/>
         </Grid>
     </>
 }
 
-function MyAppBar(props: {classes: ReturnType<typeof useStyles>}) {
+function MyAppBar() {
     return <>
         <AppBar>
             <Toolbar variant='dense'>
@@ -103,15 +101,16 @@ function getDonePuzzlersNum(state: State) {
     return state.puzzlerViews.length - 1;
 }
 
-function LayoutFrame() {
+function PuzzlerRendered() {
     const source = useSelector(state => state.puzzlerViews[state.current]?.source);
+    const classes = useStyles();
 
     return <Grid container justify='center' alignItems='center'>
         <Grid item>
             <PrevButton/>
         </Grid>
         <Grid item>{
-            source && <iframe className='layout' srcDoc={ source }/>
+            source && <Paper className={ classes.spaced }><iframe className={ classes.iframe } srcDoc={ source }/></Paper>
         }</Grid>
         <Grid item>
             <NextButton/>
@@ -159,13 +158,17 @@ function NextButton() {
 function Choices(): ReactElement {
     const keyBase = useSelector(state => `${state.current}_`);
     const choicesCount = useSelector(state => state.puzzlerViews[state.current]?.styleCodes.length);
+    const classes = useStyles();
 
-    return <Grid container>{
+    return <Grid container justify='center'>{
         choicesCount &&
         range(0, choicesCount)
             .map((choice: number) =>
                 <Grid item key={ `${keyBase}_${choice}` }>
-                    <Choice choice={ choice } />
+                    <Paper className={ `${classes.spaced} ${classes.padded}` }>
+                        <Typography>CSS {choice + 1}</Typography>
+                        <Choice choice={ choice } />
+                    </Paper>
                 </Grid>
             )
             .toArray()
@@ -205,4 +208,13 @@ function Choice(p: {choice: number}): ReactElement {
     return <div className={ `code ${ highlight } ${ outline } ${ active }` } onClick={ handleClick }>
         <Lines lines={choiceCode}/>
     </div>;
+}
+
+export function PuzzlerHtml(): ReactElement {
+    const bodyInnerCode = useSelector((state: State) => state.puzzlerViews[state.current]?.bodyInnerCode);
+    const classes = useStyles();
+
+    return <Grid item className='code'>
+        <Paper className={ classes.padded }><Lines lines={ bodyInnerCode }/></Paper>
+    </Grid>;
 }
