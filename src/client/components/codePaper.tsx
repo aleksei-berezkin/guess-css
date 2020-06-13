@@ -33,13 +33,14 @@ export function CodePaper(
     p: {
         title: string,
         lines: Region[][],
+        headerClass?: string,
         children?: ReactElement
     }
 ) {
     const classes = useStyles({ withChildren: !!p.children });
 
     return <Paper className={ classes.outer }>
-        <AppBar position='static' color='default'>
+        <AppBar position='static' color='default' className={ p.headerClass }>
             <Box className={ classes.codeHeader }>
                 <Typography variant='button'>{ p.title }</Typography>
             </Box>

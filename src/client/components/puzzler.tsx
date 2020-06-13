@@ -20,6 +20,22 @@ import Button from '@material-ui/core/Button';
 import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import CheckIcon from '@material-ui/icons/Check';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
+import { ThemeProvider } from '@material-ui/core/styles';
+import green from '@material-ui/core/colors/green';
+import red from '@material-ui/core/colors/red';
+
+const theme = createMuiTheme({
+    palette: {
+        type: 'light',
+    },
+    props: {
+        MuiPaper: {
+            square: true,
+        },
+    },
+});
 
 const iframeSize = {
     width: 240,
@@ -31,7 +47,16 @@ const useStyles = makeStyles(theme => ({
         ...iframeSize,
         border: 'none',
     },
-    iframePaper: iframeSize
+    iframePaper: {
+        ...iframeSize,
+        marginTop: theme.spacing(1),
+    },
+    successBg: {
+        backgroundColor: green['A100'],
+    },
+    errorBg: {
+        backgroundColor: red ['A100'] ,
+    },
 }));
 
 export function Puzzler(): ReactElement {
@@ -40,20 +65,23 @@ export function Puzzler(): ReactElement {
     const htmlCode = useSelector(state => state.puzzlerViews[state.current]?.bodyInnerCode || []);
 
     return <>
-        <MyAppBar/>
-        <Grid container direction='column' alignItems='center'>
-            <PuzzlerRendered/>
-            <Choices/>
-            <Grid item>
-                <CodePaper title='HTML' lines={ htmlCode }/>
+        <ThemeProvider theme={ theme }>
+            <CssBaseline/>
+            <MyAppBar/>
+            <Grid container direction='column' alignItems='center'>
+                <PuzzlerRendered/>
+                <Choices/>
+                <Grid item>
+                    <CodePaper title='HTML' lines={ htmlCode }/>
+                </Grid>
             </Grid>
-        </Grid>
+        </ThemeProvider>
     </>
 }
 
 function MyAppBar() {
     return <>
-        <AppBar>
+        <AppBar color='primary'>
             <Toolbar variant='dense'>
                 <Container maxWidth='sm'>
                     <Grid container  justify='space-between' alignItems='baseline'>
@@ -172,6 +200,8 @@ function Choices(): ReactElement {
 
     const dispatch = useDispatch();
 
+    const classes = useStyles();
+
     function onClickChoice(choice: number) {
         if (userChoice == null) {
             setBtnBoxStyle({ minHeight: btnBoxRef.current!.getBoundingClientRect().height })
@@ -183,7 +213,11 @@ function Choices(): ReactElement {
         abc().zipWithIndex().take(choicesCount)
             .map(([letter, i]) =>
                 <Grid item key={ `${keyBase}_${i}` }>
-                    <CodePaper title={ `CSS ${letter.toUpperCase()}` } lines={ choiceCodes[i] }>
+                    <CodePaper title={ `CSS ${letter.toUpperCase()}` } lines={ choiceCodes[i] } headerClass={
+                        i === correctChoice && userChoice != null && classes.successBg ||
+                        i === userChoice && userChoice !== correctChoice &&  classes.errorBg ||
+                        undefined
+                    }>
                         <Grid container justify='center'>
                             <Grid item ref={ btnBoxRef } style={ btnBoxStyle }>
                                 {
