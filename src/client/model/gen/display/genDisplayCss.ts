@@ -1,5 +1,5 @@
 import { TagNode } from '../../nodes';
-import { ClassSelector, Declaration, Rule, Selector } from '../../cssRules';
+import { ChildCombinator, ClassSelector, Declaration, Rule, Selector, TypeSelector } from '../../cssRules';
 import { getNShuffled, randomBounded, randomItemsInOrder } from '../../../util';
 import { getSiblingsSubtree } from '../siblingsSubtree';
 import { stream } from '../../../stream/stream';
@@ -30,11 +30,11 @@ export function genDisplayCss(body: TagNode): { choices: Rule[][], common: Rule[
             .toArray(),
         common: [
             new Rule(
-                stream(siblings)
-                    .flatMap(s => s.classes)
-                    .map(cls => new ClassSelector(cls))
-                    .toArray(),
-                [['border', '4px solid blue']]
+                new ChildCombinator(parentSelector, new TypeSelector('div')),
+                [
+                    ['border', '4px solid blue'],
+                    ['padding', '.5em'],
+                ]
             )
         ],
     };
