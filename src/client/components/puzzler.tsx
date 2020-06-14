@@ -23,8 +23,8 @@ import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import { ThemeProvider } from '@material-ui/core/styles';
-import green from '@material-ui/core/colors/green';
-import red from '@material-ui/core/colors/red';
+import { CodeHeader } from './codeHeader';
+import { Choices } from './choices';
 
 const theme = createMuiTheme({
     palette: {
@@ -51,12 +51,6 @@ const useStyles = makeStyles(theme => ({
         ...iframeSize,
         marginTop: theme.spacing(1),
     },
-    successBg: {
-        backgroundColor: green['A100'],
-    },
-    errorBg: {
-        backgroundColor: red ['A100'] ,
-    },
 }));
 
 export function Puzzler(): ReactElement {
@@ -71,7 +65,10 @@ export function Puzzler(): ReactElement {
             <PuzzlerRendered/>
             <Choices/>
             <Grid item>
-                <CodePaper title='HTML' code={ htmlCode }/>
+                <CodePaper
+                    header={ <CodeHeader title='HTML'/> }
+                    code={ htmlCode }
+                />
             </Grid>
         </Grid>
     </ThemeProvider>
@@ -184,64 +181,4 @@ function NextButton() {
     return <IconButton onClick={ handleNext } disabled={ !hasNext && !isAnswered } color={ isAnswered ? 'primary' : 'default' }>
         <KeyboardArrowRight/>
     </IconButton>;
-}
-
-function Choices(): ReactElement {
-    const keyBase = useSelector(state => `${state.current}_`);
-
-    const choices = useSelector(ofCurrentView(v => v?.styleChoices || []));
-    const common = useSelector(ofCurrentView(v => v?.commonStyle || []));
-
-    const correctChoice = useSelector(ofCurrentView(v => v?.correctChoice));
-    const userChoice = useSelector(ofCurrentView(v => v?.userChoice));
-
-    const btnBoxRef = useRef<HTMLDivElement | null>(null);
-    const [btnBoxStyle, setBtnBoxStyle] = useState({} as { minHeight?: number });
-
-    const dispatch = useDispatch();
-
-    const classes = useStyles();
-
-    function onClickChoice(choice: number) {
-        if (userChoice == null) {
-            setBtnBoxStyle({ minHeight: btnBoxRef.current!.getBoundingClientRect().height })
-            dispatch(checkChoice(choice));
-        }
-    }
-
-    return <Grid container justify='center'>{
-        abc().zipWithIndex().take(choices.length)
-            .map(([letter, i]) =>
-                <Grid item key={ `${keyBase}_${i}` }>
-                    <CodePaper title={ `CSS ${letter.toUpperCase()}` } code={ choices[i] || [] } headerClass={
-                        i === correctChoice && userChoice != null && classes.successBg ||
-                        i === userChoice && userChoice !== correctChoice &&  classes.errorBg ||
-                        undefined
-                    } collapsedCode={ common }>
-                        <Grid container justify='center'>
-                            <Grid item ref={ btnBoxRef } style={ btnBoxStyle }>
-                                {
-                                    userChoice == null && 
-                                    <Button onClick={() => onClickChoice(i) } disabled={ userChoice != null }
-                                            variant='outlined' color='primary' size='small'>This!</Button>
-                                }
-                                {
-                                    i === userChoice && userChoice === correctChoice &&
-                                    <CheckCircleOutlineIcon color='primary'/>
-                                }
-                                {
-                                    i === correctChoice && userChoice != null && userChoice !== correctChoice &&
-                                    <CheckIcon/>
-                                }
-                                {
-                                    i === userChoice && userChoice !== correctChoice &&
-                                    <ErrorOutlineIcon/>
-                                }
-                            </Grid>
-                        </Grid>
-                    </CodePaper>
-                </Grid>
-            )
-            .toArray()
-    }</Grid>
 }

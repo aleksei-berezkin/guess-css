@@ -33,7 +33,7 @@ export function genDisplayCss(body: TagNode): { choices: Rule[][], common: Rule[
                 new ChildCombinator(parentSelector, new TypeSelector('div')),
                 [
                     ['border', '4px solid blue'],
-                    ['padding', '.5em'],
+                    ['padding', '.25em'],
                 ]
             )
         ],

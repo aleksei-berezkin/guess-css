@@ -5,50 +5,34 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
-import AppBar from '@material-ui/core/AppBar';
 import Collapse from '@material-ui/core/Collapse';
 import IconButton from '@material-ui/core/IconButton';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { useSelector } from 'react-redux';
 import { ofCurrentView } from '../redux/store';
 
-type StylesProps = {
-    withChildren: boolean,
-    
-}
-
 const makeCodePaperStyles = makeStyles(theme => ({
     outer: {
         marginTop: theme.spacing(1.5),
         marginRight: theme.spacing(1.5),
-        paddingBottom: (p: StylesProps) => p.withChildren ? theme.spacing(1) : 0,
-    },
-    codeHeader: {
-        paddingTop: theme.spacing(1),
-        paddingLeft: theme.spacing(3),
-        paddingRight: theme.spacing(1),
-        paddingBottom: theme.spacing(1),
     },
 }));
 
 export function CodePaper(
     p: {
-        title: string,
         code: Region[][],
         collapsedCode?: Region[][],
-        headerClass?: string,
-        children?: ReactElement
+        header?: ReactElement,
+        footer?: ReactElement,
     }
 ) {
     const commonStyleSummary = useSelector(ofCurrentView(v => v?.commonStyleSummary || ''));
-    const classes = makeCodePaperStyles({ withChildren: !!p.children });
+    const classes = makeCodePaperStyles();
 
     return <Paper className={ classes.outer }>
-        <AppBar position='static' color='default' className={ p.headerClass }>
-            <Box className={ classes.codeHeader }>
-                <Typography variant='button'>{ p.title }</Typography>
-            </Box>
-        </AppBar>
+        {
+            p.header
+        }
 
         <Code lines={ p.code } />
 
@@ -60,7 +44,7 @@ export function CodePaper(
         }
 
         {
-            p.children
+            p.footer
         }
     </Paper>;
 }
