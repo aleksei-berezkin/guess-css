@@ -64,19 +64,17 @@ export function Puzzler(): ReactElement {
     useEffect(() => {dispatch(initClient())}, ['const']);
     const htmlCode = useSelector(state => state.puzzlerViews[state.current]?.bodyInnerCode || []);
 
-    return <>
-        <ThemeProvider theme={ theme }>
-            <CssBaseline/>
-            <MyAppBar/>
-            <Grid container direction='column' alignItems='center'>
-                <PuzzlerRendered/>
-                <Choices/>
-                <Grid item>
-                    <CodePaper title='HTML' lines={ htmlCode }/>
-                </Grid>
+    return <ThemeProvider theme={ theme }>
+        <CssBaseline/>
+        <MyAppBar/>
+        <Grid container direction='column' alignItems='center'>
+            <PuzzlerRendered/>
+            <Choices/>
+            <Grid item>
+                <CodePaper title='HTML' lines={ htmlCode }/>
             </Grid>
-        </ThemeProvider>
-    </>
+        </Grid>
+    </ThemeProvider>
 }
 
 function MyAppBar() {
@@ -192,6 +190,7 @@ function Choices(): ReactElement {
     const keyBase = useSelector(state => `${state.current}_`);
     const choicesCount = useSelector(state => state.puzzlerViews[state.current]?.styleCodes.length || 0);
     const choiceCodes = useSelector(state => state.puzzlerViews[state.current]?.styleCodes || []);
+    const commonCode = useSelector(state => state.puzzlerViews[state.current]?.commonStylesCode || []);
     const correctChoice = useSelector(state => state.puzzlerViews[state.current]?.correctChoice);
     const userChoice = useSelector(state => state.puzzlerViews[state.current]?.userChoice);
 
@@ -217,7 +216,7 @@ function Choices(): ReactElement {
                         i === correctChoice && userChoice != null && classes.successBg ||
                         i === userChoice && userChoice !== correctChoice &&  classes.errorBg ||
                         undefined
-                    }>
+                    } collapsedLines={ commonCode }>
                         <Grid container justify='center'>
                             <Grid item ref={ btnBoxRef } style={ btnBoxStyle }>
                                 {

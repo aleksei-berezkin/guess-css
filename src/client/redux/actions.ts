@@ -12,7 +12,9 @@ export const displayNewPuzzler = actionCreator('displayNewPuzzler', (puzzler: Pu
     puzzlerView: {
         source: puzzler.html,
         styleCodes: puzzler.getStyleCodes(diffHint),
-        bodyInnerCode: puzzler.getBodyCode(),
+        commonStylesCode: puzzler.commonStylesCode,
+        commonStylesSummary: puzzler.commonStylesSummary,
+        bodyInnerCode: puzzler.bodyCode,
         correctChoice: puzzler.correctChoice,
         userChoice: undefined,
     }

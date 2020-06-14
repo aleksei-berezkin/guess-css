@@ -25,7 +25,7 @@ const RULES_CHOICES = 3;
 
 const colors = ['pink', 'lightgreen', 'lightblue', 'cyan', 'magenta', 'yellow', 'lightgrey'];
 
-export function genRulesChoices(body: TagNode): Rule[][] | null {
+export function genRulesChoices(body: TagNode): { choices: Rule[][], common: Rule[] } | null {
     const [deepStyle, siblingsStyle] = stream(colors)
         .map((color): Declaration[] => [['background-color', color]])
         .takeRandom(2);
@@ -48,10 +48,13 @@ export function genRulesChoices(body: TagNode): Rule[][] | null {
         return null;
     }
 
-    return stream(deepChildRules).takeRandom(RULES_CHOICES)
-        .zip(stream(siblingsRules).takeRandom(RULES_CHOICES))
-        .map(([deepRule, siblingRule]) => [constantRule, deepRule, siblingRule])
-        .toArray();
+    return {
+        choices: stream(deepChildRules).takeRandom(RULES_CHOICES)
+            .zip(stream(siblingsRules).takeRandom(RULES_CHOICES))
+            .map(([deepRule, siblingRule]) => [deepRule, siblingRule])
+            .toArray(),
+        common: [constantRule],
+    };
 }
 
 function genDeepChildRules(deepest: SingleChildSubtree, style: Declaration[]): Rule[] {

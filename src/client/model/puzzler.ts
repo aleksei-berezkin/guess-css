@@ -10,15 +10,18 @@ export class Puzzler {
 
     constructor(
             private readonly body: TagNode,
-            private readonly rulesChoices: Rule[][],
+            private readonly rules: {
+                choices: Rule[][],
+                common: Rule[],
+            },
             private readonly showBodyTag = false,
             
     ) {
-        this.correctChoice = randomBounded(rulesChoices.length);
+        this.correctChoice = randomBounded(rules.choices.length);
     }
 
     get html(): string {
-        const styleText = this.rulesChoices[this.correctChoice]
+        const styleText = [...this.rules.choices[this.correctChoice], ...this.rules.common]
             .map(r => r.toUnformattedCode())
             .join('');
 
@@ -27,11 +30,22 @@ export class Puzzler {
     }
 
     getStyleCodes(diffHint: boolean): Region[][][] {
-        return this.rulesChoices
+        return this.rules.choices
             .map(choice => new StylesNode(choice, diffHint).toRegions(new Indent()));
     }
 
-    getBodyCode(): Region[][] {
+    get commonStylesCode(): Region[][] {
+        return new StylesNode(this.rules.common, false).toRegions(new Indent());
+    }
+
+    get commonStylesSummary(): string {
+        return stream(this.rules.common)
+            .flatMap(r => r.declarations)
+            .map(([key, _]) => key)
+            .join(', ');
+    }
+
+    get bodyCode(): Region[][] {
         if (this.showBodyTag) {
             return this.body.toRegions(new Indent());
         }

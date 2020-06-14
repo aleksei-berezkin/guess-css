@@ -16,6 +16,8 @@ export type State = {
     puzzlerViews: {
         source: string,
         styleCodes: Region[][][],
+        commonStylesSummary: string,
+        commonStylesCode: Region[][],
         bodyInnerCode: Region[][],
         correctChoice: number,
         userChoice: number | undefined,

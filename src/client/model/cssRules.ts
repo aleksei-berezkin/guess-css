@@ -13,7 +13,7 @@ export class Rule {
 
     constructor(
         private readonly selectors: Selector | Selector[],
-        private readonly declarations: Declaration[],
+        readonly declarations: Declaration[],
         private readonly selectorsDiffering: boolean = false) {
     }
 

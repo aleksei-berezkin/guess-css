@@ -6,7 +6,7 @@ import { stream } from '../../../stream/stream';
 
 const displays = ['inline', 'block', 'inline-block'];
 
-export function genDisplayCss(body: TagNode): Rule[][] {
+export function genDisplayCss(body: TagNode): { choices: Rule[][], common: Rule[] } {
     const {path, siblings} = getSiblingsSubtree(body)!.unfold();
     const [displays1, displays2, displays3] = getNShuffled(displays, 3);
 
@@ -24,9 +24,20 @@ export function genDisplayCss(body: TagNode): Rule[][] {
     const children1Rules = displays2.map(childrenToRule(children1, width1));
     const children2Rules = displays3.map(childrenToRule(children2, width2));
 
-    return stream(parentRules).zip(children1Rules).zip(children2Rules)
-        .map(([[ruleParent, rule1], rule2]) => [ruleParent, rule1, rule2])
-        .toArray();
+    return {
+        choices: stream(parentRules).zip(children1Rules).zip(children2Rules)
+            .map(([[ruleParent, rule1], rule2]) => [ruleParent, rule1, rule2])
+            .toArray(),
+        common: [
+            new Rule(
+                stream(siblings)
+                    .flatMap(s => s.classes)
+                    .map(cls => new ClassSelector(cls))
+                    .toArray(),
+                [['border', '4px solid blue']]
+            )
+        ],
+    };
 }
 
 function splitChildren(children: TagNode[]): [TagNode[], TagNode[]] {
@@ -47,10 +58,7 @@ function splitChildren(children: TagNode[]): [TagNode[], TagNode[]] {
 function childrenToRule(children: TagNode[], width: string | undefined): (display: string) => Rule {
     return display => new Rule(
         children.map(getClassSelector),
-        stream<Declaration>([
-            ['display', display, true],
-            ['border', '4px solid blue'],
-        ])
+        stream<Declaration>([['display', display, true]])
             .appendIf(
                 !!width, ['width', width!]
             )

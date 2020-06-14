@@ -6,19 +6,13 @@ import { stream } from '../../../stream/stream';
 
 const colors = ['#f8a8', '#0a08', '#89f8', '#ccc8'];
 
-export function genPositionCss(body: TagNode): Rule[][] {
+export function genPositionCss(body: TagNode): { choices: Rule[][], common: Rule[] } {
     const [outer, inner] = getDeepestSingleChildSubtree(body).unfoldToStream().takeLast(2);
     const [outerColor, innerColor] = stream(colors).shuffle().toArray();
 
-    return transpose(innerOuterPositionsShuffled()).map(([outerPosition, innerPosition]) =>
-        [
-            new Rule(
-                new ChildCombinator(getClassSelector(outer), new TypeSelector('*')),
-                [
-                    ['padding', '.5em'],
-                ]
-            ),
-            ...[
+    return {
+        choices: transpose(innerOuterPositionsShuffled()).map(([outerPosition, innerPosition]) =>
+            [
                 [outer, outerPosition, outerColor] as const,
                 [inner, innerPosition, innerColor] as const,
             ]
@@ -32,9 +26,14 @@ export function genPositionCss(body: TagNode): Rule[][] {
                         ]
                     )
                 )
-            
-        ]
-    );
+        ),
+        common: [
+            new Rule(
+                new ChildCombinator(getClassSelector(outer), new TypeSelector('*')),
+                [['padding', '.5em']]
+            ),
+        ],
+    };
 }
 
 function getClassSelector(node: TagNode): Selector {

@@ -4,48 +4,55 @@ import { randomItem, transpose } from '../../../util';
 import { getSiblingsSubtree } from '../siblingsSubtree';
 import { stream, streamOf } from '../../../stream/stream';
 
-export function genFlexboxCss(body: TagNode): Rule[][] {
+export function genFlexboxCss(body: TagNode): { choices: Rule[][], common: Rule[] } {
     const direction = randomItem(['row', 'column', 'row-reverse', 'column-reverse']);
     const wrap = getSiblingsSubtree(body)!.unfold().siblings.length > 2 && Math.random() < .7;
     const alignName = wrap && Math.random() < .5 ? 'align-content' : 'align-items';
 
-    return transpose([getJustifyContents(), getAlignItems()])
-        .map(([justifyContent, alignItems]) =>
-            [
-                new Rule(
-                    [new TypeSelector('html'), new TypeSelector('body')],
-                    [
-                        ['height', '100%'],
-                        ['margin', '0'],
-                    ],
-                ),
-                new Rule(
-                    new TypeSelector('body'), 
-                    stream<Declaration>([['display', 'flex']])
-                        .appendIf(
-                            direction !== 'row',
-                            ['flex-direction', direction]
-                        )
-                        .appendIf(
-                            wrap, ['flex-wrap', 'wrap']
-                        )
-                        .appendAll([
-                            ['justify-content', justifyContent, true],
-                            [alignName, alignItems, true],
-                        ])
-                        .toArray(),
-                ),
-                new Rule(
-                    new TypeSelector('div'),
-                    [
-                        ['border', '1px solid black'],
+    return {
+        choices: transpose([getJustifyContents(), getAlignItems()])
+            .map(([justifyContent, alignItems]) =>
+                [
+                    new Rule(
+                        new TypeSelector('body'),
+                        stream<Declaration>([['display', 'flex']])
+                            .appendIf(
+                                direction !== 'row',
+                                ['flex-direction', direction]
+                            )
+                            .appendIf(
+                                wrap, ['flex-wrap', 'wrap']
+                            )
+                            .appendAll([
+                                ['justify-content', justifyContent, true],
+                                [alignName, alignItems, true],
+                            ])
+                            .toArray(),
+                    ),
+                    ...(
                         wrap
-                            ? ['flex-basis', '40%']
-                            : ['padding', '.5em'],
-                    ]
-                ),
-            ]
-        );
+                            ? [new Rule(new TypeSelector('div'), [['flex-basis', '30%']])]
+                            : []
+                    ),
+                ]
+            ),
+        common: [
+            new Rule(
+                [new TypeSelector('html'), new TypeSelector('body')],
+                [
+                    ['height', '100%'],
+                    ['margin', '0'],
+                ],
+            ),
+            new Rule(
+                new TypeSelector('div'),
+                [
+                    ['border', '1px solid black'],
+                    ['padding', '.5em'],
+                ]
+            )
+        ],
+    };
 }
 
 function getJustifyContents() {

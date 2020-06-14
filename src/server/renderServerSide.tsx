@@ -41,7 +41,9 @@ export function sendRenderedApp(req: Request, res: Response) {
         puzzlerViews: [{
             source: puzzler.html,
             styleCodes: puzzler.getStyleCodes(true),
-            bodyInnerCode: puzzler.getBodyCode(),
+            commonStylesCode: puzzler.commonStylesCode,
+            commonStylesSummary: puzzler.commonStylesSummary,
+            bodyInnerCode: puzzler.bodyCode,
             correctChoice: puzzler.correctChoice,
             userChoice: undefined as number | undefined,
         }],
