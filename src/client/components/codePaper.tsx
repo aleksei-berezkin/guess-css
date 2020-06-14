@@ -10,6 +10,7 @@ import IconButton from '@material-ui/core/IconButton';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { useSelector } from 'react-redux';
 import { ofCurrentView } from '../redux/store';
+import { CodeBody } from './codeBody';
 
 const makeCodePaperStyles = makeStyles(theme => ({
     outer: {
@@ -34,12 +35,12 @@ export function CodePaper(
             p.header
         }
 
-        <Code lines={ p.code } />
+        <CodeBody lines={ p.code } />
 
         {
             p.collapsedCode &&
             <SimpleCollapsed summary={ commonStyleSummary }>
-                <Code lines={ p.collapsedCode }/>
+                <CodeBody lines={ p.collapsedCode }/>
             </SimpleCollapsed>
         }
 
@@ -91,50 +92,4 @@ function SimpleCollapsed(p: { summary: string, children: ReactElement }) {
             p.children
         }</Collapse>
     </>;
-}
-
-const makeCodeStyles = makeStyles(theme => ({
-    codeBody: {
-        padding: theme.spacing(1.5),
-    },
-}));
-
-function Code(p: { lines: Region[][] }) {
-    const classes = makeCodeStyles();
-
-    return <Box className={ `code ${ classes.codeBody }` }>{
-        p.lines &&
-        stream(p.lines).zipWithIndex().map(
-            ([regions, i]) => <Line key={ i } regions={ regions }/>
-        )
-    }</Box>;
-}
-
-function Line(p: {regions: Region[]}) {
-    return <pre>{
-        p.regions.map(
-            (reg, i) => {
-                const className = reg.differing
-                    ? reg.kind + ' differing'
-                    : reg.kind;
-
-                return <span key={ i } className={ className } style={ getStyle(reg) }>{ reg.text }</span>;
-            }
-        )
-    }</pre>
-}
-
-function getStyle(reg: Region) {
-    if (reg.backgroundColor) {
-        if (reg.color) {
-            return {
-                backgroundColor: reg.backgroundColor,
-                color: reg.color,
-            }
-        }
-        return {
-            backgroundColor: reg.backgroundColor,
-        }
-    }
-    return undefined;
 }

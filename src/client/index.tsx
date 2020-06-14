@@ -1,4 +1,3 @@
-import './styles.less';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Puzzler } from './components/puzzler';
