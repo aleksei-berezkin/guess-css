@@ -71,7 +71,7 @@ export function Puzzler(): ReactElement {
             <PuzzlerRendered/>
             <Choices/>
             <Grid item>
-                <CodePaper title='HTML' lines={ htmlCode }/>
+                <CodePaper title='HTML' code={ htmlCode }/>
             </Grid>
         </Grid>
     </ThemeProvider>
@@ -213,11 +213,11 @@ function Choices(): ReactElement {
         abc().zipWithIndex().take(choices.length)
             .map(([letter, i]) =>
                 <Grid item key={ `${keyBase}_${i}` }>
-                    <CodePaper title={ `CSS ${letter.toUpperCase()}` } lines={ choices[i] } headerClass={
+                    <CodePaper title={ `CSS ${letter.toUpperCase()}` } code={ choices[i] || [] } headerClass={
                         i === correctChoice && userChoice != null && classes.successBg ||
                         i === userChoice && userChoice !== correctChoice &&  classes.errorBg ||
                         undefined
-                    } collapsedLines={ common }>
+                    } collapsedCode={ common }>
                         <Grid container justify='center'>
                             <Grid item ref={ btnBoxRef } style={ btnBoxStyle }>
                                 {

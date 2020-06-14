@@ -1,6 +1,6 @@
 import React, { ReactElement, useState } from 'react';
 import { Region } from '../model/region';
-import { stream } from '../stream/stream';
+import { stream, streamOf } from '../stream/stream';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
@@ -10,13 +10,14 @@ import Collapse from '@material-ui/core/Collapse';
 import IconButton from '@material-ui/core/IconButton';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { useSelector } from 'react-redux';
+import { ofCurrentView } from '../redux/store';
 
 type StylesProps = {
     withChildren: boolean,
     
 }
 
-const useStyles = makeStyles(theme => ({
+const makeCodePaperStyles = makeStyles(theme => ({
     outer: {
         marginTop: theme.spacing(1.5),
         marginRight: theme.spacing(1.5),
@@ -28,44 +29,19 @@ const useStyles = makeStyles(theme => ({
         paddingRight: theme.spacing(1),
         paddingBottom: theme.spacing(1),
     },
-    codeBody: {
-        padding: theme.spacing(1.5),
-    },
-    expandButton: {
-        color: theme.palette.grey![600],
-    },
-    expandIcon: {
-        transform: 'rotate(0deg)',
-        transition: theme.transitions.create('transform', {
-            duration: theme.transitions.duration.shortest,
-        }),    
-    },
-    expandIconOpen: {
-        transform: 'rotate(90deg)',
-    },
-    expandText: {
-        color: theme.palette.grey![600],
-        cursor: 'pointer',
-    }
 }));
 
 export function CodePaper(
     p: {
         title: string,
-        lines: Region[][],
-        collapsedLines?: Region[][],
+        code: Region[][],
+        collapsedCode?: Region[][],
         headerClass?: string,
         children?: ReactElement
     }
 ) {
-    const [linesShown, setLinesShown] = useState(false);
-    const commonStylesSummary = useSelector(state => state.puzzlerViews[state.current]?.commonStyleSummary);
-    const classes = useStyles({ withChildren: !!p.children });
-
-    function toggleCollapsible(e: React.MouseEvent) {
-        setLinesShown(!linesShown);
-        e.stopPropagation();
-    }
+    const commonStyleSummary = useSelector(ofCurrentView(v => v?.commonStyleSummary || ''));
+    const classes = makeCodePaperStyles({ withChildren: !!p.children });
 
     return <Paper className={ classes.outer }>
         <AppBar position='static' color='default' className={ p.headerClass }>
@@ -73,37 +49,84 @@ export function CodePaper(
                 <Typography variant='button'>{ p.title }</Typography>
             </Box>
         </AppBar>
-        <Box className={ `code ${classes.codeBody }` }>
-            <Lines lines={ p.lines }/>
-        </Box>
+
+        <Code lines={ p.code } />
+
         {
-            p.collapsedLines &&
-            <>
-                <IconButton size='small' className={ classes.expandButton } onClick={ toggleCollapsible }>
-                    <ChevronRightIcon fontSize='small' className={ `${ classes.expandIcon } ${ linesShown ? classes.expandIconOpen : '' }` }/>
-                </IconButton>
-                <Typography variant='caption' className={ classes.expandText } onClick={ toggleCollapsible }>{ commonStylesSummary }</Typography>
-                <Collapse in={ linesShown }>
-                    <Box className={ `code ${classes.codeBody }` }>
-                        <Lines lines={ p.collapsedLines }/>
-                    </Box>
-                </Collapse>
-            </>
+            p.collapsedCode &&
+            <SimpleCollapsed summary={ commonStyleSummary }>
+                <Code lines={ p.collapsedCode }/>
+            </SimpleCollapsed>
         }
-        { p.children }
+
+        {
+            p.children
+        }
     </Paper>;
 }
 
-export function Lines(p: {lines: Region[][] | undefined}) {
-    return <>{
+
+const makeCollapsedStyles = makeStyles(theme => ({
+    expandButton: {
+        color: theme.palette.grey![600],
+    },
+    expandText: {
+        color: theme.palette.grey![600],
+        cursor: 'pointer',
+    },
+    expandIcon: {
+        transform: 'rotate(0deg)',
+        transition: theme.transitions.create('transform', {
+            duration: theme.transitions.duration.shortest,
+        }),
+    },
+    expandIconOpen: {
+        transform: 'rotate(90deg)',
+    },
+}));
+
+function SimpleCollapsed(p: { summary: string, children: ReactElement }) {
+    const [collapsedOpen, setCollapsedOpen] = useState(false);
+    const classes = makeCollapsedStyles();
+
+    function toggleCollapsed(e: React.MouseEvent) {
+        setCollapsedOpen(!collapsedOpen);
+        e.stopPropagation();
+    }
+
+    return <>
+        <IconButton size='small' className={ classes.expandButton } onClick={ toggleCollapsed }>
+            <ChevronRightIcon fontSize='small' className={
+                streamOf(classes.expandIcon)
+                    .appendIf(collapsedOpen, classes.expandIconOpen)
+                    .join(' ')
+            }/>
+        </IconButton>
+        <Typography variant='caption' className={ classes.expandText } onClick={ toggleCollapsed }>{ p.summary }</Typography>
+        <Collapse in={ collapsedOpen }>{
+            p.children
+        }</Collapse>
+    </>;
+}
+
+const makeCodeStyles = makeStyles(theme => ({
+    codeBody: {
+        padding: theme.spacing(1.5),
+    },
+}));
+
+function Code(p: { lines: Region[][] }) {
+    const classes = makeCodeStyles();
+
+    return <Box className={ `code ${ classes.codeBody }` }>{
         p.lines &&
         stream(p.lines).zipWithIndex().map(
             ([regions, i]) => <Line key={ i } regions={ regions }/>
         )
-    }</>;
+    }</Box>;
 }
 
-export function Line(p: {regions: Region[]}) {
+function Line(p: {regions: Region[]}) {
     return <pre>{
         p.regions.map(
             (reg, i) => {
