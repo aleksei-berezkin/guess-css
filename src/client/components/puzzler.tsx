@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { State } from '../redux/store';
+import { ofCurrentView, State } from '../redux/store';
 import { navNextPuzzler, navPrevPuzzler } from '../redux/actions';
 import { Dispatch } from 'redux';
 import { checkChoice, genNewPuzzler, initClient } from '../redux/thunks';
@@ -62,7 +62,7 @@ const useStyles = makeStyles(theme => ({
 export function Puzzler(): ReactElement {
     const dispatch = useDispatch();
     useEffect(() => {dispatch(initClient())}, ['const']);
-    const htmlCode = useSelector(state => state.puzzlerViews[state.current]?.bodyInnerCode || []);
+    const htmlCode = useSelector(state => state.puzzlerViews[state.current]?.body || []);
 
     return <ThemeProvider theme={ theme }>
         <CssBaseline/>
@@ -188,11 +188,12 @@ function NextButton() {
 
 function Choices(): ReactElement {
     const keyBase = useSelector(state => `${state.current}_`);
-    const choicesCount = useSelector(state => state.puzzlerViews[state.current]?.styleCodes.length || 0);
-    const choiceCodes = useSelector(state => state.puzzlerViews[state.current]?.styleCodes || []);
-    const commonCode = useSelector(state => state.puzzlerViews[state.current]?.commonStylesCode || []);
-    const correctChoice = useSelector(state => state.puzzlerViews[state.current]?.correctChoice);
-    const userChoice = useSelector(state => state.puzzlerViews[state.current]?.userChoice);
+
+    const choices = useSelector(ofCurrentView(v => v?.styleChoices || []));
+    const common = useSelector(ofCurrentView(v => v?.commonStyle || []));
+
+    const correctChoice = useSelector(ofCurrentView(v => v?.correctChoice));
+    const userChoice = useSelector(ofCurrentView(v => v?.userChoice));
 
     const btnBoxRef = useRef<HTMLDivElement | null>(null);
     const [btnBoxStyle, setBtnBoxStyle] = useState({} as { minHeight?: number });
@@ -209,14 +210,14 @@ function Choices(): ReactElement {
     }
 
     return <Grid container justify='center'>{
-        abc().zipWithIndex().take(choicesCount)
+        abc().zipWithIndex().take(choices.length)
             .map(([letter, i]) =>
                 <Grid item key={ `${keyBase}_${i}` }>
-                    <CodePaper title={ `CSS ${letter.toUpperCase()}` } lines={ choiceCodes[i] } headerClass={
+                    <CodePaper title={ `CSS ${letter.toUpperCase()}` } lines={ choices[i] } headerClass={
                         i === correctChoice && userChoice != null && classes.successBg ||
                         i === userChoice && userChoice !== correctChoice &&  classes.errorBg ||
                         undefined
-                    } collapsedLines={ commonCode }>
+                    } collapsedLines={ common }>
                         <Grid container justify='center'>
                             <Grid item ref={ btnBoxRef } style={ btnBoxStyle }>
                                 {

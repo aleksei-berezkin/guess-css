@@ -59,7 +59,7 @@ export function CodePaper(
     }
 ) {
     const [linesShown, setLinesShown] = useState(false);
-    const commonStylesSummary = useSelector(state => state.puzzlerViews[state.current]?.commonStylesSummary);
+    const commonStylesSummary = useSelector(state => state.puzzlerViews[state.current]?.commonStyleSummary);
     const classes = useStyles({ withChildren: !!p.children });
 
     function toggleCollapsible(e: React.MouseEvent) {

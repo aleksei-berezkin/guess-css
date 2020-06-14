@@ -15,15 +15,19 @@ export type State = {
     topics: Topic[],
     puzzlerViews: {
         source: string,
-        styleCodes: Region[][][],
-        commonStylesSummary: string,
-        commonStylesCode: Region[][],
-        bodyInnerCode: Region[][],
+        styleChoices: Region[][][],
+        commonStyleSummary: string,
+        commonStyle: Region[][],
+        body: Region[][],
         correctChoice: number,
         userChoice: number | undefined,
     }[],
     current: number,
     correctAnswers: number,
+}
+
+export function ofCurrentView<T>(map: (view: State['puzzlerViews'][number] | undefined) => T): (state: State) => T {
+    return state => map(state.puzzlerViews[state.current]);
 }
 
 export const initialState: State = {

@@ -11,10 +11,10 @@ export const setTopics = actionCreator('setTopics', (
 export const displayNewPuzzler = actionCreator('displayNewPuzzler', (puzzler: Puzzler, diffHint: boolean): { puzzlerView: InferArrayType<State['puzzlerViews']> } => ({
     puzzlerView: {
         source: puzzler.html,
-        styleCodes: puzzler.getStyleCodes(diffHint),
-        commonStylesCode: puzzler.commonStylesCode,
-        commonStylesSummary: puzzler.commonStylesSummary,
-        bodyInnerCode: puzzler.bodyCode,
+        styleChoices: puzzler.getStyleCodes(diffHint),
+        commonStyle: puzzler.commonStyleCode,
+        commonStyleSummary: puzzler.commonStyleSummary,
+        body: puzzler.bodyCode,
         correctChoice: puzzler.correctChoice,
         userChoice: undefined,
     }

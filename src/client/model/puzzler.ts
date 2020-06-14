@@ -34,11 +34,11 @@ export class Puzzler {
             .map(choice => new StylesNode(choice, diffHint).toRegions(new Indent()));
     }
 
-    get commonStylesCode(): Region[][] {
+    get commonStyleCode(): Region[][] {
         return new StylesNode(this.rules.common, false).toRegions(new Indent());
     }
 
-    get commonStylesSummary(): string {
+    get commonStyleSummary(): string {
         return stream(this.rules.common)
             .flatMap(r => r.declarations)
             .map(([key, _]) => key)
