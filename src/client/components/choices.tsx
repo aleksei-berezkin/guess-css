@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useRef } from 'react';
+import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ofCurrentView } from '../redux/store';
 import { checkChoice } from '../redux/thunks';
@@ -11,8 +11,14 @@ import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import CheckIcon from '@material-ui/icons/Check';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import makeStyles from '@material-ui/core/styles/makeStyles';
-import { ChoiceStatus } from './choiceStatus';
+import { ChoiceStatus, getChoiceStatus } from './choiceStatus';
 import { setFooterBtnHeight } from '../redux/actions';
+import { useTheme } from '@material-ui/core/styles';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import AppBar from '@material-ui/core/AppBar';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+
 
 export function Choices(): ReactElement {
     const keyPrefix = useSelector(state => `${state.current}_`);
@@ -23,23 +29,17 @@ export function Choices(): ReactElement {
     const correctChoice = useSelector(ofCurrentView(v => v?.correctChoice));
     const userChoice = useSelector(ofCurrentView(v => v?.userChoice));
 
+    const theme = useTheme();
+    const isWide = useMediaQuery(theme.breakpoints.up('md'));
+
     const dispatch = useDispatch();
 
-    function getChoiceStatus(i: number): ChoiceStatus {
-        if (userChoice == null) {
-            return 'notAnswered';
-        }
-        if (i === correctChoice) {
-            if (userChoice === correctChoice) {
-                return 'userCorrect' as const;
-            }
-            return 'correct';
-        }
-        if (i === userChoice && userChoice !== correctChoice) {
-            return 'incorrect';
-        }
-        return 'untouched';
-    }
+    // TODO other component
+    const [current, setCurrent] = useState(0);
+    const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+        setCurrent(newValue);
+    };
+
 
     function dispatchCheckChoice(choice: number) {
         return () => {
@@ -49,25 +49,54 @@ export function Choices(): ReactElement {
         }
     }
 
-    return <Grid container justify='center'>{
-        abc().zipWithIndex().take(choices.length)
-            .map(([letter, i]) =>
-                <Grid item key={ `${keyPrefix}_${i}` }>
-                    <CodePaper
-                        code={ choices[i] || [] }
-                        collapsedCode={ common }
-                        header={
-                            <CodeHeader title={`CSS ${letter.toUpperCase()}`} status={ getChoiceStatus(i) }/>
-                        }
-                        footer = {
-                            <Footer status={ getChoiceStatus(i) } checkChoice={ dispatchCheckChoice(i) }/>
-                        }
-                        sideMargins={ i === 1 }
-                    />
-                </Grid>
-            )
-            .toArray()
-    }</Grid>
+    if (isWide) {
+        return <Grid container justify='center'>{
+            abc().zipWithIndex().take(choices.length)
+                .map(([letter, i]) =>
+                    <Grid item key={ keyPrefix + letter }>
+                        <CodePaper
+                            code={ choices[i] || [] }
+                            collapsedCode={ common }
+                            header={
+                                <CodeHeader title={`CSS ${letter.toUpperCase()}`} status={ getChoiceStatus(i, correctChoice, userChoice) }/>
+                            }
+                            footer = {
+                                <Footer status={ getChoiceStatus(i, correctChoice, userChoice) } checkChoice={ dispatchCheckChoice(i) }/>
+                            }
+                            sideMargins={ i === 1 }
+                        />
+                    </Grid>
+                )
+                .toArray()
+        }</Grid>
+    }
+
+    return <>
+        <CodePaper
+            code={ choices[current] || [] }
+            collapsedCode={ common }
+            header={
+                <AppBar position='static' color="default">
+                    <Tabs
+                        value={ current }
+                        onChange={ handleChange }
+                        indicatorColor='primary'
+                        textColor='primary'
+                        variant='standard'
+                    >{
+                        abc().take(choices.length)
+                            .map(letter =>
+                                <Tab label={ `CSS ${ letter.toUpperCase() }` } key={ keyPrefix + letter }/>
+                            )
+                            .toArray()
+                    }</Tabs>
+                </AppBar>
+            }
+            footer={
+                <Footer status={ getChoiceStatus(current, correctChoice, userChoice) } checkChoice={ dispatchCheckChoice(current) }/>
+            }
+        />
+    </>
 }
 
 const useFooterStyles = makeStyles(theme => ({
