@@ -6,9 +6,9 @@ import { ThunkAction } from 'redux-thunk';
 import { Action } from 'redux';
 import { stream } from '../stream/stream';
 
-type MyThunk = ThunkAction<void, State, never, Action<string>>;
+type VoidThunk = ThunkAction<void, State, never, Action<string>>;
 
-export function initClient(): MyThunk {
+export function initClient(): VoidThunk {
     return function(dispatch, getState) {
         if (getState().puzzlerViews.length) {
             // Already initialized
@@ -19,19 +19,19 @@ export function initClient(): MyThunk {
     };
 }
 
-export function genNewPuzzler(diffHint: boolean): MyThunk {
+export function genNewPuzzler(diffHint: boolean): VoidThunk {
     return function(dispatch, getState) {
         const state = getState();
         const topic = state.topics[state.puzzlerViews.length % state.topics.length]
 
         const puzzler = genPuzzler(topic);
-        dispatch(displayNewPuzzler(puzzler, diffHint));
+        dispatch(displayNewPuzzler({puzzler, diffHint}));
     }
 }
 
-export function checkChoice(userChoice: number): MyThunk {
+export function checkChoice(userChoice: number): VoidThunk {
     return function(dispatch, getState) {
-        const correctChoice = stream(getState().puzzlerViews).last().get().correctChoice;
-        dispatch(displayAnswer(userChoice, correctChoice === userChoice));
+        const isCorrect = stream(getState().puzzlerViews).last().get().correctChoice === userChoice;
+        dispatch(displayAnswer({userChoice, isCorrect}));
     }
 }

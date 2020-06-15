@@ -1,34 +1,22 @@
 import { Topic } from '../model/gen/topic';
-import { actionCreator } from './actionUtils';
 import { Puzzler } from '../model/puzzler';
-import { State } from './store';
-import { InferArrayType } from '../util';
+import { createAction } from '@reduxjs/toolkit';
+import { noPayload, withPayload } from './payloadUtils';
 
-export const setTopics = actionCreator('setTopics', (
-    topics: Topic[],
-) => ({topics}));
+export const setTopics = createAction('setTopics', withPayload<Topic[]>());
 
-export const displayNewPuzzler = actionCreator('displayNewPuzzler', (puzzler: Puzzler, diffHint: boolean): { puzzlerView: InferArrayType<State['puzzlerViews']> } => ({
-    puzzlerView: {
-        source: puzzler.html,
-        styleChoices: puzzler.getStyleCodes(diffHint),
-        commonStyle: puzzler.commonStyleCode,
-        commonStyleSummary: puzzler.commonStyleSummary,
-        body: puzzler.bodyCode,
-        correctChoice: puzzler.correctChoice,
-        userChoice: undefined,
-    }
-}));
+export const displayNewPuzzler = createAction('displayNewPuzzler', withPayload<{
+    puzzler: Puzzler,
+    diffHint: boolean
+}>());
 
-export const displayAnswer = actionCreator('displayAnswer', (
+export const displayAnswer = createAction('displayAnswer', withPayload<{
     userChoice: number,
     isCorrect: boolean,
-) => ({userChoice, isCorrect})); 
+}>()); 
 
-export const navNextPuzzler = actionCreator('navNextPuzzler', () => ({}));
+export const navNextPuzzler = createAction('navNextPuzzler', noPayload);
 
-export const navPrevPuzzler = actionCreator('navPrevPuzzler', () => ({}));
+export const navPrevPuzzler = createAction('navPrevPuzzler', noPayload);
 
-export const setFooterBtnHeight = actionCreator('setFooterBtnHeight', (height: number) => ({
-    height,    
-}))
+export const setFooterBtnHeight = createAction('setFooterBtnHeight', withPayload<number>());

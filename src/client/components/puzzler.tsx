@@ -1,10 +1,10 @@
-import React, { ReactElement, useEffect, useRef, useState } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ofCurrentView, State } from '../redux/store';
+import { State } from '../redux/store';
 import { navNextPuzzler, navPrevPuzzler } from '../redux/actions';
 import { Dispatch } from 'redux';
-import { checkChoice, genNewPuzzler, initClient } from '../redux/thunks';
-import { abc, stream } from '../stream/stream';
+import { genNewPuzzler, initClient } from '../redux/thunks';
+import { stream } from '../stream/stream';
 import AppBar from '@material-ui/core/AppBar';
 import Grid from '@material-ui/core/Grid';
 import Toolbar from '@material-ui/core/Toolbar';

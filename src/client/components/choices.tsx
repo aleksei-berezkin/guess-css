@@ -76,7 +76,7 @@ export function Choices(): ReactElement {
             code={ choices[current] || [] }
             collapsedCode={ common }
             header={
-                <AppBar position='static' color="default">
+                <AppBar position='static' color='default'>
                     <Tabs
                         value={ current }
                         onChange={ handleChange }

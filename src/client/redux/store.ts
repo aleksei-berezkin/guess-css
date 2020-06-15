@@ -4,11 +4,9 @@ import {
     displayNewPuzzler, navNextPuzzler, navPrevPuzzler, setFooterBtnHeight,
     setTopics,
 } from './actions';
-import { Action, applyMiddleware, combineReducers, createStore } from 'redux';
-import thunkMiddleware, { ThunkMiddleware } from 'redux-thunk';
 import { Topic } from '../model/gen/topic';
-import { isAction } from './actionUtils';
 import { stream } from '../stream/stream';
+import { configureStore, createReducer, combineReducers } from '@reduxjs/toolkit';
 
 
 export type State = {
@@ -45,69 +43,53 @@ declare module 'react-redux' {
     }
 }
 
-const rootReducer = combineReducers({
-    topics: function(state: State['topics'] = initialState.topics, action: Action): State['topics'] {
-        if (isAction(setTopics, action)) {
-            return action.topics;
-        }
-        return state;
-    },
+const reducer = combineReducers<State>({
+    topics: createReducer(initialState.topics, builder =>
+        builder
+            .addCase(setTopics, (state, { payload }) => payload)
+    ),
 
-    puzzlerViews: function(state: State['puzzlerViews'] = initialState.puzzlerViews, action: Action): State['puzzlerViews'] {
-        if (isAction(displayNewPuzzler, action)) {
-            return [...state, action.puzzlerView];
-        }
-
-        if (isAction(displayAnswer, action)) {
-            return [
+    puzzlerViews: createReducer(initialState.puzzlerViews, builder =>
+        builder
+            .addCase(displayNewPuzzler, (state, { payload }) => [...state, {
+                source: payload.puzzler.html,
+                styleChoices: payload.puzzler.getStyleCodes(payload.diffHint),
+                commonStyleSummary: payload.puzzler.commonStyleSummary,
+                commonStyle: payload.puzzler.commonStyleCode,
+                body: payload.puzzler.bodyCode,
+                correctChoice: payload.puzzler.correctChoice,
+                userChoice: undefined,
+            }])
+            .addCase(displayAnswer, (state, { payload }) => [
                 ...stream(state).butLast(),
                 {
                     ...stream(state).last().get(),
-                    userChoice: action.userChoice,
+                    userChoice: payload.userChoice,
                 }
-            ]
-        }
+            ])
+    ),
 
-        return state;
-    },
+    current: createReducer(initialState.current, builder =>
+        builder
+            .addCase(displayNewPuzzler, state => state + 1)
+            .addCase(navNextPuzzler, state => state + 1)
+            .addCase(navPrevPuzzler, state => state -1)
+    ),
 
-    current: function(state: State['current'] = initialState.current, action: Action): State['current'] {
-        if (isAction(displayNewPuzzler, action) || isAction(navNextPuzzler, action)) {
-            return state + 1;
-        }
+    correctAnswers: createReducer(initialState.correctAnswers, builder =>
+        builder
+            .addCase(displayAnswer, (state, { payload }) => state + (payload.isCorrect && 1 || 0))
+    ),
 
-        if (isAction(navPrevPuzzler, action)) {
-            return state - 1;
-        }
-
-        return state;
-    },
-
-    correctAnswers: function(state: State['correctAnswers'] = initialState.correctAnswers, action: Action): State['correctAnswers'] {
-        if (isAction(displayAnswer, action) && action.isCorrect) {
-            return state + 1;
-        }
-
-        return state;
-    },
-
-    footerBtnHeight: function(state: State['footerBtnHeight'] = initialState.footerBtnHeight, action: Action): State['footerBtnHeight'] {
-        if (isAction(setFooterBtnHeight, action)) {
-            return action.height;
-        }
-
-        return state;
-    }
+    footerBtnHeight: createReducer(initialState.footerBtnHeight, builder =>
+        builder
+            .addCase(setFooterBtnHeight, (state, { payload }) => payload)
+    ),
 });
 
-export function createAppStore(state: State) {
-    return createAppStoreWithMiddleware(state, thunkMiddleware);
-}
-
-export function createAppStoreWithMiddleware(state: State, middleware?: ThunkMiddleware) {
-    return createStore(
-        rootReducer,
-        state,
-        middleware && applyMiddleware(middleware),
-    );
+export function createAppStore(preloadedState: State) {
+    return configureStore({
+        reducer,
+        preloadedState,
+    })
 }

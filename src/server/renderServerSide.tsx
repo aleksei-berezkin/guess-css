@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { Puzzler } from '../client/model/puzzler';
 import { genPuzzler } from '../client/model/gen/genPuzzler';
-import { createAppStoreWithMiddleware, State } from '../client/redux/store';
+import { createAppStore, State } from '../client/redux/store';
 import { renderToString } from 'react-dom/server';
 import { Provider } from 'react-redux';
 import { Puzzler as PuzzlerComponent } from '../client/components/puzzler';
@@ -53,7 +53,7 @@ export function sendRenderedApp(req: Request, res: Response) {
     };
 
     const appHtml = renderToString(
-        <Provider store={ createAppStoreWithMiddleware(state, undefined) }>
+        <Provider store={ createAppStore(state) }>
             <PuzzlerComponent/>
         </Provider>
     )
