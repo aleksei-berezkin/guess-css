@@ -62,6 +62,7 @@ export function Choices(): ReactElement {
                         footer = {
                             <Footer status={ getChoiceStatus(i) } checkChoice={ dispatchCheckChoice(i) }/>
                         }
+                        sideMargins={ i === 1 }
                     />
                 </Grid>
             )

@@ -1,9 +1,8 @@
 import React, { ReactElement, useState } from 'react';
 import { Region } from '../model/region';
-import { stream, streamOf } from '../stream/stream';
+import { streamOf } from '../stream/stream';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Paper from '@material-ui/core/Paper';
-import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import Collapse from '@material-ui/core/Collapse';
 import IconButton from '@material-ui/core/IconButton';
@@ -12,11 +11,14 @@ import { useSelector } from 'react-redux';
 import { ofCurrentView } from '../redux/store';
 import { CodeBody } from './codeBody';
 
-const makeCodePaperStyles = makeStyles(theme => ({
-    outer: {
-        marginTop: theme.spacing(1.5),
-        marginRight: theme.spacing(1.5),
-    },
+const spacing = 1.5;
+
+const makeRootStyles = makeStyles(theme => ({
+    root: (sideMargins: boolean) => ({
+        marginTop: theme.spacing(spacing),
+        marginLeft: theme.spacing(sideMargins && spacing || 0),
+        marginRight: theme.spacing(sideMargins && spacing || 0),
+    }),
 }));
 
 export function CodePaper(
@@ -25,12 +27,13 @@ export function CodePaper(
         collapsedCode?: Region[][],
         header?: ReactElement,
         footer?: ReactElement,
+        sideMargins?: boolean,
     }
 ) {
     const commonStyleSummary = useSelector(ofCurrentView(v => v?.commonStyleSummary || ''));
-    const classes = makeCodePaperStyles();
+    const classes = makeRootStyles(!!p.sideMargins);
 
-    return <Paper className={ classes.outer }>
+    return <Paper className={ classes.root }>
         {
             p.header
         }
