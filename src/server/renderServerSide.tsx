@@ -49,6 +49,7 @@ export function sendRenderedApp(req: Request, res: Response) {
         }],
         current: 0,
         correctAnswers: 0,
+        footerBtnHeight: null,
     };
 
     const appHtml = renderToString(

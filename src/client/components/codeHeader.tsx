@@ -5,6 +5,7 @@ import React from 'react';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import green from '@material-ui/core/colors/green';
 import red from '@material-ui/core/colors/red';
+import { ChoiceStatus } from './choiceStatus';
 
 const useStyles = makeStyles(theme => ({
     padded: {
@@ -22,11 +23,13 @@ const useStyles = makeStyles(theme => ({
     incorrect: {
         backgroundColor: red [100] ,
     },
+    untouched: {},
+    notAnswered: {},
 }));
 
-export function CodeHeader(p: { title: string, color?: 'userCorrect' | 'correct' | 'incorrect'}) {
+export function CodeHeader(p: { title: string, status?: ChoiceStatus}) {
     const styles = useStyles();
-    return <AppBar position='static' color='default' className={ p.color && styles[p.color] || undefined }>
+    return <AppBar position='static' color='default' className={ p.status && styles[p.status] || undefined }>
         <Box className={ styles.padded }>
             <Typography variant='button'>{ p.title }</Typography>
         </Box>

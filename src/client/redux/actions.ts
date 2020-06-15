@@ -28,3 +28,7 @@ export const displayAnswer = actionCreator('displayAnswer', (
 export const navNextPuzzler = actionCreator('navNextPuzzler', () => ({}));
 
 export const navPrevPuzzler = actionCreator('navPrevPuzzler', () => ({}));
+
+export const setFooterBtnHeight = actionCreator('setFooterBtnHeight', (height: number) => ({
+    height,    
+}))

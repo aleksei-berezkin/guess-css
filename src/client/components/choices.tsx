@@ -1,4 +1,4 @@
-import React, { ReactElement, useRef, useState } from 'react';
+import React, { ReactElement, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ofCurrentView } from '../redux/store';
 import { checkChoice } from '../redux/thunks';
@@ -11,13 +11,8 @@ import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import CheckIcon from '@material-ui/icons/Check';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import makeStyles from '@material-ui/core/styles/makeStyles';
-
-const useStyles = makeStyles(theme => ({
-    footer: {
-        paddingTop: theme.spacing(1),
-        paddingBottom: theme.spacing(1.5),
-    }
-}));
+import { ChoiceStatus } from './choiceStatus';
+import { setFooterBtnHeight } from '../redux/actions';
 
 export function Choices(): ReactElement {
     const keyPrefix = useSelector(state => `${state.current}_`);
@@ -28,15 +23,13 @@ export function Choices(): ReactElement {
     const correctChoice = useSelector(ofCurrentView(v => v?.correctChoice));
     const userChoice = useSelector(ofCurrentView(v => v?.userChoice));
 
-    const btnBoxRef = useRef<HTMLDivElement | null>(null);
-    const [btnBoxStyle, setBtnBoxStyle] = useState({} as { minHeight?: number });
-
     const dispatch = useDispatch();
 
-    const classes = useStyles();
-
-    function headerColor(i: number) {
-        if (i === correctChoice && userChoice != null) {
+    function getChoiceStatus(i: number): ChoiceStatus {
+        if (userChoice == null) {
+            return 'notAnswered';
+        }
+        if (i === correctChoice) {
             if (userChoice === correctChoice) {
                 return 'userCorrect' as const;
             }
@@ -45,13 +38,14 @@ export function Choices(): ReactElement {
         if (i === userChoice && userChoice !== correctChoice) {
             return 'incorrect';
         }
-        return undefined;
+        return 'untouched';
     }
 
-    function onClickChoice(choice: number) {
-        if (userChoice == null) {
-            setBtnBoxStyle({ minHeight: btnBoxRef.current!.getBoundingClientRect().height })
-            dispatch(checkChoice(choice));
+    function dispatchCheckChoice(choice: number) {
+        return () => {
+            if (userChoice == null) {
+                dispatch(checkChoice(choice));
+            }
         }
     }
 
@@ -63,34 +57,65 @@ export function Choices(): ReactElement {
                         code={ choices[i] || [] }
                         collapsedCode={ common }
                         header={
-                            <CodeHeader title={`CSS ${letter.toUpperCase()}`} color={ headerColor(i) }/>
+                            <CodeHeader title={`CSS ${letter.toUpperCase()}`} status={ getChoiceStatus(i) }/>
                         }
                         footer = {
-                            <Grid container justify='center' className={ classes.footer }>
-                                <Grid item ref={ btnBoxRef } style={ btnBoxStyle }>
-                                    {
-                                        userChoice == null &&
-                                        <Button onClick={() => onClickChoice(i) } variant='outlined'
-                                                color='primary' size='small'>This!</Button>
-                                    }
-                                    {
-                                        i === userChoice && userChoice === correctChoice &&
-                                        <CheckCircleOutlineIcon color='primary'/>
-                                    }
-                                    {
-                                        i === correctChoice && userChoice != null && userChoice !== correctChoice &&
-                                        <CheckIcon/>
-                                    }
-                                    {
-                                        i === userChoice && userChoice !== correctChoice &&
-                                        <ErrorOutlineIcon/>
-                                    }
-                                </Grid>
-                            </Grid>
+                            <Footer status={ getChoiceStatus(i) } checkChoice={ dispatchCheckChoice(i) }/>
                         }
                     />
                 </Grid>
             )
             .toArray()
     }</Grid>
+}
+
+const useFooterStyles = makeStyles(theme => ({
+    footer: {
+        paddingTop: theme.spacing(1),
+        paddingBottom: theme.spacing(1.5),
+    }
+}));
+
+
+function Footer(p: {status: ChoiceStatus, checkChoice: () => void}) {
+    const footerStyle = useSelector(state => {
+        if (state.footerBtnHeight) {
+            return {
+                minHeight: state.footerBtnHeight,
+            }
+        }
+        return undefined;
+    });
+    const btnBoxRef = useRef<HTMLDivElement | null>(null);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (!footerStyle) {
+            dispatch(setFooterBtnHeight(btnBoxRef.current!.getBoundingClientRect().height));
+        }
+    }, ['const']);
+
+    const classes = useFooterStyles();
+
+    return <Grid container justify='center' className={ classes.footer }>
+        <Grid item ref={ btnBoxRef } style={ footerStyle }>
+            {
+                p.status === 'notAnswered' &&
+                <Button onClick={() => p.checkChoice() } variant='outlined'
+                        color='primary' size='small'>This!</Button>
+            }
+            {
+                p.status === 'userCorrect' &&
+                <CheckCircleOutlineIcon color='primary'/>
+            }
+            {
+                p.status === 'correct' &&
+                <CheckIcon/>
+            }
+            {
+                p.status === 'incorrect' &&
+                <ErrorOutlineIcon/>
+            }
+        </Grid>
+    </Grid>
 }

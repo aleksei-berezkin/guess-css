@@ -1,7 +1,7 @@
 import { Region } from '../model/region';
 import {
     displayAnswer,
-    displayNewPuzzler, navNextPuzzler, navPrevPuzzler,
+    displayNewPuzzler, navNextPuzzler, navPrevPuzzler, setFooterBtnHeight,
     setTopics,
 } from './actions';
 import { Action, applyMiddleware, combineReducers, createStore } from 'redux';
@@ -24,6 +24,7 @@ export type State = {
     }[],
     current: number,
     correctAnswers: number,
+    footerBtnHeight: number | null,
 }
 
 export function ofCurrentView<T>(map: (view: State['puzzlerViews'][number] | undefined) => T): (state: State) => T {
@@ -35,9 +36,11 @@ export const initialState: State = {
     puzzlerViews: [],
     current: -1,
     correctAnswers: 0,
+    footerBtnHeight: null,
 };
 
 declare module 'react-redux' {
+    // noinspection JSUnusedGlobalSymbols
     interface DefaultRootState extends State {
     }
 }
@@ -83,6 +86,14 @@ const rootReducer = combineReducers({
     correctAnswers: function(state: State['correctAnswers'] = initialState.correctAnswers, action: Action): State['correctAnswers'] {
         if (isAction(displayAnswer, action) && action.isCorrect) {
             return state + 1;
+        }
+
+        return state;
+    },
+
+    footerBtnHeight: function(state: State['footerBtnHeight'] = initialState.footerBtnHeight, action: Action): State['footerBtnHeight'] {
+        if (isAction(setFooterBtnHeight, action)) {
+            return action.height;
         }
 
         return state;
