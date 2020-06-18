@@ -37,13 +37,13 @@ export class TagNode implements Node {
         if (this.children.length === 1 && this.children[0] instanceof TextNode) {
             const textNode = this.children[0] as TextNode;
             return [
-                [indent, ...this.openTagToRegions(), textNode.toTextRegion(), this.closeTagToRegion()]
+                [indent.toRegion(), ...this.openTagToRegions(), textNode.toTextRegion(), this.closeTagToRegion()]
             ];
         }
 
-        return streamOf([indent, ...this.openTagToRegions()])
+        return streamOf([indent.toRegion(), ...this.openTagToRegions()])
             .appendAll(this.childrenToRegions(indent.indent()))
-            .append([indent, this.closeTagToRegion()])
+            .append([indent.toRegion(), this.closeTagToRegion()])
             .toArray();
     }
 
@@ -119,7 +119,7 @@ export class TextNode implements Node {
 
     toRegions(indent: Indent): Region[][] {
         return [
-            [indent, this.toTextRegion()]
+            [indent.toRegion(), this.toTextRegion()]
         ];
     }
 

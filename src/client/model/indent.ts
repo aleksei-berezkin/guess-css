@@ -3,8 +3,7 @@ import { same } from '../stream/stream';
 
 const indentSize = 2;
 
-export class Indent implements Region {
-    readonly kind: RegionKind = RegionKind.Default;
+export class Indent {
     readonly text: string;
 
     constructor(indent: number = 0) {
@@ -13,5 +12,12 @@ export class Indent implements Region {
 
     indent(): Indent {
         return new Indent(this.text.length + indentSize);
+    }
+
+    toRegion(): Region {
+        return {
+            kind: RegionKind.Default,
+            text: this.text,
+        }
     }
 }

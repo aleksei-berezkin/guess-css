@@ -53,17 +53,7 @@ const reducer = combineReducers<State>({
 
     puzzlerViews: createReducer(initialState.puzzlerViews, builder =>
         builder
-            .addCase(displayNewPuzzler, (state, { payload }) => [...state, {
-                source: payload.puzzler.html,
-                styleChoices: payload.puzzler.getStyleCodes(payload.diffHint),
-                commonStyleSummary: payload.puzzler.commonStyleSummary,
-                commonStyle: payload.puzzler.commonStyleCode,
-                body: payload.puzzler.bodyCode,
-                status: {
-                    correctChoice: payload.puzzler.correctChoice,
-                    userChoice: undefined,
-                },
-            }])
+            .addCase(displayNewPuzzler, (state, { payload }) => [...state, payload])
             .addCase(displayAnswer, (state, { payload }) => {
                 stream(state).last().get().status.userChoice = payload.userChoice;
                 return state;

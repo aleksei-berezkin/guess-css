@@ -42,13 +42,13 @@ export class Rule {
 
     toRegions(indent: Indent): Region[][] {
         return streamOf<Region[]>([
-                indent,
+                indent.toRegion(),
                 {kind: RegionKind.Selector, text: this.selectorsString, differing: this.selectorsDiffering},
                 {kind: RegionKind.Default, text: ' {'},
             ])
             .appendAll(this.declarationsToRegions(indent.indent()))
             .append([
-                indent,
+                indent.toRegion(),
                 {kind: RegionKind.Default, text: '}'},
             ])
             .toArray();
@@ -59,7 +59,7 @@ export class Rule {
         return this.declarations
             .map(([name, value, differing]): Region[] =>
                 [
-                    indent,
+                    indent.toRegion(),
                     {kind: RegionKind.DeclName, text: name},
                     {kind: RegionKind.Default, text: ': '},
                     ...Rule.valueToRegions(name, value, differing),

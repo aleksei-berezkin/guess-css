@@ -25,7 +25,17 @@ export function genNewPuzzler(diffHint: boolean): VoidThunk {
         const topic = state.topics[state.puzzlerViews.length % state.topics.length]
 
         const puzzler = genPuzzler(topic);
-        dispatch(displayNewPuzzler({puzzler, diffHint}));
+        dispatch(displayNewPuzzler({
+            source: puzzler.html,
+            styleChoices: puzzler.getStyleCodes(diffHint),
+            commonStyleSummary: puzzler.commonStyleSummary,
+            commonStyle: puzzler.commonStyleCode,
+            body: puzzler.bodyCode,
+            status: {
+                correctChoice: puzzler.correctChoice,
+                userChoice: undefined,
+            }
+        }));
     }
 }
 

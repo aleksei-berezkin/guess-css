@@ -68,7 +68,7 @@ class StylesNode implements Node {
     toRegions(indent: Indent): Region[][] {
         if (this.isDiffHint) {
             return streamOf<Region[]>([
-                indent,
+                indent.toRegion(),
                 {
                     kind: RegionKind.Comment,
                     text: '/* Only text in ',
