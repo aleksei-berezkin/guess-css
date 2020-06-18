@@ -17,8 +17,10 @@ export type State = {
         commonStyleSummary: string,
         commonStyle: Region[][],
         body: Region[][],
-        correctChoice: number,
-        userChoice: number | undefined,
+        status: {
+            correctChoice: number,
+            userChoice: number | undefined,
+        }
     }[],
     current: number,
     correctAnswers: number,
@@ -57,16 +59,15 @@ const reducer = combineReducers<State>({
                 commonStyleSummary: payload.puzzler.commonStyleSummary,
                 commonStyle: payload.puzzler.commonStyleCode,
                 body: payload.puzzler.bodyCode,
-                correctChoice: payload.puzzler.correctChoice,
-                userChoice: undefined,
+                status: {
+                    correctChoice: payload.puzzler.correctChoice,
+                    userChoice: undefined,
+                },
             }])
-            .addCase(displayAnswer, (state, { payload }) => [
-                ...stream(state).butLast(),
-                {
-                    ...stream(state).last().get(),
-                    userChoice: payload.userChoice,
-                }
-            ])
+            .addCase(displayAnswer, (state, { payload }) => {
+                stream(state).last().get().status.userChoice = payload.userChoice;
+                return state;
+            })
     ),
 
     current: createReducer(initialState.current, builder =>

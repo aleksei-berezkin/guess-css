@@ -44,8 +44,10 @@ export function sendRenderedApp(req: Request, res: Response) {
             commonStyle: puzzler.commonStyleCode,
             commonStyleSummary: puzzler.commonStyleSummary,
             body: puzzler.bodyCode,
-            correctChoice: puzzler.correctChoice,
-            userChoice: undefined as number | undefined,
+            status: {
+                correctChoice: puzzler.correctChoice,
+                userChoice: undefined,
+            },
         }],
         current: 0,
         correctAnswers: 0,

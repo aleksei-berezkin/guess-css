@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ofCurrentView } from '../redux/store';
+import { ofCurrentView, State } from '../redux/store';
 import { checkChoice } from '../redux/thunks';
 import Grid from '@material-ui/core/Grid';
 import { abc } from '../stream/stream';
@@ -18,85 +18,95 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import { Dispatch } from 'redux';
 
 
 export function Choices(): ReactElement {
-    const keyPrefix = useSelector(state => `${state.current}_`);
-
-    const choices = useSelector(ofCurrentView(v => v?.styleChoices || []));
-    const common = useSelector(ofCurrentView(v => v?.commonStyle || []));
-
-    const correctChoice = useSelector(ofCurrentView(v => v?.correctChoice));
-    const userChoice = useSelector(ofCurrentView(v => v?.userChoice));
-
     const theme = useTheme();
     const isWide = useMediaQuery(theme.breakpoints.up('md'));
 
+    return isWide && <WideChoices/> || <TabChoices/>;
+}
+
+const keyPrefixSelector = (state: State) => state.current + '_';
+const choicesSelector = ofCurrentView(v => v?.styleChoices || []);
+const commonSelector = ofCurrentView(v => v?.commonStyle || []);
+const statusSelector = ofCurrentView(v => v?.status);
+
+function dispatchCheckChoice(choice: number, status: State['puzzlerViews'][number]['status'] | undefined, dispatch: Dispatch<any>) {
+    return () => {
+        if (status?.userChoice == null) {
+            dispatch(checkChoice(choice));
+        }
+    }
+}
+
+function WideChoices() {
+    const keyPrefix = useSelector(keyPrefixSelector);
+    const choices = useSelector(choicesSelector);
+    const common = useSelector(commonSelector);
+    const status = useSelector(statusSelector);
+
     const dispatch = useDispatch();
 
-    // TODO other component
+    return <Grid container justify='center'>{
+        abc().zipWithIndex().take(choices.length)
+            .map(([letter, i]) =>
+                <Grid item key={ keyPrefix + letter }>
+                    <CodePaper
+                        code={ choices[i] || [] }
+                        collapsedCode={ common }
+                        header={
+                            <CodeHeader title={`CSS ${letter.toUpperCase()}`} status={ getChoiceStatus(i, status) }/>
+                        }
+                        footer = {
+                            <FooterButton status={ getChoiceStatus(i, status) } checkChoice={ dispatchCheckChoice(i, status, dispatch) }/>
+                        }
+                        sideMargins={ i === 1 }
+                    />
+                </Grid>
+            )
+            .toArray()
+    }</Grid>    
+}
+
+function TabChoices() {
+    const keyPrefix = useSelector(keyPrefixSelector);
+    const choices = useSelector(choicesSelector);
+    const common = useSelector(commonSelector);
+    const status = useSelector(statusSelector);
+
     const [current, setCurrent] = useState(0);
     const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
         setCurrent(newValue);
     };
 
+    const dispatch = useDispatch();
 
-    function dispatchCheckChoice(choice: number) {
-        return () => {
-            if (userChoice == null) {
-                dispatch(checkChoice(choice));
-            }
+    return <CodePaper
+        code={ choices[current] || [] }
+        collapsedCode={ common }
+        header={
+            <AppBar position='static' color='default'>
+                <Tabs
+                    value={ current }
+                    onChange={ handleChange }
+                    indicatorColor='primary'
+                    textColor='primary'
+                    variant='standard'
+                >{
+                    abc().take(choices.length)
+                        .map(letter =>
+                            <Tab label={ `CSS ${ letter.toUpperCase() }` } key={ keyPrefix + letter }/>
+                        )
+                        .toArray()
+                }</Tabs>
+            </AppBar>
         }
-    }
-
-    if (isWide) {
-        return <Grid container justify='center'>{
-            abc().zipWithIndex().take(choices.length)
-                .map(([letter, i]) =>
-                    <Grid item key={ keyPrefix + letter }>
-                        <CodePaper
-                            code={ choices[i] || [] }
-                            collapsedCode={ common }
-                            header={
-                                <CodeHeader title={`CSS ${letter.toUpperCase()}`} status={ getChoiceStatus(i, correctChoice, userChoice) }/>
-                            }
-                            footer = {
-                                <Footer status={ getChoiceStatus(i, correctChoice, userChoice) } checkChoice={ dispatchCheckChoice(i) }/>
-                            }
-                            sideMargins={ i === 1 }
-                        />
-                    </Grid>
-                )
-                .toArray()
-        }</Grid>
-    }
-
-    return <>
-        <CodePaper
-            code={ choices[current] || [] }
-            collapsedCode={ common }
-            header={
-                <AppBar position='static' color='default'>
-                    <Tabs
-                        value={ current }
-                        onChange={ handleChange }
-                        indicatorColor='primary'
-                        textColor='primary'
-                        variant='standard'
-                    >{
-                        abc().take(choices.length)
-                            .map(letter =>
-                                <Tab label={ `CSS ${ letter.toUpperCase() }` } key={ keyPrefix + letter }/>
-                            )
-                            .toArray()
-                    }</Tabs>
-                </AppBar>
-            }
-            footer={
-                <Footer status={ getChoiceStatus(current, correctChoice, userChoice) } checkChoice={ dispatchCheckChoice(current) }/>
-            }
-        />
-    </>
+        footer={
+            <FooterButton status={ getChoiceStatus(current, status) } checkChoice={ dispatchCheckChoice(current, status, dispatch) }/>
+        }
+    />;    
 }
 
 const useFooterStyles = makeStyles(theme => ({
@@ -107,7 +117,7 @@ const useFooterStyles = makeStyles(theme => ({
 }));
 
 
-function Footer(p: {status: ChoiceStatus, checkChoice: () => void}) {
+function FooterButton(p: {status: ChoiceStatus, checkChoice: () => void}) {
     const footerStyle = useSelector(state => {
         if (state.footerBtnHeight) {
             return {

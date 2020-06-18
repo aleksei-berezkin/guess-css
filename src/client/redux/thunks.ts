@@ -31,7 +31,7 @@ export function genNewPuzzler(diffHint: boolean): VoidThunk {
 
 export function checkChoice(userChoice: number): VoidThunk {
     return function(dispatch, getState) {
-        const isCorrect = stream(getState().puzzlerViews).last().get().correctChoice === userChoice;
+        const isCorrect = stream(getState().puzzlerViews).last().get().status.correctChoice === userChoice;
         dispatch(displayAnswer({userChoice, isCorrect}));
     }
 }

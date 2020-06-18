@@ -119,7 +119,7 @@ function getDonePuzzlersNum(state: State) {
     if (!state.puzzlerViews.length) {
         return 0;
     }
-    if (stream(state.puzzlerViews).last().orElseUndefined()?.userChoice != null) {
+    if (stream(state.puzzlerViews).last().orElseUndefined()?.status.userChoice != null) {
         return state.puzzlerViews.length;
     }
     return state.puzzlerViews.length - 1;
@@ -161,7 +161,7 @@ function PrevButton() {
 
 function NextButton() {
     const hasNext = useSelector(state => state.current < state.puzzlerViews.length - 1);
-    const isAnswered = useSelector(state => state.puzzlerViews[state.puzzlerViews.length - 1]?.userChoice != null);
+    const isAnswered = useSelector(state => state.puzzlerViews[state.puzzlerViews.length - 1]?.status.userChoice != null);
     const dispatch = useDispatch();
 
     function handleNext() {
