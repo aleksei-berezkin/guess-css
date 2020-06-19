@@ -22,7 +22,24 @@ import { ThemeProvider } from '@material-ui/core/styles';
 import { CodeHeader } from './codeHeader';
 import { Choices } from './choices';
 
+declare module '@material-ui/core/styles/createBreakpoints' {
+    // noinspection JSUnusedGlobalSymbols
+    interface BreakpointOverrides {
+        narrow: true;
+    }
+}
+
 const theme = createMuiTheme({
+    breakpoints: {
+        values: {
+            xs: 0,
+            narrow: 350,
+            sm: 600,
+            md: 960,
+            lg: 1280,
+            xl: 1920,
+        },
+    },
     palette: {
         type: 'light',
     },
@@ -33,18 +50,18 @@ const theme = createMuiTheme({
     },
 });
 
-const iframeSize = {
-    width: 240,
-    height: 160,
-}
-
 const useStyles = makeStyles(theme => ({
+    layoutSize: {
+        height: 160,
+        width: 190,
+        [theme.breakpoints.up('narrow')]: {
+            width: 240,
+        },
+    },
     iframe: {
-        ...iframeSize,
         border: 'none',
     },
     iframePaper: {
-        ...iframeSize,
         marginTop: theme.spacing(1),
     },
 }));
@@ -134,7 +151,10 @@ function PuzzlerRendered() {
             <PrevButton/>
         </Grid>
         <Grid item>{
-            source && <Paper className={ classes.iframePaper }><iframe className={ classes.iframe } srcDoc={ source }/></Paper>
+            source &&
+            <Paper className={ `${classes.layoutSize} ${classes.iframePaper}` }>
+                <iframe className={ `${classes.layoutSize} ${classes.iframe}` } srcDoc={ source }/>
+            </Paper>
         }</Grid>
         <Grid item>
             <NextButton/>
