@@ -17,3 +17,8 @@ export const navNextPuzzler = createAction('navNextPuzzler', noPayload);
 export const navPrevPuzzler = createAction('navPrevPuzzler', noPayload);
 
 export const setFooterBtnHeight = createAction('setFooterBtnHeight', withPayload<number>());
+
+export const setCurrentTab = createAction('setCurrentTab', withPayload<{
+    currentPuzzler: number,
+    currentTab: number
+}>());

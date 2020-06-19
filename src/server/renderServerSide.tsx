@@ -48,6 +48,7 @@ export function sendRenderedApp(req: Request, res: Response) {
                 correctChoice: puzzler.correctChoice,
                 userChoice: undefined,
             },
+            currentTab: 0,
         }],
         current: 0,
         correctAnswers: 0,

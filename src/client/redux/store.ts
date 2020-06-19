@@ -1,7 +1,7 @@
 import { Region } from '../model/region';
 import {
     displayAnswer,
-    displayNewPuzzler, navNextPuzzler, navPrevPuzzler, setFooterBtnHeight,
+    displayNewPuzzler, navNextPuzzler, navPrevPuzzler, setCurrentTab, setFooterBtnHeight,
     setTopics,
 } from './actions';
 import { Topic } from '../model/gen/topic';
@@ -20,7 +20,8 @@ export type State = {
         status: {
             correctChoice: number,
             userChoice: number | undefined,
-        }
+        },
+        currentTab: number,
     }[],
     current: number,
     correctAnswers: number,
@@ -56,6 +57,10 @@ const reducer = combineReducers<State>({
             .addCase(displayNewPuzzler, (state, { payload }) => [...state, payload])
             .addCase(displayAnswer, (state, { payload }) => {
                 stream(state).last().get().status.userChoice = payload.userChoice;
+                return state;
+            })
+            .addCase(setCurrentTab, (state, { payload }) => {
+                state[payload.currentPuzzler].currentTab = payload.currentTab;
                 return state;
             })
     ),

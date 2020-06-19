@@ -34,7 +34,8 @@ export function genNewPuzzler(diffHint: boolean): VoidThunk {
             status: {
                 correctChoice: puzzler.correctChoice,
                 userChoice: undefined,
-            }
+            },
+            currentTab: 0,
         }));
     }
 }

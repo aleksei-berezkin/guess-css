@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useRef, useState } from 'react';
+import React, { ReactElement, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ofCurrentView, State } from '../redux/store';
 import { checkChoice } from '../redux/thunks';
@@ -12,7 +12,7 @@ import CheckIcon from '@material-ui/icons/Check';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { ChoiceStatus, getChoiceStatus, useChoiceStyles } from './choiceStatus';
-import { setFooterBtnHeight } from '../redux/actions';
+import { setCurrentTab, setFooterBtnHeight } from '../redux/actions';
 import { useTheme } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import AppBar from '@material-ui/core/AppBar';
@@ -28,7 +28,7 @@ export function Choices(): ReactElement {
     return isWide && <WideChoices/> || <NarrowChoices/>;
 }
 
-const keyPrefixSelector = (state: State) => state.current + '_';
+const currentSelector = (state: State) => state.current;
 const choicesSelector = ofCurrentView(v => v?.styleChoices || []);
 const commonSelector = ofCurrentView(v => v?.commonStyle || []);
 const statusSelector = ofCurrentView(v => v?.status);
@@ -42,7 +42,7 @@ function dispatchCheckChoice(choice: number, status: State['puzzlerViews'][numbe
 }
 
 function WideChoices() {
-    const keyPrefix = useSelector(keyPrefixSelector);
+    const current = useSelector(currentSelector);
     const choices = useSelector(choicesSelector);
     const common = useSelector(commonSelector);
     const status = useSelector(statusSelector);
@@ -53,7 +53,7 @@ function WideChoices() {
     return <Grid container justify='center'>{
         abc().zipWithIndex().take(choices.length)
             .map(([letter, i]) =>
-                <Grid item key={ keyPrefix + letter }>
+                <Grid item key={ current + letter }>
                     <CodePaper
                         code={ choices[i] || [] }
                         collapsedCode={ common }
@@ -72,26 +72,26 @@ function WideChoices() {
 }
 
 function NarrowChoices() {
-    const keyPrefix = useSelector(keyPrefixSelector);
+    const currentPuzzler = useSelector(currentSelector);
     const choices = useSelector(choicesSelector);
     const common = useSelector(commonSelector);
     const status = useSelector(statusSelector);
+    const currentTab = useSelector(ofCurrentView(v => v?.currentTab || 0));
     const classes = useChoiceStyles();
 
-    const [current, setCurrent] = useState(0);
-    const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
-        setCurrent(newValue);
+    const handleChange = (event: React.ChangeEvent<{}>, currentTab: number) => {
+        dispatch(setCurrentTab({currentPuzzler, currentTab}));
     };
 
     const dispatch = useDispatch();
 
     return <CodePaper
-        code={ choices[current] || [] }
+        code={ choices[currentTab] || [] }
         collapsedCode={ common }
         header={
             <AppBar position='static' color='default'>
                 <Tabs
-                    value={ current }
+                    value={ currentTab }
                     onChange={ handleChange }
                     indicatorColor='primary'
                     textColor='primary'
@@ -100,7 +100,7 @@ function NarrowChoices() {
                     abc().zipWithIndex().take(choices.length)
                         .map(([letter, i]) =>
                             <Tab label={ `CSS ${ letter.toUpperCase() }` }
-                                 key={ keyPrefix + letter }
+                                 key={ currentPuzzler + letter }
                                  className={ classes[getChoiceStatus(i, status)]}
                             />
                         )
@@ -109,7 +109,7 @@ function NarrowChoices() {
             </AppBar>
         }
         footer={
-            <FooterButton status={ getChoiceStatus(current, status) } checkChoice={ dispatchCheckChoice(current, status, dispatch) }/>
+            <FooterButton status={ getChoiceStatus(currentTab, status) } checkChoice={ dispatchCheckChoice(currentTab, status, dispatch) }/>
         }
     />;    
 }
