@@ -8,6 +8,17 @@ export function streamOf<T>(...input: T[]): Stream<T> {
     return new StreamImpl(input, Base._IDENTITY);
 }
 
+export function entriesStream<O extends {[k: string]: any}>(obj: O): Stream<readonly [keyof O, O[keyof O]]> {
+    return new StreamImpl<
+            readonly [keyof O, O[keyof O]],
+            readonly [keyof O, O[keyof O]]>
+    (function* () {
+        for (const k of Object.keys(obj)) {
+            yield [k, obj[k]] as const;
+        }
+    }(), Base._IDENTITY);
+}
+
 export function range(from: number, bound: number): Stream<number> {
     return new StreamImpl(function* () {
         for (let i = from; i < bound; i++) {
@@ -517,6 +528,23 @@ class StreamImpl<P, T> extends Base<P, T> implements Stream<T> {
             yield* buffer;
         });
     }
+    
+    toObject(): T extends readonly [string, any] ? { [key in T[0]]: T[1] } : never {
+        const obj: any = {};
+        for (const i of this) {
+            if (Array.isArray(i) && i.length === 2) {
+                const [k, v] = i;
+                if (typeof k === 'string' || typeof  k === 'number' || typeof k === 'symbol') {
+                    obj[k] = v;
+                } else {
+                    throw Error('Not key: ' + k);
+                }
+            } else {
+                throw Error('Not 2-element array: ' + i);
+            }
+        }
+        return obj;
+    }
 
     transform<U>(transformer: (s: Stream<T>) => U): U {
         return transformer(this);
@@ -731,6 +759,7 @@ export interface Stream<T> extends Iterable<T> {
     takeLast(n: number): Stream<T>;
     transform<U>(transformer: (s: Stream<T>) => U): U;
     toArray(): T[];
+    toObject(): T extends readonly [string, any] ? { [key in T[0]]: T[1] } : never;
     zip<U>(other: Iterable<U>): Stream<readonly [T, U]>;
     zipWithIndex(): Stream<readonly [T, number]>;
 }

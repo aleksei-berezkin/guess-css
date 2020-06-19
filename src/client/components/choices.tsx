@@ -11,7 +11,7 @@ import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import CheckIcon from '@material-ui/icons/Check';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import makeStyles from '@material-ui/core/styles/makeStyles';
-import { ChoiceStatus, getChoiceStatus } from './choiceStatus';
+import { ChoiceStatus, getChoiceStatus, useChoiceStyles } from './choiceStatus';
 import { setFooterBtnHeight } from '../redux/actions';
 import { useTheme } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
@@ -25,7 +25,7 @@ export function Choices(): ReactElement {
     const theme = useTheme();
     const isWide = useMediaQuery(theme.breakpoints.up('md'));
 
-    return isWide && <WideChoices/> || <TabChoices/>;
+    return isWide && <WideChoices/> || <NarrowChoices/>;
 }
 
 const keyPrefixSelector = (state: State) => state.current + '_';
@@ -46,6 +46,7 @@ function WideChoices() {
     const choices = useSelector(choicesSelector);
     const common = useSelector(commonSelector);
     const status = useSelector(statusSelector);
+    const classes = useChoiceStyles();
 
     const dispatch = useDispatch();
 
@@ -57,7 +58,7 @@ function WideChoices() {
                         code={ choices[i] || [] }
                         collapsedCode={ common }
                         header={
-                            <CodeHeader title={`CSS ${letter.toUpperCase()}`} status={ getChoiceStatus(i, status) }/>
+                            <CodeHeader title={`CSS ${letter.toUpperCase()}`} className={ classes[getChoiceStatus(i, status)] }/>
                         }
                         footer = {
                             <FooterButton status={ getChoiceStatus(i, status) } checkChoice={ dispatchCheckChoice(i, status, dispatch) }/>
@@ -70,11 +71,12 @@ function WideChoices() {
     }</Grid>    
 }
 
-function TabChoices() {
+function NarrowChoices() {
     const keyPrefix = useSelector(keyPrefixSelector);
     const choices = useSelector(choicesSelector);
     const common = useSelector(commonSelector);
     const status = useSelector(statusSelector);
+    const classes = useChoiceStyles();
 
     const [current, setCurrent] = useState(0);
     const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
@@ -93,11 +95,14 @@ function TabChoices() {
                     onChange={ handleChange }
                     indicatorColor='primary'
                     textColor='primary'
-                    variant='standard'
+                    variant='fullWidth'
                 >{
-                    abc().take(choices.length)
-                        .map(letter =>
-                            <Tab label={ `CSS ${ letter.toUpperCase() }` } key={ keyPrefix + letter }/>
+                    abc().zipWithIndex().take(choices.length)
+                        .map(([letter, i]) =>
+                            <Tab label={ `CSS ${ letter.toUpperCase() }` }
+                                 key={ keyPrefix + letter }
+                                 className={ classes[getChoiceStatus(i, status)]}
+                            />
                         )
                         .toArray()
                 }</Tabs>

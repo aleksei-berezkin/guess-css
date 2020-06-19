@@ -3,9 +3,6 @@ import Box from '@material-ui/core/Box';
 import Typography from '@material-ui/core/Typography';
 import React from 'react';
 import makeStyles from '@material-ui/core/styles/makeStyles';
-import green from '@material-ui/core/colors/green';
-import red from '@material-ui/core/colors/red';
-import { ChoiceStatus } from './choiceStatus';
 
 const useStyles = makeStyles(theme => ({
     padded: {
@@ -14,22 +11,11 @@ const useStyles = makeStyles(theme => ({
         paddingRight: theme.spacing(1),
         paddingBottom: theme.spacing(1),
     },
-    userCorrect: {
-        backgroundColor: green['A100'],
-    },
-    correct: {
-        backgroundColor: green[100],
-    },
-    incorrect: {
-        backgroundColor: red [100] ,
-    },
-    untouched: {},
-    notAnswered: {},
 }));
 
-export function CodeHeader(p: { title: string, status?: ChoiceStatus}) {
+export function CodeHeader(p: { title: string, className?: string}) {
     const styles = useStyles();
-    return <AppBar position='static' color='default' className={ p.status && styles[p.status] || undefined }>
+    return <AppBar position='static' color='default' className={ p.className }>
         <Box className={ styles.padded }>
             <Typography variant='button'>{ p.title }</Typography>
         </Box>
