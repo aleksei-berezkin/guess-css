@@ -23,7 +23,8 @@ import { Dispatch } from 'redux';
 
 export function Choices(): ReactElement {
     const theme = useTheme();
-    const isWide = useMediaQuery(theme.breakpoints.up('md'));
+    const ssr = useSelector(state => state.ssr);
+    const isWide = useMediaQuery(theme.breakpoints.up('md')) || ssr?.wide;
 
     return isWide && <WideChoices/> || <NarrowChoices/>;
 }

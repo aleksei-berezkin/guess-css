@@ -1,7 +1,7 @@
 import { Region } from '../model/region';
 import {
     displayAnswer,
-    displayNewPuzzler, navNextPuzzler, navPrevPuzzler, setCurrentTab, setFooterBtnHeight,
+    displayNewPuzzler, navNextPuzzler, navPrevPuzzler, resetSsrData, setCurrentTab, setFooterBtnHeight,
     setTopics,
 } from './actions';
 import { Topic } from '../model/gen/topic';
@@ -26,6 +26,9 @@ export type State = {
     current: number,
     correctAnswers: number,
     footerBtnHeight: number | null,
+    ssr: {
+        wide: boolean,
+    } | null;
 }
 
 export function ofCurrentView<T>(map: (view: State['puzzlerViews'][number] | undefined) => T): (state: State) => T {
@@ -38,6 +41,7 @@ export const initialState: State = {
     current: -1,
     correctAnswers: 0,
     footerBtnHeight: null,
+    ssr: null,
 };
 
 declare module 'react-redux' {
@@ -81,6 +85,11 @@ const reducer = combineReducers<State>({
         builder
             .addCase(setFooterBtnHeight, (state, { payload }) => payload)
     ),
+
+    ssr: createReducer(initialState.ssr, builder =>
+        builder
+            .addCase(resetSsrData, _ => null)
+    )
 });
 
 export function createAppStore(preloadedState: State) {

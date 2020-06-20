@@ -1,5 +1,4 @@
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
-import { Options } from '@material-ui/core/useMediaQuery';
 
 declare module '@material-ui/core/styles/createBreakpoints' {
     // noinspection JSUnusedGlobalSymbols
@@ -8,7 +7,7 @@ declare module '@material-ui/core/styles/createBreakpoints' {
     }
 }
 
-export const createTheme = (ssrMatchMedia?: Options['ssrMatchMedia']) => createMuiTheme({
+export const createTheme = () => createMuiTheme({
     breakpoints: {
         values: {
             xs: 0,
@@ -26,10 +25,5 @@ export const createTheme = (ssrMatchMedia?: Options['ssrMatchMedia']) => createM
         MuiPaper: {
             square: true,
         },
-        MuiUseMediaQuery: {
-            ssrMatchMedia
-        },
-        // ...(ssrMatchMedia ? {
-        // } : {}),
     },
 });

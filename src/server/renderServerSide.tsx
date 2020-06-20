@@ -15,7 +15,6 @@ import ServerStyleSheets from '@material-ui/styles/ServerStyleSheets';
 import { ThemeProvider } from '@material-ui/styles';
 import { createTheme } from '../client/components/theme';
 import { UAParser } from 'ua-parser-js';
-import mediaQuery from 'css-mediaquery';
 
 const indexHtmlParts = new Promise<[string, string, string, string]>((resolve, reject) => {
     readFile(path.resolve(__dirname, '..', '..', 'dist', 'index.html'), (err, data) => {
@@ -47,6 +46,8 @@ function escape(re: string) {
 export function sendRenderedApp(req: Request, res: Response) {
     const topics = getRandomizedTopics();
     const puzzler: Puzzler = genPuzzler(topics[0]);
+    const deviceType = new UAParser(req.headers['user-agent']).getDevice().type;
+
     const state: State = {
         topics,
         puzzlerViews: [{
@@ -64,22 +65,17 @@ export function sendRenderedApp(req: Request, res: Response) {
         current: 0,
         correctAnswers: 0,
         footerBtnHeight: null,
+        ssr: {
+            wide: deviceType !== 'mobile',
+        }
     };
-
-    const deviceType = new UAParser(req.headers['user-agent']).getDevice().type;
-    const ssrMatchMedia = (query: string) => ({
-        matches: mediaQuery.match(query, {
-            width: deviceType === 'mobile' ? '0px' : '1720px',
-        })
-    });
-
 
     const sheets = new ServerStyleSheets();
 
     const app = renderToString(
         sheets.collect(
             <Provider store={ createAppStore(state) }>
-                <ThemeProvider theme={ createTheme(/*ssrMatchMedia*/) }>
+                <ThemeProvider theme={ createTheme() }>
                     <PuzzlerApp/>
                 </ThemeProvider>
             </Provider>

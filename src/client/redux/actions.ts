@@ -22,3 +22,5 @@ export const setCurrentTab = createAction('setCurrentTab', withPayload<{
     currentPuzzler: number,
     currentTab: number
 }>());
+
+export const resetSsrData = createAction('resetSsrData', noPayload);

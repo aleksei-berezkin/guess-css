@@ -1,7 +1,7 @@
 import React, { ReactElement, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { State } from '../redux/store';
-import { navNextPuzzler, navPrevPuzzler } from '../redux/actions';
+import { navNextPuzzler, navPrevPuzzler, resetSsrData } from '../redux/actions';
 import { Dispatch } from 'redux';
 import { genNewPuzzler, initClient } from '../redux/thunks';
 import { stream } from '../stream/stream';
@@ -22,18 +22,18 @@ import { Choices } from './choices';
 import { STYLE_ID } from '../../shared/templateConst';
 
 export function PuzzlerApp(): ReactElement {
+    const ssr = useSelector(state => state.ssr);
     const htmlCode = useSelector(state => state.puzzlerViews[state.current]?.body || []);
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (!htmlCode.length) {
+        if (ssr) {
+            dispatch(resetSsrData());
+            const jssStyles = document.getElementById(STYLE_ID)!;
+            jssStyles.parentElement!.removeChild(jssStyles);
+        } else {
             dispatch(initClient());
         }
-
-        const jssStyles = document.getElementById(STYLE_ID);
-        if (jssStyles) {
-            jssStyles.parentElement!.removeChild(jssStyles);
-        }    
     }, []);
 
 
