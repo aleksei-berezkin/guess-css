@@ -8,7 +8,7 @@ import { Puzzler as PuzzlerComponent } from '../client/components/puzzler';
 import React from 'react';
 import { readFile } from 'fs';
 import path from 'path';
-import { SCRIPT_PLACEHOLDER, STYLE_PLACEHOLDER, APP_PLACEHOLDER } from '../shared/appWideConst';
+import { SCRIPT_PLACEHOLDER, STYLE_PLACEHOLDER, APP_PLACEHOLDER } from '../shared/templateConst';
 import { PRELOADED_STATE_ID } from '../shared/preloadedStateId';
 import { getRandomizedTopics } from '../client/model/gen/topic';
 import ServerStyleSheets from '@material-ui/styles/ServerStyleSheets';

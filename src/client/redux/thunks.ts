@@ -9,11 +9,7 @@ import { stream } from '../stream/stream';
 type VoidThunk = ThunkAction<void, State, never, Action<string>>;
 
 export function initClient(): VoidThunk {
-    return function(dispatch, getState) {
-        if (getState().puzzlerViews.length) {
-            // Already initialized
-            return;
-        }
+    return function(dispatch) {
         dispatch(setTopics(getRandomizedTopics()));
         dispatch(genNewPuzzler(true));
     };

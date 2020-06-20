@@ -3,7 +3,7 @@ if (!['development', 'production'].includes(process.env.NODE_ENV)) {
 }
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const {  SCRIPT_PLACEHOLDER, STYLE_PLACEHOLDER, ROOT_EL_ID, APP_PLACEHOLDER } = require('./src/shared/appWideConst');
+const templateConst = require('./src/shared/templateConst');
 
 module.exports = {
     mode: process.env.NODE_ENV,
@@ -14,10 +14,7 @@ module.exports = {
     plugins: [
         new HtmlWebpackPlugin({
             template: './template.ejs',
-            SCRIPT_PLACEHOLDER,
-            STYLE_PLACEHOLDER,
-            ROOT_EL_ID,
-            APP_PLACEHOLDER,
+            ...templateConst,
         }),
     ],
     output: {

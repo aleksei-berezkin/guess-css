@@ -3,7 +3,7 @@ import * as ReactDOM from 'react-dom';
 import { Puzzler } from './components/puzzler';
 import { Provider } from 'react-redux';
 import { createAppStore, initialState } from './redux/store';
-import { ROOT_EL_ID } from '../shared/appWideConst';
+import { ROOT_EL_ID } from '../shared/templateConst';
 import { PRELOADED_STATE_ID } from '../shared/preloadedStateId';
 
 

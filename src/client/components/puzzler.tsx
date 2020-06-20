@@ -21,6 +21,7 @@ import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { CodeHeader } from './codeHeader';
 import { Choices } from './choices';
+import { STYLE_ID } from '../../shared/templateConst';
 
 declare module '@material-ui/core/styles/createBreakpoints' {
     // noinspection JSUnusedGlobalSymbols
@@ -67,9 +68,20 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export function Puzzler(): ReactElement {
-    const dispatch = useDispatch();
-    useEffect(() => {dispatch(initClient())}, ['const']);
     const htmlCode = useSelector(state => state.puzzlerViews[state.current]?.body || []);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (!htmlCode.length) {
+            dispatch(initClient());
+        }
+
+        const jssStyles = document.getElementById(STYLE_ID);
+        if (jssStyles) {
+            jssStyles.parentElement!.removeChild(jssStyles);
+        }    
+    }, []);
+
 
     return <ThemeProvider theme={ theme }>
         <CssBaseline/>
