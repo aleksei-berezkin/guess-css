@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { State } from '../redux/store';
+import { mapCurrentView, ofCurrentView, State } from '../redux/store';
 import { navNextPuzzler, navPrevPuzzler, resetSsrData } from '../redux/actions';
 import { Dispatch } from 'redux';
 import { genNewPuzzler, initClient } from '../redux/thunks';
@@ -23,7 +23,7 @@ import { STYLE_ID } from '../../shared/templateConst';
 
 export function PuzzlerApp(): ReactElement {
     const ssr = useSelector(state => state.ssr);
-    const htmlCode = useSelector(state => state.puzzlerViews[state.current]?.body || []);
+    const htmlCode = useSelector(ofCurrentView('body', []));
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -125,19 +125,18 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function PuzzlerRendered() {
-    const source = useSelector(state => state.puzzlerViews[state.current]?.source);
+    const source = useSelector(ofCurrentView('source', ''));
     const classes = useStyles();
 
     return <Grid container justify='center' alignItems='center'>
         <Grid item>
             <PrevButton/>
         </Grid>
-        <Grid item>{
-            source &&
+        <Grid item>
             <Paper className={ `${classes.layoutSize} ${classes.iframePaper}` }>
                 <iframe className={ `${classes.layoutSize} ${classes.iframe}` } srcDoc={ source }/>
             </Paper>
-        }</Grid>
+        </Grid>
         <Grid item>
             <NextButton/>
         </Grid>
@@ -163,7 +162,7 @@ function PrevButton() {
 
 function NextButton() {
     const hasNext = useSelector(state => state.current < state.puzzlerViews.length - 1);
-    const isAnswered = useSelector(state => state.puzzlerViews[state.puzzlerViews.length - 1]?.status.userChoice != null);
+    const isAnswered = useSelector(mapCurrentView(v => v.status.userChoice != null, false));
     const dispatch = useDispatch();
 
     function handleNext() {

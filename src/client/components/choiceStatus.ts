@@ -3,7 +3,6 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import green from '@material-ui/core/colors/green';
 import red from '@material-ui/core/colors/red';
 import { CSSProperties } from '@material-ui/styles/withStyles/withStyles';
-import { DefaultTheme } from '@material-ui/styles';
 
 export type ChoiceStatus = 'userCorrect' | 'correct' | 'incorrect' | 'untouched' | 'notAnswered';
 
@@ -37,4 +36,4 @@ const choiceStylesObj: {[status in ChoiceStatus]: CSSProperties} = {
     notAnswered: {},
 }
 
-export const useChoiceStyles = makeStyles<DefaultTheme, ChoiceStatus>(choiceStylesObj);
+export const useChoiceStyles = makeStyles(choiceStylesObj);

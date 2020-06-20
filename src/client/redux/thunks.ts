@@ -1,7 +1,6 @@
 import { displayAnswer, displayNewPuzzler, setTopics } from './actions';
-import { genPuzzler } from '../model/gen/genPuzzler';
+import { genPuzzler, getRandomizedTopics } from '../model/gen/genPuzzler';
 import { State } from './store';
-import { getRandomizedTopics } from '../model/gen/topic';
 import { ThunkAction } from 'redux-thunk';
 import { Action } from 'redux';
 import { stream } from '../stream/stream';

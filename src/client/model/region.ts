@@ -6,15 +6,15 @@ export interface Region {
     color?: string,
 }
 
-export enum RegionKind {
-    Default = 'default',
-    Text = 'text',
-    Tag = 'tag',
-    AttrName = 'attr-name',
-    AttrValue = 'attr-value',
-    Operator = 'operator',
-    Selector = 'selector',
-    DeclName = 'decl-name',
-    DeclValue = 'decl-value',
-    Comment = 'comment',
-}
+export type RegionKind =
+    'default'
+    | 'text'
+    | 'tag'
+    | 'attrName'
+    | 'attrValue'
+    | 'operator'
+    | 'selector'
+    | 'declName'
+    | 'declValue'
+    | 'comment'
+    ;

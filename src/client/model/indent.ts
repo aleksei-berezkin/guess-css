@@ -1,4 +1,4 @@
-import { Region, RegionKind } from './region';
+import { Region } from './region';
 import { same } from '../stream/stream';
 
 const indentSize = 2;
@@ -16,7 +16,7 @@ export class Indent {
 
     toRegion(): Region {
         return {
-            kind: RegionKind.Default,
+            kind: 'default',
             text: this.text,
         }
     }

@@ -1,6 +1,6 @@
 import { Node, TagNode } from './nodes';
 import { Rule } from './cssRules';
-import { Region, RegionKind } from './region';
+import { Region } from './region';
 import { Indent } from './indent';
 import { randomBounded } from '../util';
 import { Stream, stream, streamOf } from '../stream/stream';
@@ -70,16 +70,16 @@ class StylesNode implements Node {
             return streamOf<Region[]>([
                 indent.toRegion(),
                 {
-                    kind: RegionKind.Comment,
+                    kind: 'comment',
                     text: '/* Only text in ',
                 },
                 {
-                    kind: RegionKind.Comment,
+                    kind: 'comment',
                     text: 'bold',
                     differing: true,
                 },
                 {
-                    kind: RegionKind.Comment,
+                    kind: 'comment',
                     text: ' differs */',
                 },
             ])

@@ -1,4 +1,4 @@
-import { Region, RegionKind } from './region';
+import { Region } from './region';
 import { Indent } from './indent';
 import { stream, streamOf } from '../stream/stream';
 
@@ -50,13 +50,13 @@ export class TagNode implements Node {
     private openTagToRegions(): Region[] {
         const classesRegions = this.classesToRegions();
         if (!classesRegions.length) {
-            return [{kind: RegionKind.Tag, text: `<${this.name}>`}];
+            return [{kind: 'tag', text: `<${this.name}>`}];
         }
 
         return [
-            {kind: RegionKind.Tag, text: `<${this.name}`},
+            {kind: 'tag', text: `<${this.name}`},
             ...classesRegions,
-            {kind: RegionKind.Tag, text: `>`},
+            {kind: 'tag', text: `>`},
         ];
     }
 
@@ -66,16 +66,16 @@ export class TagNode implements Node {
         }
 
         return [
-            {kind: RegionKind.Default, text: ' '},
-            {kind: RegionKind.AttrName, text: 'class'},
-            {kind: RegionKind.Operator, text: '="'},
-            {kind: RegionKind.AttrValue, text: this.classes.join(' ')},
-            {kind: RegionKind.Operator, text: '"'},
+            {kind: 'default', text: ' '},
+            {kind: 'attrName', text: 'class'},
+            {kind: 'operator', text: '="'},
+            {kind: 'attrValue', text: this.classes.join(' ')},
+            {kind: 'operator', text: '"'},
         ];
     }
 
     private closeTagToRegion(): Region {
-        return {kind: RegionKind.Tag, text: `</${this.name}>`};
+        return {kind: 'tag', text: `</${this.name}>`};
     }
 
     private childrenToRegions(indent: Indent): Region[][] {
@@ -124,6 +124,6 @@ export class TextNode implements Node {
     }
 
     toTextRegion(): Region {
-        return {kind: RegionKind.Text, text: this.text};
+        return {kind: 'text', text: this.text};
     }
 }

@@ -1,4 +1,4 @@
-import { Region, RegionKind } from './region';
+import { Region } from './region';
 import { Indent } from './indent';
 import { streamOf } from '../stream/stream';
 
@@ -43,13 +43,13 @@ export class Rule {
     toRegions(indent: Indent): Region[][] {
         return streamOf<Region[]>([
                 indent.toRegion(),
-                {kind: RegionKind.Selector, text: this.selectorsString, differing: this.selectorsDiffering},
-                {kind: RegionKind.Default, text: ' {'},
+                {kind: 'selector', text: this.selectorsString, differing: this.selectorsDiffering},
+                {kind: 'default', text: ' {'},
             ])
             .appendAll(this.declarationsToRegions(indent.indent()))
             .append([
                 indent.toRegion(),
-                {kind: RegionKind.Default, text: '}'},
+                {kind: 'default', text: '}'},
             ])
             .toArray();
     }
@@ -60,26 +60,26 @@ export class Rule {
             .map(([name, value, differing]): Region[] =>
                 [
                     indent.toRegion(),
-                    {kind: RegionKind.DeclName, text: name},
-                    {kind: RegionKind.Default, text: ': '},
+                    {kind: 'declName', text: name},
+                    {kind: 'default', text: ': '},
                     ...Rule.valueToRegions(name, value, differing),
-                    {kind: RegionKind.Default, text: ';'},
+                    {kind: 'default', text: ';'},
                 ]
             );
     }
 
     private static valueToRegions(name: string, value: string, differing?: boolean): Region[] {
         if (name === 'background-color') {
-            return [{kind: RegionKind.DeclValue, text: value, backgroundColor: value, differing}];
+            return [{kind: 'declValue', text: value, backgroundColor: value, differing}];
         }
         if (name === 'border') {
             const [thickness, style, color] = value.split(' ');
             return [
-                {kind: RegionKind.DeclValue, text: `${ thickness } ${ style } `, differing},
-                {kind: RegionKind.DeclValue, text: color, differing, backgroundColor: color, color: 'white'},
+                {kind: 'declValue', text: `${ thickness } ${ style } `, differing},
+                {kind: 'declValue', text: color, differing, backgroundColor: color, color: 'white'},
             ]
         }
-        return [{kind: RegionKind.DeclValue, text: value, differing}];
+        return [{kind: 'declValue', text: value, differing}];
     }
 }
 

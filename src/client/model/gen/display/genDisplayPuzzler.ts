@@ -7,7 +7,7 @@ export function genDisplayPuzzler(): Puzzler {
     const body = new TagNode('body', [],
         [
             new TagNode(
-                'div', ['outer'],
+                'div', ['root'],
                 genClassedDivs(2, 4)
             )
         ]

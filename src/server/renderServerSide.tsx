@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { Puzzler } from '../client/model/puzzler';
-import { genPuzzler } from '../client/model/gen/genPuzzler';
+import { genPuzzler, getRandomizedTopics } from '../client/model/gen/genPuzzler';
 import { createAppStore, State } from '../client/redux/store';
 import { renderToString } from 'react-dom/server';
 import { Provider } from 'react-redux';
@@ -10,7 +10,6 @@ import { readFile } from 'fs';
 import path from 'path';
 import { SCRIPT_PLACEHOLDER, STYLE_PLACEHOLDER, APP_PLACEHOLDER } from '../shared/templateConst';
 import { PRELOADED_STATE_ID } from '../shared/preloadedStateId';
-import { getRandomizedTopics } from '../client/model/gen/topic';
 import ServerStyleSheets from '@material-ui/styles/ServerStyleSheets';
 import { ThemeProvider } from '@material-ui/styles';
 import { createTheme } from '../client/components/theme';
