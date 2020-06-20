@@ -4,7 +4,7 @@ import { genPuzzler } from '../client/model/gen/genPuzzler';
 import { createAppStore, State } from '../client/redux/store';
 import { renderToString } from 'react-dom/server';
 import { Provider } from 'react-redux';
-import { Puzzler as PuzzlerComponent } from '../client/components/puzzler';
+import { PuzzlerApp } from '../client/components/puzzler';
 import React from 'react';
 import { readFile } from 'fs';
 import path from 'path';
@@ -12,6 +12,10 @@ import { SCRIPT_PLACEHOLDER, STYLE_PLACEHOLDER, APP_PLACEHOLDER } from '../share
 import { PRELOADED_STATE_ID } from '../shared/preloadedStateId';
 import { getRandomizedTopics } from '../client/model/gen/topic';
 import ServerStyleSheets from '@material-ui/styles/ServerStyleSheets';
+import { ThemeProvider } from '@material-ui/styles';
+import { createTheme } from '../client/components/theme';
+import { UAParser } from 'ua-parser-js';
+import mediaQuery from 'css-mediaquery';
 
 const indexHtmlParts = new Promise<[string, string, string, string]>((resolve, reject) => {
     readFile(path.resolve(__dirname, '..', '..', 'dist', 'index.html'), (err, data) => {
@@ -62,12 +66,22 @@ export function sendRenderedApp(req: Request, res: Response) {
         footerBtnHeight: null,
     };
 
+    const deviceType = new UAParser(req.headers['user-agent']).getDevice().type;
+    const ssrMatchMedia = (query: string) => ({
+        matches: mediaQuery.match(query, {
+            width: deviceType === 'mobile' ? '0px' : '1720px',
+        })
+    });
+
+
     const sheets = new ServerStyleSheets();
 
     const app = renderToString(
         sheets.collect(
             <Provider store={ createAppStore(state) }>
-                <PuzzlerComponent/>
+                <ThemeProvider theme={ createTheme(/*ssrMatchMedia*/) }>
+                    <PuzzlerApp/>
+                </ThemeProvider>
             </Provider>
         )
     );

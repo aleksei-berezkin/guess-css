@@ -17,57 +17,11 @@ import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
 import { CodePaper } from './codePaper';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
-import { ThemeProvider } from '@material-ui/core/styles';
 import { CodeHeader } from './codeHeader';
 import { Choices } from './choices';
 import { STYLE_ID } from '../../shared/templateConst';
 
-declare module '@material-ui/core/styles/createBreakpoints' {
-    // noinspection JSUnusedGlobalSymbols
-    interface BreakpointOverrides {
-        narrow: true;
-    }
-}
-
-const theme = createMuiTheme({
-    breakpoints: {
-        values: {
-            xs: 0,
-            narrow: 350,
-            sm: 600,
-            md: 960,
-            lg: 1280,
-            xl: 1920,
-        },
-    },
-    palette: {
-        type: 'light',
-    },
-    props: {
-        MuiPaper: {
-            square: true,
-        },
-    },
-});
-
-const useStyles = makeStyles(theme => ({
-    layoutSize: {
-        height: 160,
-        width: 190,
-        [theme.breakpoints.up('narrow')]: {
-            width: 240,
-        },
-    },
-    iframe: {
-        border: 'none',
-    },
-    iframePaper: {
-        marginTop: theme.spacing(1),
-    },
-}));
-
-export function Puzzler(): ReactElement {
+export function PuzzlerApp(): ReactElement {
     const htmlCode = useSelector(state => state.puzzlerViews[state.current]?.body || []);
     const dispatch = useDispatch();
 
@@ -83,7 +37,7 @@ export function Puzzler(): ReactElement {
     }, []);
 
 
-    return <ThemeProvider theme={ theme }>
+    return <>
         <CssBaseline/>
         <MyAppBar/>
         <Grid container direction='column' alignItems='center'>
@@ -96,7 +50,7 @@ export function Puzzler(): ReactElement {
                 />
             </Grid>
         </Grid>
-    </ThemeProvider>
+    </>
 }
 
 function MyAppBar() {
@@ -153,6 +107,22 @@ function getDonePuzzlersNum(state: State) {
     }
     return state.puzzlerViews.length - 1;
 }
+
+const useStyles = makeStyles(theme => ({
+    layoutSize: {
+        height: 160,
+        width: 190,
+        [theme.breakpoints.up('narrow')]: {
+            width: 240,
+        },
+    },
+    iframe: {
+        border: 'none',
+    },
+    iframePaper: {
+        marginTop: theme.spacing(1),
+    },
+}));
 
 function PuzzlerRendered() {
     const source = useSelector(state => state.puzzlerViews[state.current]?.source);
