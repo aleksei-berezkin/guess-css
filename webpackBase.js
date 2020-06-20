@@ -3,7 +3,7 @@ if (!['development', 'production'].includes(process.env.NODE_ENV)) {
 }
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { ROOT_EL_ID, ROOT_EL_TEXT } = require('./src/shared/appWideConst');
+const {  SCRIPT_PLACEHOLDER, STYLE_PLACEHOLDER, ROOT_EL_ID, APP_PLACEHOLDER } = require('./src/shared/appWideConst');
 
 module.exports = {
     mode: process.env.NODE_ENV,
@@ -13,10 +13,11 @@ module.exports = {
     ],
     plugins: [
         new HtmlWebpackPlugin({
-            title: 'CSS Puzzler',
             template: './template.ejs',
-            rootElementId: ROOT_EL_ID,
-            initText: ROOT_EL_TEXT,
+            SCRIPT_PLACEHOLDER,
+            STYLE_PLACEHOLDER,
+            ROOT_EL_ID,
+            APP_PLACEHOLDER,
         }),
     ],
     output: {
