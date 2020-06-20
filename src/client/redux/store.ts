@@ -31,8 +31,19 @@ export type State = {
     } | null;
 }
 
-export function ofCurrentView<T>(map: (view: State['puzzlerViews'][number] | undefined) => T): (state: State) => T {
-    return state => map(state.puzzlerViews[state.current]);
+export type PuzzlerView = State['puzzlerViews'][number];
+
+export function ofCurrentView<K extends keyof PuzzlerView>(key: K, deflt: PuzzlerView[K]): (state: State) => PuzzlerView[K] {
+    return state => {
+        const currentView = state.puzzlerViews[state.current];
+        return currentView && currentView[key] || deflt;
+    }
+}
+export function ofCurrentViewOrUndefined<K extends keyof PuzzlerView>(key: K): (state: State) => (PuzzlerView[K] | undefined) {
+    return state => {
+        const currentView = state.puzzlerViews[state.current];
+        return currentView && currentView[key] || undefined;
+    }
 }
 
 export const initialState: State = {

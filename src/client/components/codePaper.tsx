@@ -30,7 +30,7 @@ export function CodePaper(
         sideMargins?: boolean,
     }
 ) {
-    const commonStyleSummary = useSelector(ofCurrentView(v => v?.commonStyleSummary || ''));
+    const commonStyleSummary = useSelector(ofCurrentView('commonStyleSummary', ''));
     const classes = makeRootStyles(!!p.sideMargins);
 
     return <Paper className={ classes.root }>

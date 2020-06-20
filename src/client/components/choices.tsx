@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ofCurrentView, State } from '../redux/store';
+import { ofCurrentView, ofCurrentViewOrUndefined, PuzzlerView, State } from '../redux/store';
 import { checkChoice } from '../redux/thunks';
 import Grid from '@material-ui/core/Grid';
 import { abc } from '../stream/stream';
@@ -30,11 +30,11 @@ export function Choices(): ReactElement {
 }
 
 const currentSelector = (state: State) => state.current;
-const choicesSelector = ofCurrentView(v => v?.styleChoices || []);
-const commonSelector = ofCurrentView(v => v?.commonStyle || []);
-const statusSelector = ofCurrentView(v => v?.status);
+const choicesSelector = ofCurrentView('styleChoices', []);
+const commonSelector = ofCurrentView('commonStyle', []);
+const statusSelector = ofCurrentViewOrUndefined('status');
 
-function dispatchCheckChoice(choice: number, status: State['puzzlerViews'][number]['status'] | undefined, dispatch: Dispatch<any>) {
+function dispatchCheckChoice(choice: number, status: PuzzlerView['status'] | undefined, dispatch: Dispatch<any>) {
     return () => {
         if (status?.userChoice == null) {
             dispatch(checkChoice(choice));
@@ -77,7 +77,7 @@ function NarrowChoices() {
     const choices = useSelector(choicesSelector);
     const common = useSelector(commonSelector);
     const status = useSelector(statusSelector);
-    const currentTab = useSelector(ofCurrentView(v => v?.currentTab || 0));
+    const currentTab = useSelector(ofCurrentView('currentTab', 0));
     const classes = useChoiceStyles();
 
     const handleChange = (event: React.ChangeEvent<{}>, currentTab: number) => {

@@ -1,4 +1,4 @@
-import { State } from '../redux/store';
+import { PuzzlerView } from '../redux/store';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import green from '@material-ui/core/colors/green';
 import red from '@material-ui/core/colors/red';
@@ -7,7 +7,7 @@ import { DefaultTheme } from '@material-ui/styles';
 
 export type ChoiceStatus = 'userCorrect' | 'correct' | 'incorrect' | 'untouched' | 'notAnswered';
 
-export function getChoiceStatus(i: number, status: State['puzzlerViews'][number]['status'] | undefined): ChoiceStatus {
+export function getChoiceStatus(i: number, status: PuzzlerView['status'] | undefined): ChoiceStatus {
     if (status?.userChoice == null) {
         return 'notAnswered';
     }

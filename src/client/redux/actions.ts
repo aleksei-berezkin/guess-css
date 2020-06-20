@@ -1,11 +1,11 @@
 import { Topic } from '../model/gen/topic';
 import { createAction } from '@reduxjs/toolkit';
 import { noPayload, withPayload } from './payloadUtils';
-import { State } from './store';
+import { PuzzlerView } from './store';
 
 export const setTopics = createAction('setTopics', withPayload<Topic[]>());
 
-export const displayNewPuzzler = createAction('displayNewPuzzler', withPayload<State['puzzlerViews'][number]>());
+export const displayNewPuzzler = createAction('displayNewPuzzler', withPayload<PuzzlerView>());
 
 export const displayAnswer = createAction('displayAnswer', withPayload<{
     userChoice: number,
