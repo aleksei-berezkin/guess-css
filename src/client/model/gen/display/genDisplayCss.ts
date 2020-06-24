@@ -3,18 +3,21 @@ import { ChildCombinator, ClassSelector, Declaration, Rule, Selector, TypeSelect
 import { getNShuffled, randomBounded, randomItemsInOrder } from '../../../util';
 import { getSiblingsSubtree } from '../siblingsSubtree';
 import { stream } from '../../../stream/stream';
+import { RulesParam } from '../../puzzler';
+import { contrastColorPlaceholder, getColorPlaceholder } from '../colorPlaceholder';
 
 const displays = ['inline', 'block', 'inline-block'];
 
-export function genDisplayCss(body: TagNode): { choices: Rule[][], common: Rule[] } {
+export function genDisplayCss(body: TagNode): RulesParam {
     const {path, siblings} = getSiblingsSubtree(body)!.unfold();
     const [displays1, displays2, displays3] = getNShuffled(displays, 3);
+    const colorPlaceholderBg = getColorPlaceholder('background', 0);
 
     const parentSelector = stream(path).last().map(getClassSelector).get()
     const parentRules = displays1
         .map(d => new Rule(parentSelector, [
             ['display', d, true],
-            ['background-color', 'pink'],
+            ['background-color', colorPlaceholderBg.id],
         ]));
 
     const [children1, children2] = splitChildren(siblings);
@@ -24,6 +27,7 @@ export function genDisplayCss(body: TagNode): { choices: Rule[][], common: Rule[
     const children1Rules = displays2.map(childrenToRule(children1, width1));
     const children2Rules = displays3.map(childrenToRule(children2, width2));
 
+    const colorPlaceholderBorder = getColorPlaceholder('border', 0);
     return {
         choices: stream(parentRules).zip(children1Rules).zip(children2Rules)
             .map(([[ruleParent, rule1], rule2]) => [ruleParent, rule1, rule2])
@@ -32,11 +36,15 @@ export function genDisplayCss(body: TagNode): { choices: Rule[][], common: Rule[
             new Rule(
                 new ChildCombinator(parentSelector, new TypeSelector('div')),
                 [
-                    ['border', '4px solid blue'],
+                    ['border', `4px solid ${ colorPlaceholderBorder.id }`],
                     ['padding', '.25em'],
                 ]
             )
         ],
+        placeholders: {
+            contrastColor: contrastColorPlaceholder,
+            colors: [colorPlaceholderBg, colorPlaceholderBorder]
+        },
     };
 }
 

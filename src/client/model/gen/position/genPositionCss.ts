@@ -2,13 +2,13 @@ import { TagNode } from '../../nodes';
 import { ChildCombinator, ClassSelector, Rule, Selector, TypeSelector } from '../../cssRules';
 import { getDeepestSingleChildSubtree } from '../singleChildSubtree';
 import { transpose } from '../../../util';
-import { stream } from '../../../stream/stream';
+import { range, stream } from '../../../stream/stream';
+import { contrastColorPlaceholder, getColorPlaceholder } from '../colorPlaceholder';
+import { RulesParam } from '../../puzzler';
 
-const colors = ['#f8a8', '#0a08', '#89f8', '#ccc8'];
-
-export function genPositionCss(body: TagNode): { choices: Rule[][], common: Rule[] } {
+export function genPositionCss(body: TagNode): RulesParam {
     const [outer, inner] = getDeepestSingleChildSubtree(body).unfoldToStream().takeLast(2);
-    const [outerColor, innerColor] = stream(colors).shuffle().toArray();
+    const [outerColor, innerColor] = range(0, 2).map(i => getColorPlaceholder('background', i));
 
     return {
         choices: transpose(innerOuterPositionsShuffled()).map(([outerPosition, innerPosition]) =>
@@ -21,7 +21,7 @@ export function genPositionCss(body: TagNode): { choices: Rule[][], common: Rule
                         getClassSelector(node),
                         [
                             ['position', position, true],
-                            ['background-color', color],
+                            ['background-color', color.id],
                             ['left', '3em'],
                         ]
                     )
@@ -33,6 +33,10 @@ export function genPositionCss(body: TagNode): { choices: Rule[][], common: Rule
                 [['padding', '.5em']]
             ),
         ],
+        placeholders: {
+            contrastColor: contrastColorPlaceholder,
+            colors: [outerColor, innerColor],
+        },
     };
 }
 

@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { mapCurrentView, ofCurrentView, State } from '../redux/store';
+import { mapCurrentView, ofCurrentView, ofCurrentViewOrUndefined, PuzzlerView, State } from '../redux/store';
 import { navNextPuzzler, navPrevPuzzler, resetSsrData } from '../redux/actions';
 import { Dispatch } from 'redux';
 import { genNewPuzzler, initClient } from '../redux/thunks';
@@ -20,6 +20,9 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import { CodeHeader } from './codeHeader';
 import { Choices } from './choices';
 import { STYLE_ID } from '../../shared/templateConst';
+import useTheme from '@material-ui/core/styles/useTheme';
+import { PaletteType } from '@material-ui/core';
+import { globalRe } from '../util';
 
 export function PuzzlerApp(): ReactElement {
     const ssr = useSelector(state => state.ssr);
@@ -126,6 +129,8 @@ const useStyles = makeStyles(theme => ({
 
 function PuzzlerRendered() {
     const source = useSelector(ofCurrentView('source', ''));
+    const resolvedPlaceholders = useSelector(ofCurrentViewOrUndefined('resolvedPlaceholders'));
+    const paletteType = useTheme().palette.type;
     const classes = useStyles();
 
     return <Grid container justify='center' alignItems='center'>
@@ -134,13 +139,32 @@ function PuzzlerRendered() {
         </Grid>
         <Grid item>
             <Paper className={ `${classes.layoutSize} ${classes.iframePaper}` }>
-                <iframe className={ `${classes.layoutSize} ${classes.iframe}` } srcDoc={ source }/>
+                <iframe className={ `${classes.layoutSize} ${classes.iframe}` } srcDoc={
+                    insertColors(source, resolvedPlaceholders, paletteType)
+                }/>
             </Paper>
         </Grid>
         <Grid item>
             <NextButton/>
         </Grid>
     </Grid>;
+}
+
+function insertColors(src: string, resolvedPlaceholders: PuzzlerView['resolvedPlaceholders'] | undefined, paletteType: PaletteType): string {
+    if (!resolvedPlaceholders) {
+        return src;
+    }
+
+    const colorsInserted = resolvedPlaceholders.colors
+        .reduceRight(
+            (t, c) => t.replace(globalRe(c.id), c[paletteType].color),
+            src
+        );
+
+    return colorsInserted.replace(
+        globalRe(resolvedPlaceholders.contrastColor.id),
+        resolvedPlaceholders.contrastColor[paletteType]
+    );
 }
 
 function PrevButton() {

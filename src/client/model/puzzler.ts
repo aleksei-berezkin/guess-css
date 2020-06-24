@@ -4,18 +4,24 @@ import { Region } from './region';
 import { Indent } from './indent';
 import { randomBounded } from '../util';
 import { Stream, stream, streamOf } from '../stream/stream';
+import { ColorPlaceholder } from './gen/colorPlaceholder';
+
+export type RulesParam = ConstructorParameters<typeof Puzzler>[1];
 
 export class Puzzler {
     readonly correctChoice: number;
 
     constructor(
             private readonly body: TagNode,
-            private readonly rules: {
+            readonly rules: {
                 choices: Rule[][],
                 common: Rule[],
+                placeholders: {
+                    contrastColor: string,
+                    colors: readonly ColorPlaceholder[],
+                }
             },
             private readonly showBodyTag = false,
-            
     ) {
         this.correctChoice = randomBounded(rules.choices.length);
     }

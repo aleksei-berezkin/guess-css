@@ -62,24 +62,10 @@ export class Rule {
                     indent.toRegion(),
                     {kind: 'declName', text: name},
                     {kind: 'default', text: ': '},
-                    ...Rule.valueToRegions(name, value, differing),
+                    {kind: 'declValue', text: value, differing},
                     {kind: 'default', text: ';'},
                 ]
             );
-    }
-
-    private static valueToRegions(name: string, value: string, differing?: boolean): Region[] {
-        if (name === 'background-color') {
-            return [{kind: 'declValue', text: value, backgroundColor: value, differing}];
-        }
-        if (name === 'border') {
-            const [thickness, style, color] = value.split(' ');
-            return [
-                {kind: 'declValue', text: `${ thickness } ${ style } `, differing},
-                {kind: 'declValue', text: color, differing, backgroundColor: color, color: 'white'},
-            ]
-        }
-        return [{kind: 'declValue', text: value, differing}];
     }
 }
 

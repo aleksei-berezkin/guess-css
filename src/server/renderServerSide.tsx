@@ -8,12 +8,15 @@ import { PuzzlerApp } from '../client/components/puzzler';
 import React from 'react';
 import { readFile } from 'fs';
 import path from 'path';
-import { SCRIPT_PLACEHOLDER, STYLE_PLACEHOLDER, APP_PLACEHOLDER } from '../shared/templateConst';
+import { APP_PLACEHOLDER, SCRIPT_PLACEHOLDER, STYLE_PLACEHOLDER } from '../shared/templateConst';
 import { PRELOADED_STATE_ID } from '../shared/preloadedStateId';
 import ServerStyleSheets from '@material-ui/styles/ServerStyleSheets';
 import { ThemeProvider } from '@material-ui/styles';
 import { createTheme } from '../client/components/theme';
 import { UAParser } from 'ua-parser-js';
+import { resolveColors } from '../client/redux/resolvedColor';
+import { escapeRe } from '../client/util';
+import { resolveContrastColor } from '../client/redux/resolvedContrastColor';
 
 const indexHtmlParts = new Promise<[string, string, string, string]>((resolve, reject) => {
     readFile(path.resolve(__dirname, '..', '..', 'dist', 'index.html'), (err, data) => {
@@ -23,7 +26,7 @@ const indexHtmlParts = new Promise<[string, string, string, string]>((resolve, r
         }
 
         const re = new RegExp(
-            `^(.+)${ escape(SCRIPT_PLACEHOLDER) }(.+)${ escape(STYLE_PLACEHOLDER) }(.+)${ escape(APP_PLACEHOLDER) }(.+)$`,
+            `^(.+)${ escapeRe(SCRIPT_PLACEHOLDER) }(.+)${ escapeRe(STYLE_PLACEHOLDER) }(.+)${ escapeRe(APP_PLACEHOLDER) }(.+)$`,
             's'
         );
         const parts = re.exec(String(data));
@@ -38,10 +41,6 @@ const indexHtmlParts = new Promise<[string, string, string, string]>((resolve, r
     process.exit(1);
 });
 
-function escape(re: string) {
-    return re.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&');
-}
-
 export function sendRenderedApp(req: Request, res: Response) {
     const topics = getRandomizedTopics();
     const puzzler: Puzzler = genPuzzler(topics[0]);
@@ -54,6 +53,10 @@ export function sendRenderedApp(req: Request, res: Response) {
             styleChoices: puzzler.getStyleCodes(true),
             commonStyle: puzzler.commonStyleCode,
             commonStyleSummary: puzzler.commonStyleSummary,
+            resolvedPlaceholders: {
+                contrastColor: resolveContrastColor(puzzler.rules.placeholders.contrastColor),
+                colors: resolveColors(puzzler.rules.placeholders.colors),
+            },
             body: puzzler.bodyCode,
             status: {
                 correctChoice: puzzler.correctChoice,

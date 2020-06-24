@@ -1,4 +1,5 @@
 import { range, Stream, stream } from './stream/stream';
+
 export function randomItem<T>(items: T[]): T {
     return items[randomBounded(items.length)];
 }
@@ -98,4 +99,16 @@ export function transpose<T>(m: T[][]): T[][] {
     return mT;
 }
 
-export type InferArrayType<T> = T extends Array<infer E> ? E : never;
+export type ItemType<T> = T extends Array<infer E> ? E : never;
+
+export function singleRe(re: string) {
+    return new RegExp(escapeRe(re));
+}
+
+export function globalRe(re: string) {
+    return new RegExp(escapeRe(re), 'g');
+}
+
+export function escapeRe(re: string) {
+    return re.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&');
+}

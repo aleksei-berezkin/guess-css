@@ -2,8 +2,12 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import { Region, RegionKind } from '../model/region';
 import Box from '@material-ui/core/Box';
 import { stream } from '../stream/stream';
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
+import { useSelector } from 'react-redux';
+import { ofCurrentViewOrUndefined } from '../redux/store';
+import useTheme from '@material-ui/core/styles/useTheme';
+import { escapeRe, globalRe } from '../util';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -13,9 +17,6 @@ const useStyles = makeStyles(theme => ({
         margin: 0,
         fontFamily: 'Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace',
         fontSize: 12,
-    },
-    differing: {
-        fontWeight: 'bold',
     },
 }));
 
@@ -30,7 +31,17 @@ export function CodeBody(p: { lines: Region[][] }) {
     }</Box>;
 }
 
-const regionStylesObj: {[k in RegionKind]: CSSProperties} = {
+function Line(p: {regions: Region[]}) {
+    const classes = useStyles();
+
+    return <pre className={ classes.pre }>{
+        p.regions.map(
+            (reg, i) => <RegionCode key={ i } region={ reg } />
+        )
+    }</pre>
+}
+
+const regionStylesObj: {[k in RegionKind]: CSSProperties} & {differing: CSSProperties} = {
     default: {
         color: '#000000',
     },
@@ -63,40 +74,55 @@ const regionStylesObj: {[k in RegionKind]: CSSProperties} = {
         color: '#808080',
         fontStyle: 'italic',
     },
+    differing: {
+        fontWeight: 'bold',
+    },
 };
 
 const useRegionStyles = makeStyles(regionStylesObj);
 
-function Line(p: {regions: Region[]}) {
-    const classes = useStyles();
+function RegionCode(p: {region: Region}): ReactElement {
+    const resolvedPlaceholders = useSelector(ofCurrentViewOrUndefined('resolvedPlaceholders'));
     const regionClasses = useRegionStyles();
+    const theme = useTheme();
 
-    return <pre className={ classes.pre }>{
-        p.regions.map(
-            (reg, i) => {
-                return <span
-                    key={ i }
-                    className={ `${ regionClasses[reg.kind] } ${ reg.differing && classes.differing || '' }` }
-                    style={ getInlineColorStyle(reg) }
-                >{
-                    reg.text
-                }</span>;
-            }
-        )
-    }</pre>
-}
-
-function getInlineColorStyle(reg: Region) {
-    if (reg.backgroundColor) {
-        if (reg.color) {
-            return {
-                backgroundColor: reg.backgroundColor,
-                color: reg.color,
-            }
-        }
-        return {
-            backgroundColor: reg.backgroundColor,
-        }
+    if (!resolvedPlaceholders) {
+        return <></>;
     }
-    return undefined;
+
+    const differingClass = p.region.differing && regionClasses.differing || '';
+    const { contrastColor, colors } = resolvedPlaceholders;
+    const { palette: { type }} = theme;
+    const text = p.region.text.replace(globalRe(contrastColor.id), contrastColor[type]);
+
+    return <>{
+        [...function* toSpans(text: string): IterableIterator<ReactElement> {
+            for (const color of colors) {
+                const match = new RegExp(`^(.*)(${ escapeRe(color.id) })(.*)$`).exec(text);
+                if (match) {
+                    if (match[1]) {
+                        yield* toSpans(match[1]);  
+                    } 
+
+                    yield <span
+                        className={ `${ differingClass }` }
+                        style={{
+                            backgroundColor: color[type].color,
+                            color: color[type].codeText,
+                        }}
+                    >{ color[type].color }</span>;
+
+                    if (match[3]) {
+                        yield* toSpans(match[3]);
+                    } 
+
+                    return;
+                }
+            }
+
+            yield <span className={
+                `${ regionClasses[p.region.kind] } ${ differingClass }`
+            }>{ text }</span>;
+        }(text)]
+    }</>;
 }

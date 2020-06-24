@@ -3,8 +3,10 @@ import { Declaration, Rule, TypeSelector } from '../../cssRules';
 import { randomItem, transpose } from '../../../util';
 import { getSiblingsSubtree } from '../siblingsSubtree';
 import { stream, streamOf } from '../../../stream/stream';
+import { RulesParam } from '../../puzzler';
+import { contrastColorPlaceholder } from '../colorPlaceholder';
 
-export function genFlexboxCss(body: TagNode): { choices: Rule[][], common: Rule[] } {
+export function genFlexboxCss(body: TagNode): RulesParam {
     const direction = randomItem(['row', 'column', 'row-reverse', 'column-reverse']);
     const wrap = getSiblingsSubtree(body)!.unfold().siblings.length > 2 && Math.random() < .7;
     const alignName = wrap && Math.random() < .5 ? 'align-content' : 'align-items';
@@ -47,11 +49,15 @@ export function genFlexboxCss(body: TagNode): { choices: Rule[][], common: Rule[
             new Rule(
                 new TypeSelector('div'),
                 [
-                    ['border', '1px solid black'],
+                    ['border', `1px solid ${ contrastColorPlaceholder }`],
                     ['padding', '.5em'],
                 ]
             )
         ],
+        placeholders: {
+            contrastColor: contrastColorPlaceholder,
+            colors: [],
+        },
     };
 }
 

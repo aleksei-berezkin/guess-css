@@ -563,6 +563,11 @@ class StreamImpl<P, T> extends Base<P, T> implements Stream<T> {
         });
     }
 
+    zipStrict<U>(other: Iterable<U>): Stream<readonly [T, U]> {
+        // TODO strict
+        return this.zip(other);
+    }
+
     zipWithIndex(): Stream<readonly [T, number]> {
         return new StreamImpl(this, function* (items) {
             let index = 0;
@@ -761,6 +766,7 @@ export interface Stream<T> extends Iterable<T> {
     toArray(): T[];
     toObject(): T extends readonly [string, any] ? { [key in T[0]]: T[1] } : never;
     zip<U>(other: Iterable<U>): Stream<readonly [T, U]>;
+    zipStrict<U>(other: Iterable<U>): Stream<readonly [T, U]>
     zipWithIndex(): Stream<readonly [T, number]>;
 }
 
