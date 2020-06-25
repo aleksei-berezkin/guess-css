@@ -1,4 +1,5 @@
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
+import { PaletteType } from '@material-ui/core';
 
 declare module '@material-ui/core/styles/createBreakpoints' {
     // noinspection JSUnusedGlobalSymbols
@@ -7,7 +8,7 @@ declare module '@material-ui/core/styles/createBreakpoints' {
     }
 }
 
-export const createTheme = () => createMuiTheme({
+export const createTheme = (paletteType: PaletteType) => createMuiTheme({
     breakpoints: {
         values: {
             xs: 0,
@@ -19,7 +20,7 @@ export const createTheme = () => createMuiTheme({
         },
     },
     palette: {
-        type: 'light',
+        type: paletteType,
     },
     props: {
         MuiPaper: {

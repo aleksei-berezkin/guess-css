@@ -4,7 +4,7 @@ import { genPuzzler, getRandomizedTopics } from '../client/model/gen/genPuzzler'
 import { createAppStore, State } from '../client/redux/store';
 import { renderToString } from 'react-dom/server';
 import { Provider } from 'react-redux';
-import { PuzzlerApp } from '../client/components/puzzler';
+import { PuzzlerApp } from '../client/components/puzzlerApp';
 import React from 'react';
 import { readFile } from 'fs';
 import path from 'path';
@@ -77,7 +77,7 @@ export function sendRenderedApp(req: Request, res: Response) {
     const app = renderToString(
         sheets.collect(
             <Provider store={ createAppStore(state) }>
-                <ThemeProvider theme={ createTheme() }>
+                <ThemeProvider theme={ createTheme('light') }>
                     <PuzzlerApp/>
                 </ThemeProvider>
             </Provider>

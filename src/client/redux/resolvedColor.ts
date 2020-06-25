@@ -1,5 +1,5 @@
 import { ColorPlaceholder, ColorType } from '../model/gen/colorPlaceholder';
-import { escapeRe, randomItem } from '../util';
+import { randomItem } from '../util';
 import { stream } from '../stream/stream';
 import { PaletteType } from '@material-ui/core';
 

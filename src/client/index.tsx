@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { PuzzlerApp } from './components/puzzler';
+import { PuzzlerApp } from './components/puzzlerApp';
 import { Provider } from 'react-redux';
 import { createAppStore, initialState, State } from './redux/store';
 import { ROOT_EL_ID } from '../shared/templateConst';
@@ -26,8 +26,6 @@ if (preloadedState) {
 
 function createApp(state: State) {
     return <Provider store={ createAppStore(state) }>
-        <ThemeProvider theme={ createTheme() }>
-            <PuzzlerApp/>
-        </ThemeProvider>
+        <PuzzlerApp/>
     </Provider>;
 }

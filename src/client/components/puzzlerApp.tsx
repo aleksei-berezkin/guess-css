@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect } from 'react';
+import React, { ReactElement, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { mapCurrentView, ofCurrentView, ofCurrentViewOrUndefined, PuzzlerView, State } from '../redux/store';
 import { navNextPuzzler, navPrevPuzzler, resetSsrData } from '../redux/actions';
@@ -23,10 +23,15 @@ import { STYLE_ID } from '../../shared/templateConst';
 import useTheme from '@material-ui/core/styles/useTheme';
 import { PaletteType } from '@material-ui/core';
 import { globalRe } from '../util';
+import { ThemeProvider } from '@material-ui/styles';
+import { createTheme } from './theme';
+import Brightness2Icon from '@material-ui/icons/Brightness2';
+import Brightness5Icon from '@material-ui/icons/Brightness5';
 
 export function PuzzlerApp(): ReactElement {
     const ssr = useSelector(state => state.ssr);
     const htmlCode = useSelector(ofCurrentView('body', []));
+    const [paletteType, setPaletteType] = useState<PaletteType>('light');
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -39,10 +44,11 @@ export function PuzzlerApp(): ReactElement {
         }
     }, []);
 
+    const theme = useMemo(() => createTheme(paletteType), [paletteType]);
 
-    return <>
+    return <ThemeProvider theme={ theme }>
         <CssBaseline/>
-        <MyAppBar/>
+        <MyAppBar paletteType={ paletteType } setPaletteType={ setPaletteType }/>
         <Grid container direction='column' alignItems='center'>
             <PuzzlerRendered/>
             <Choices/>
@@ -53,19 +59,36 @@ export function PuzzlerApp(): ReactElement {
                 />
             </Grid>
         </Grid>
-    </>
+    </ThemeProvider>;
 }
 
-function MyAppBar() {
+function MyAppBar(p: {paletteType: PaletteType, setPaletteType: (paletteType: PaletteType) => void}) {
+    const togglePaletteType = () => {
+        if (p.paletteType === 'light') {
+            p.setPaletteType('dark');
+        } else {
+            p.setPaletteType('light');
+        }
+    };
+
     return <>
         <AppBar color='primary'>
             <Toolbar variant='dense'>
                 <Container maxWidth='sm'>
-                    <Grid container  justify='space-between' alignItems='baseline'>
+                    <Grid container  justify='space-between' alignItems='center'>
                         <Grid item>
                             <Typography variant="h6">
                                 Guess CSS!
                             </Typography>
+                        </Grid>
+                        <Grid item>
+                            <IconButton onClick={ togglePaletteType }>
+                                {
+                                    p.paletteType === 'light' &&
+                                    <Brightness2Icon htmlColor='white'/> ||
+                                    <Brightness5Icon htmlColor='white'/>
+                                }
+                            </IconButton>
                         </Grid>
                         <Grid item>
                             <Score/>
