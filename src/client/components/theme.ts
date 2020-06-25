@@ -21,6 +21,11 @@ export const createTheme = (paletteType: PaletteType) => createMuiTheme({
     },
     palette: {
         type: paletteType,
+        ...(paletteType === 'dark' ? {
+            primary: {
+                main: '#90caf9',
+            }
+        } : {}),
     },
     props: {
         MuiPaper: {

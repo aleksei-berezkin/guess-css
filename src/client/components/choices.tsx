@@ -11,7 +11,7 @@ import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
 import CheckIcon from '@material-ui/icons/Check';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import makeStyles from '@material-ui/core/styles/makeStyles';
-import { ChoiceStatus, getChoiceStatus, useChoiceStyles } from './choiceStatus';
+import { ChoiceStatus, getChoiceStatus, makeChoiceStyles } from './choiceStatus';
 import { setCurrentTab, setFooterBtnHeight } from '../redux/actions';
 import { useTheme } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
@@ -47,7 +47,7 @@ function WideChoices() {
     const choices = useSelector(choicesSelector);
     const common = useSelector(commonSelector);
     const status = useSelector(statusSelector);
-    const classes = useChoiceStyles();
+    const classes = makeChoiceStyles();
 
     const dispatch = useDispatch();
 
@@ -78,7 +78,7 @@ function NarrowChoices() {
     const common = useSelector(commonSelector);
     const status = useSelector(statusSelector);
     const currentTab = useSelector(ofCurrentView('currentTab', 0));
-    const classes = useChoiceStyles();
+    const classes = makeChoiceStyles();
 
     const handleChange = (event: React.ChangeEvent<{}>, currentTab: number) => {
         dispatch(setCurrentTab({currentPuzzler, currentTab}));

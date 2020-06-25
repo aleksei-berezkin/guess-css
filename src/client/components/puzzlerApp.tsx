@@ -72,7 +72,7 @@ function MyAppBar(p: {paletteType: PaletteType, setPaletteType: (paletteType: Pa
     };
 
     return <>
-        <AppBar color='primary'>
+        <AppBar color={ p.paletteType === 'light' ? 'primary' : 'default' }>
             <Toolbar variant='dense'>
                 <Container maxWidth='sm'>
                     <Grid container  justify='space-between' alignItems='center'>
