@@ -16,7 +16,6 @@ import { createTheme } from '../client/components/theme';
 import { UAParser } from 'ua-parser-js';
 import { assignColorVars } from '../client/redux/assignedColorVar';
 import { escapeRe } from '../client/util';
-import { assignContrastColorVar } from '../client/redux/assignedContrastColorVar';
 
 const indexHtmlParts = new Promise<[string, string, string, string]>((resolve, reject) => {
     readFile(path.resolve(__dirname, '..', '..', 'dist', 'index.html'), (err, data) => {
@@ -54,7 +53,7 @@ export function sendRenderedApp(req: Request, res: Response) {
             commonStyle: puzzler.commonStyleCode,
             commonStyleSummary: puzzler.commonStyleSummary,
             assignedVars: {
-                contrastColor: assignContrastColorVar(puzzler.rules.vars.contrastColor),
+                contrastColor: puzzler.rules.vars.contrastColor,
                 colors: assignColorVars(puzzler.rules.vars.colors),
             },
             body: puzzler.bodyCode,

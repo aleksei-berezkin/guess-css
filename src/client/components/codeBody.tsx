@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import { ofCurrentViewOrUndefined } from '../redux/store';
 import useTheme from '@material-ui/core/styles/useTheme';
 import { escapeRe, globalRe } from '../util';
+import { getContrastColorValue } from './contrastColorValue';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -93,7 +94,7 @@ function RegionCode(p: {region: Region}): ReactElement {
     const differingClass = p.region.differing && regionClasses.differing || '';
     const { contrastColor, colors } = assignedVars;
     const { palette: { type, getContrastText }} = theme;
-    const text = p.region.text.replace(globalRe(contrastColor.id), contrastColor[type]);
+    const text = p.region.text.replace(globalRe(contrastColor), getContrastColorValue(theme));
 
     return <>{
         [...function* toSpans(text: string): IterableIterator<ReactElement> {

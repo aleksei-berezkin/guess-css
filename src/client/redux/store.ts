@@ -8,7 +8,6 @@ import { Topic } from '../model/gen/topic';
 import { stream } from '../stream/stream';
 import { configureStore, createReducer, combineReducers } from '@reduxjs/toolkit';
 import { AssignedColorVar } from './assignedColorVar';
-import { AssignedContrastColorVar } from './assignedContrastColorVar';
 
 
 export type State = {
@@ -19,7 +18,7 @@ export type State = {
         commonStyleSummary: string,
         commonStyle: Region[][],
         assignedVars: {
-            contrastColor: AssignedContrastColorVar,
+            contrastColor: string,
             colors: AssignedColorVar[],
         },
         body: Region[][],

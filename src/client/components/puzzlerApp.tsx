@@ -21,12 +21,13 @@ import { CodeHeader } from './codeHeader';
 import { Choices } from './choices';
 import { STYLE_ID } from '../../shared/templateConst';
 import useTheme from '@material-ui/core/styles/useTheme';
-import { PaletteType } from '@material-ui/core';
+import { PaletteType, Theme } from '@material-ui/core';
 import { globalRe } from '../util';
 import { ThemeProvider } from '@material-ui/styles';
 import { createTheme } from './theme';
 import Brightness2Icon from '@material-ui/icons/Brightness2';
 import Brightness5Icon from '@material-ui/icons/Brightness5';
+import { getContrastColorValue } from './contrastColorValue';
 
 export function PuzzlerApp(): ReactElement {
     const ssr = useSelector(state => state.ssr);
@@ -153,7 +154,7 @@ const useStyles = makeStyles(theme => ({
 function PuzzlerRendered() {
     const source = useSelector(ofCurrentView('source', ''));
     const assignedVars = useSelector(ofCurrentViewOrUndefined('assignedVars'));
-    const paletteType = useTheme().palette.type;
+    const theme = useTheme();
     const classes = useStyles();
 
     return <Grid container justify='center' alignItems='center'>
@@ -163,7 +164,7 @@ function PuzzlerRendered() {
         <Grid item>
             <Paper className={ `${classes.layoutSize} ${classes.iframePaper}` }>
                 <iframe className={ `${classes.layoutSize} ${classes.iframe}` } srcDoc={
-                    insertColors(source, assignedVars, paletteType)
+                    insertColors(source, assignedVars, theme)
                 }/>
             </Paper>
         </Grid>
@@ -173,20 +174,21 @@ function PuzzlerRendered() {
     </Grid>;
 }
 
-function insertColors(src: string, assignedVars: PuzzlerView['assignedVars'] | undefined, paletteType: PaletteType): string {
+function insertColors(src: string, assignedVars: PuzzlerView['assignedVars'] | undefined, theme: Theme): string {
     if (!assignedVars) {
         return src;
     }
 
     const colorsInserted = assignedVars.colors
         .reduceRight(
-            (t, c) => t.replace(globalRe(c.id), c[paletteType]),
+            (t, c) => t.replace(globalRe(c.id), c[theme.palette.type]),
             src
         );
 
+    const contrastColorValue = getContrastColorValue(theme);
     return colorsInserted.replace(
-        globalRe(assignedVars.contrastColor.id),
-        assignedVars.contrastColor[paletteType]
+        globalRe(assignedVars.contrastColor),
+        contrastColorValue,
     );
 }
 
