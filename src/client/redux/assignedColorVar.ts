@@ -2,12 +2,12 @@ import { ColorVar, ColorVarType } from '../model/gen/colorVar';
 import { randomItem } from '../util';
 import { stream } from '../stream/stream';
 import { PaletteType } from '@material-ui/core';
+import blue from '@material-ui/core/colors/blue';
+import blueGrey from '@material-ui/core/colors/blueGrey';
+import red from '@material-ui/core/colors/red';
 
 export type AssignedColorVar = ColorVar & {
-    [paletteType in PaletteType]: {
-        color: string,
-        codeText: string,
-    }
+    [paletteType in PaletteType]: string;
 };
 
 type Hue = 'red' | 'blue' | 'gray';
@@ -15,77 +15,38 @@ type Hue = 'red' | 'blue' | 'gray';
 const colors: {
     [hue in Hue]: {
         [paletteType in PaletteType]: {
-            [colorType in ColorVarType]: {
-                color: string,
-                codeText: string,
-            }
+            [colorType in ColorVarType]: string;
         }
     }
 } = {
     red: {
         light: {
-            background: {
-                color: 'pink',
-                codeText: 'black',
-            },
-            border: {
-                color: 'red',
-                codeText: 'black',
-            },
+            background: red[200],
+            border: red[600],
         },
         dark: {
-            background: {
-                color: 'darkred',
-                codeText: 'white',
-            },
-            border: {
-                color: 'pink',
-                codeText: 'black',
-            },
+            background: red[700],
+            border: red[200],
         }
     },
     blue: {
         light: {
-            background: {
-                color: 'lightblue',
-                codeText: 'black',
-            },
-            border: {
-                color: 'blue',
-                codeText: 'white',
-            },
+            background: blue[200],
+            border: blue[600],
         },
         dark: {
-            background: {
-                color: 'darkblue',
-                codeText: 'white',
-            },
-            border: {
-                color: 'lightblue',
-                codeText: 'black',
-            },
+            background: blue[700],
+            border: blue[200],
         }
     },
     gray: {
         light: {
-            background: {
-                color: 'lightgray',
-                codeText: 'black',
-            },
-            border: {
-                color: 'gray',
-                codeText: 'white',
-            },
+            background: blueGrey[200],
+            border: blueGrey[500],
         },
         dark: {
-            background: {
-                color: 'darkgray',
-                codeText: 'white',
-            },
-            border: {
-                color: 'lightgray',
-                codeText: 'black',
-            },
+            background: blueGrey[400],
+            border: blueGrey[200],
         },
     }
 };

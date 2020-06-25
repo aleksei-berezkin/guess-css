@@ -86,7 +86,7 @@ function MyAppBar(p: {paletteType: PaletteType, setPaletteType: (paletteType: Pa
                                 {
                                     p.paletteType === 'light' &&
                                     <Brightness2Icon htmlColor='white'/> ||
-                                    <Brightness5Icon htmlColor='white'/>
+                                    <Brightness5Icon/>
                                 }
                             </IconButton>
                         </Grid>
@@ -180,7 +180,7 @@ function insertColors(src: string, assignedVars: PuzzlerView['assignedVars'] | u
 
     const colorsInserted = assignedVars.colors
         .reduceRight(
-            (t, c) => t.replace(globalRe(c.id), c[paletteType].color),
+            (t, c) => t.replace(globalRe(c.id), c[paletteType]),
             src
         );
 

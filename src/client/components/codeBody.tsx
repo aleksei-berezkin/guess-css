@@ -92,7 +92,7 @@ function RegionCode(p: {region: Region}): ReactElement {
 
     const differingClass = p.region.differing && regionClasses.differing || '';
     const { contrastColor, colors } = assignedVars;
-    const { palette: { type }} = theme;
+    const { palette: { type, getContrastText }} = theme;
     const text = p.region.text.replace(globalRe(contrastColor.id), contrastColor[type]);
 
     return <>{
@@ -107,10 +107,10 @@ function RegionCode(p: {region: Region}): ReactElement {
                     yield <span
                         className={ `${ differingClass }` }
                         style={{
-                            backgroundColor: color[type].color,
-                            color: color[type].codeText,
+                            backgroundColor: color[type],
+                            color: getContrastText(color[type]),
                         }}
-                    >{ color[type].color }</span>;
+                    >{ color[type] }</span>;
 
                     if (match[3]) {
                         yield* toSpans(match[3]);
