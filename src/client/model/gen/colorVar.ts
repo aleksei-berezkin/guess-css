@@ -1,5 +1,3 @@
-export const contrastColorVar = '$contrastColor$';
-
 export type ColorVarType = 'background' | 'border';
 
 export type ColorVar = {

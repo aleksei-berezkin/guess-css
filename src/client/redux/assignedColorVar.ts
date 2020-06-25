@@ -1,4 +1,4 @@
-import { ColorVar, ColorVarType } from '../model/gen/vars';
+import { ColorVar, ColorVarType } from '../model/gen/colorVar';
 import { randomItem } from '../util';
 import { stream } from '../stream/stream';
 import { PaletteType } from '@material-ui/core';

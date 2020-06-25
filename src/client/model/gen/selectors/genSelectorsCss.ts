@@ -12,8 +12,9 @@ import {
 import { getSiblingsSubtree, SiblingsSubtree } from '../siblingsSubtree';
 import { getDeepestSingleChildSubtree, SingleChildSubtree } from '../singleChildSubtree';
 import { optional, Optional, range, stream } from '../../../stream/stream';
-import { contrastColorVar, getColorVar } from '../vars';
+import { getColorVar } from '../colorVar';
 import { RulesParam } from '../../puzzler';
+import { contrastColorRule, contrastColorVar } from '../contrastColorVar';
 
 const constantRule = new Rule(
     new TypeSelector('div'),
@@ -54,7 +55,10 @@ export function genRulesChoices(body: TagNode): RulesParam | null {
             .zip(stream(siblingsRules).takeRandom(RULES_CHOICES))
             .map(([deepRule, siblingRule]) => [deepRule, siblingRule])
             .toArray(),
-        common: [constantRule],
+        common: [
+            constantRule,
+            contrastColorRule,
+        ],
         vars: {
             contrastColor: contrastColorVar,
             colors: colorVars,

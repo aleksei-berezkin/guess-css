@@ -4,7 +4,7 @@ import { Region } from './region';
 import { Indent } from './indent';
 import { randomBounded } from '../util';
 import { Stream, stream, streamOf } from '../stream/stream';
-import { ColorVar } from './gen/vars';
+import { ColorVar } from './gen/colorVar';
 
 export type RulesParam = ConstructorParameters<typeof Puzzler>[1];
 
