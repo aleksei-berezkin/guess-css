@@ -3,12 +3,12 @@ import { ChildCombinator, ClassSelector, Rule, Selector, TypeSelector } from '..
 import { getDeepestSingleChildSubtree } from '../singleChildSubtree';
 import { transpose } from '../../../util';
 import { range, stream } from '../../../stream/stream';
-import { contrastColorPlaceholder, getColorPlaceholder } from '../colorPlaceholder';
+import { contrastColorVar, getColorVar } from '../vars';
 import { RulesParam } from '../../puzzler';
 
 export function genPositionCss(body: TagNode): RulesParam {
     const [outer, inner] = getDeepestSingleChildSubtree(body).unfoldToStream().takeLast(2);
-    const [outerColor, innerColor] = range(0, 2).map(i => getColorPlaceholder('background', i));
+    const [outerColor, innerColor] = range(0, 2).map(i => getColorVar('background', i));
 
     return {
         choices: transpose(innerOuterPositionsShuffled()).map(([outerPosition, innerPosition]) =>
@@ -33,8 +33,8 @@ export function genPositionCss(body: TagNode): RulesParam {
                 [['padding', '.5em']]
             ),
         ],
-        placeholders: {
-            contrastColor: contrastColorPlaceholder,
+        vars: {
+            contrastColor: contrastColorVar,
             colors: [outerColor, innerColor],
         },
     };

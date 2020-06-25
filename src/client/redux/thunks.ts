@@ -4,8 +4,8 @@ import { State } from './store';
 import { ThunkAction } from 'redux-thunk';
 import { Action } from 'redux';
 import { stream } from '../stream/stream';
-import { resolveColors } from './resolvedColor';
-import { resolveContrastColor } from './resolvedContrastColor';
+import { assignColorVars } from './assignedColorVar';
+import { assignContrastColorVar } from './assignedContrastColorVar';
 
 type VoidThunk = ThunkAction<void, State, never, Action<string>>;
 
@@ -27,9 +27,9 @@ export function genNewPuzzler(diffHint: boolean): VoidThunk {
             styleChoices: puzzler.getStyleCodes(diffHint),
             commonStyleSummary: puzzler.commonStyleSummary,
             commonStyle: puzzler.commonStyleCode,
-            resolvedPlaceholders: {
-                contrastColor: resolveContrastColor(puzzler.rules.placeholders.contrastColor),
-                colors: resolveColors(puzzler.rules.placeholders.colors),
+            assignedVars: {
+                contrastColor: assignContrastColorVar(puzzler.rules.vars.contrastColor),
+                colors: assignColorVars(puzzler.rules.vars.colors),
             },
             body: puzzler.bodyCode,
             status: {

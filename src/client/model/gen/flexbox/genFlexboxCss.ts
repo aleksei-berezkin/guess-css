@@ -4,7 +4,7 @@ import { randomItem, transpose } from '../../../util';
 import { getSiblingsSubtree } from '../siblingsSubtree';
 import { stream, streamOf } from '../../../stream/stream';
 import { RulesParam } from '../../puzzler';
-import { contrastColorPlaceholder } from '../colorPlaceholder';
+import { contrastColorVar } from '../vars';
 
 export function genFlexboxCss(body: TagNode): RulesParam {
     const direction = randomItem(['row', 'column', 'row-reverse', 'column-reverse']);
@@ -49,13 +49,13 @@ export function genFlexboxCss(body: TagNode): RulesParam {
             new Rule(
                 new TypeSelector('div'),
                 [
-                    ['border', `1px solid ${ contrastColorPlaceholder }`],
+                    ['border', `1px solid ${ contrastColorVar }`],
                     ['padding', '.5em'],
                 ]
             )
         ],
-        placeholders: {
-            contrastColor: contrastColorPlaceholder,
+        vars: {
+            contrastColor: contrastColorVar,
             colors: [],
         },
     };

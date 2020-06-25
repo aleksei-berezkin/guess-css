@@ -82,16 +82,16 @@ const regionStylesObj: {[k in RegionKind]: CSSProperties} & {differing: CSSPrope
 const useRegionStyles = makeStyles(regionStylesObj);
 
 function RegionCode(p: {region: Region}): ReactElement {
-    const resolvedPlaceholders = useSelector(ofCurrentViewOrUndefined('resolvedPlaceholders'));
+    const assignedVars = useSelector(ofCurrentViewOrUndefined('assignedVars'));
     const regionClasses = useRegionStyles();
     const theme = useTheme();
 
-    if (!resolvedPlaceholders) {
+    if (!assignedVars) {
         return <></>;
     }
 
     const differingClass = p.region.differing && regionClasses.differing || '';
-    const { contrastColor, colors } = resolvedPlaceholders;
+    const { contrastColor, colors } = assignedVars;
     const { palette: { type }} = theme;
     const text = p.region.text.replace(globalRe(contrastColor.id), contrastColor[type]);
 

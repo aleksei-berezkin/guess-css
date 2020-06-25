@@ -1,9 +1,9 @@
-import { ColorPlaceholder, ColorType } from '../model/gen/colorPlaceholder';
+import { ColorVar, ColorVarType } from '../model/gen/vars';
 import { randomItem } from '../util';
 import { stream } from '../stream/stream';
 import { PaletteType } from '@material-ui/core';
 
-export type ResolvedColor = ColorPlaceholder & {
+export type AssignedColorVar = ColorVar & {
     [paletteType in PaletteType]: {
         color: string,
         codeText: string,
@@ -15,7 +15,7 @@ type Hue = 'red' | 'blue' | 'gray';
 const colors: {
     [hue in Hue]: {
         [paletteType in PaletteType]: {
-            [colorType in ColorType]: {
+            [colorType in ColorVarType]: {
                 color: string,
                 codeText: string,
             }
@@ -95,33 +95,33 @@ const compatibleColors: [Hue, Hue][] = [
     ['red', 'gray'],
 ];
 
-export function resolveColors(placeholders: readonly ColorPlaceholder[]): ResolvedColor[] {
-    if (!placeholders.length) {
+export function assignColorVars(vars: readonly ColorVar[]): AssignedColorVar[] {
+    if (!vars.length) {
         return [];
     }
 
-    const doResolve = (hue: Hue, placeholder: ColorPlaceholder): ResolvedColor => {
+    const doAssign = (hue: Hue, colorVar: ColorVar): AssignedColorVar => {
         return {
-            ...placeholder,
-            light: colors[hue].light[placeholder.type],
-            dark: colors[hue].dark[placeholder.type],
+            ...colorVar,
+            light: colors[hue].light[colorVar.type],
+            dark: colors[hue].dark[colorVar.type],
         };
     }
 
-    if (placeholders.length === 1) {
+    if (vars.length === 1) {
         const hues = Object.getOwnPropertyNames(colors) as Hue[];
-        return [doResolve(randomItem(hues), placeholders[0])];
+        return [doAssign(randomItem(hues), vars[0])];
     }
 
-    if (placeholders.length === 2) {
+    if (vars.length === 2) {
         return stream(compatibleColors)
             .randomItem()
             .flatMap(h => h)
-            .zipStrict(placeholders)
+            .zipStrict(vars)
             .shuffle()
-            .map(([h, p]) => doResolve(h, p))
+            .map(([h, p]) => doAssign(h, p))
             .toArray();
     }
 
-    throw new Error('Bad length: ' + placeholders.length);
+    throw new Error('Bad length: ' + vars.length);
 }

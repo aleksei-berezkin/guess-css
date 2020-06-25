@@ -152,7 +152,7 @@ const useStyles = makeStyles(theme => ({
 
 function PuzzlerRendered() {
     const source = useSelector(ofCurrentView('source', ''));
-    const resolvedPlaceholders = useSelector(ofCurrentViewOrUndefined('resolvedPlaceholders'));
+    const assignedVars = useSelector(ofCurrentViewOrUndefined('assignedVars'));
     const paletteType = useTheme().palette.type;
     const classes = useStyles();
 
@@ -163,7 +163,7 @@ function PuzzlerRendered() {
         <Grid item>
             <Paper className={ `${classes.layoutSize} ${classes.iframePaper}` }>
                 <iframe className={ `${classes.layoutSize} ${classes.iframe}` } srcDoc={
-                    insertColors(source, resolvedPlaceholders, paletteType)
+                    insertColors(source, assignedVars, paletteType)
                 }/>
             </Paper>
         </Grid>
@@ -173,20 +173,20 @@ function PuzzlerRendered() {
     </Grid>;
 }
 
-function insertColors(src: string, resolvedPlaceholders: PuzzlerView['resolvedPlaceholders'] | undefined, paletteType: PaletteType): string {
-    if (!resolvedPlaceholders) {
+function insertColors(src: string, assignedVars: PuzzlerView['assignedVars'] | undefined, paletteType: PaletteType): string {
+    if (!assignedVars) {
         return src;
     }
 
-    const colorsInserted = resolvedPlaceholders.colors
+    const colorsInserted = assignedVars.colors
         .reduceRight(
             (t, c) => t.replace(globalRe(c.id), c[paletteType].color),
             src
         );
 
     return colorsInserted.replace(
-        globalRe(resolvedPlaceholders.contrastColor.id),
-        resolvedPlaceholders.contrastColor[paletteType]
+        globalRe(assignedVars.contrastColor.id),
+        assignedVars.contrastColor[paletteType]
     );
 }
 

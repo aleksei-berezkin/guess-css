@@ -4,7 +4,7 @@ import { Region } from './region';
 import { Indent } from './indent';
 import { randomBounded } from '../util';
 import { Stream, stream, streamOf } from '../stream/stream';
-import { ColorPlaceholder } from './gen/colorPlaceholder';
+import { ColorVar } from './gen/vars';
 
 export type RulesParam = ConstructorParameters<typeof Puzzler>[1];
 
@@ -16,9 +16,9 @@ export class Puzzler {
             readonly rules: {
                 choices: Rule[][],
                 common: Rule[],
-                placeholders: {
+                vars: {
                     contrastColor: string,
-                    colors: readonly ColorPlaceholder[],
+                    colors: readonly ColorVar[],
                 }
             },
             private readonly showBodyTag = false,

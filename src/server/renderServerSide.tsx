@@ -14,9 +14,9 @@ import ServerStyleSheets from '@material-ui/styles/ServerStyleSheets';
 import { ThemeProvider } from '@material-ui/styles';
 import { createTheme } from '../client/components/theme';
 import { UAParser } from 'ua-parser-js';
-import { resolveColors } from '../client/redux/resolvedColor';
+import { assignColorVars } from '../client/redux/assignedColorVar';
 import { escapeRe } from '../client/util';
-import { resolveContrastColor } from '../client/redux/resolvedContrastColor';
+import { assignContrastColorVar } from '../client/redux/assignedContrastColorVar';
 
 const indexHtmlParts = new Promise<[string, string, string, string]>((resolve, reject) => {
     readFile(path.resolve(__dirname, '..', '..', 'dist', 'index.html'), (err, data) => {
@@ -53,9 +53,9 @@ export function sendRenderedApp(req: Request, res: Response) {
             styleChoices: puzzler.getStyleCodes(true),
             commonStyle: puzzler.commonStyleCode,
             commonStyleSummary: puzzler.commonStyleSummary,
-            resolvedPlaceholders: {
-                contrastColor: resolveContrastColor(puzzler.rules.placeholders.contrastColor),
-                colors: resolveColors(puzzler.rules.placeholders.colors),
+            assignedVars: {
+                contrastColor: assignContrastColorVar(puzzler.rules.vars.contrastColor),
+                colors: assignColorVars(puzzler.rules.vars.colors),
             },
             body: puzzler.bodyCode,
             status: {

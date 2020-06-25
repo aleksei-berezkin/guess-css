@@ -12,7 +12,7 @@ import {
 import { getSiblingsSubtree, SiblingsSubtree } from '../siblingsSubtree';
 import { getDeepestSingleChildSubtree, SingleChildSubtree } from '../singleChildSubtree';
 import { optional, Optional, range, stream } from '../../../stream/stream';
-import { contrastColorPlaceholder, getColorPlaceholder } from '../colorPlaceholder';
+import { contrastColorVar, getColorVar } from '../vars';
 import { RulesParam } from '../../puzzler';
 
 const constantRule = new Rule(
@@ -20,15 +20,15 @@ const constantRule = new Rule(
     [
         ['display', 'inline-block'],
         ['padding', '.5em'],
-        ['border', `1px solid ${ contrastColorPlaceholder }`],
+        ['border', `1px solid ${ contrastColorVar }`],
     ]
 );
 const RULES_CHOICES = 3;
 
 export function genRulesChoices(body: TagNode): RulesParam | null {
-    const colorPlaceholders = range(0, 2).map(i => getColorPlaceholder('background', i)).toArray();
-    const [deepStyle, siblingsStyle] = stream(colorPlaceholders)
-        .map((placeholder): Declaration[] => [['background-color', placeholder.id]])
+    const colorVars = range(0, 2).map(i => getColorVar('background', i)).toArray();
+    const [deepStyle, siblingsStyle] = stream(colorVars)
+        .map((colorVar): Declaration[] => [['background-color', colorVar.id]])
         .takeRandom(2);
 
     const deepest: SingleChildSubtree = getDeepestSingleChildSubtree(body);
@@ -55,9 +55,9 @@ export function genRulesChoices(body: TagNode): RulesParam | null {
             .map(([deepRule, siblingRule]) => [deepRule, siblingRule])
             .toArray(),
         common: [constantRule],
-        placeholders: {
-            contrastColor: contrastColorPlaceholder,
-            colors: colorPlaceholders,
+        vars: {
+            contrastColor: contrastColorVar,
+            colors: colorVars,
         }
     };
 }

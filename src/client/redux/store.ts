@@ -7,8 +7,8 @@ import {
 import { Topic } from '../model/gen/topic';
 import { stream } from '../stream/stream';
 import { configureStore, createReducer, combineReducers } from '@reduxjs/toolkit';
-import { ResolvedColor } from './resolvedColor';
-import { ResolvedContrastColor } from './resolvedContrastColor';
+import { AssignedColorVar } from './assignedColorVar';
+import { AssignedContrastColorVar } from './assignedContrastColorVar';
 
 
 export type State = {
@@ -18,9 +18,9 @@ export type State = {
         styleChoices: Region[][][],
         commonStyleSummary: string,
         commonStyle: Region[][],
-        resolvedPlaceholders: {
-            contrastColor: ResolvedContrastColor,
-            colors: ResolvedColor[],
+        assignedVars: {
+            contrastColor: AssignedContrastColorVar,
+            colors: AssignedColorVar[],
         },
         body: Region[][],
         status: {

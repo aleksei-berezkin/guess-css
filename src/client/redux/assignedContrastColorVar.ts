@@ -1,10 +1,10 @@
 import { PaletteType } from '@material-ui/core';
 
-export type ResolvedContrastColor = { id: string } & {
+export type AssignedContrastColorVar = { id: string } & {
     [paletteType in PaletteType]: string;
 };
 
-export function resolveContrastColor(id: string): ResolvedContrastColor {
+export function assignContrastColorVar(id: string): AssignedContrastColorVar {
     return {
         id,
         light: 'black',
