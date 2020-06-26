@@ -28,6 +28,7 @@ import { createTheme } from './theme';
 import Brightness2Icon from '@material-ui/icons/Brightness2';
 import Brightness5Icon from '@material-ui/icons/Brightness5';
 import { getContrastColorValue } from './contrastColorValue';
+import { resolveColor } from '../redux/resolveColor';
 
 export function PuzzlerApp(): ReactElement {
     const ssr = useSelector(state => state.ssr);
@@ -153,7 +154,7 @@ const useStyles = makeStyles(theme => ({
 
 function PuzzlerRendered() {
     const source = useSelector(ofCurrentView('source', ''));
-    const assignedVars = useSelector(ofCurrentViewOrUndefined('assignedVars'));
+    const vars = useSelector(ofCurrentViewOrUndefined('vars'));
     const theme = useTheme();
     const classes = useStyles();
 
@@ -164,7 +165,7 @@ function PuzzlerRendered() {
         <Grid item>
             <Paper className={ `${classes.layoutSize} ${classes.iframePaper}` }>
                 <iframe className={ `${classes.layoutSize} ${classes.iframe}` } srcDoc={
-                    insertColors(source, assignedVars, theme)
+                    insertColors(source, vars, theme)
                 }/>
             </Paper>
         </Grid>
@@ -174,20 +175,23 @@ function PuzzlerRendered() {
     </Grid>;
 }
 
-function insertColors(src: string, assignedVars: PuzzlerView['assignedVars'] | undefined, theme: Theme): string {
-    if (!assignedVars) {
+function insertColors(src: string, vars: PuzzlerView['vars'] | undefined, theme: Theme): string {
+    if (!vars) {
         return src;
     }
 
-    const colorsInserted = assignedVars.colors
+    const colorsInserted = vars.colors
         .reduceRight(
-            (t, c) => t.replace(globalRe(c.id), c[theme.palette.type]),
+            (t, assignedCol) => t.replace(
+                globalRe(assignedCol.id),
+                resolveColor(assignedCol, theme.palette.type),
+            ),
             src
         );
 
     const contrastColorValue = getContrastColorValue(theme);
     return colorsInserted.replace(
-        globalRe(assignedVars.contrastColor),
+        globalRe(vars.contrastColor),
         contrastColorValue,
     );
 }

@@ -288,7 +288,7 @@ class StreamImpl<P, T> extends Base<P, T> implements Stream<T> {
 
     distinctBy(getKey: (item: T) => any) {
         return new StreamImpl(this, function* (items) {
-            const keys = new Set<any>();
+            const keys = new Set<T>();
             for (const i of items) {
                 const key = getKey(i);
                 if (!keys.has(key)) {

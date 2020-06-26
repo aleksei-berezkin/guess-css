@@ -9,6 +9,7 @@ import { ofCurrentViewOrUndefined } from '../redux/store';
 import useTheme from '@material-ui/core/styles/useTheme';
 import { escapeRe, globalRe } from '../util';
 import { getContrastColorValue } from './contrastColorValue';
+import { resolveColor } from '../redux/resolveColor';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -83,35 +84,36 @@ const regionStylesObj: {[k in RegionKind]: CSSProperties} & {differing: CSSPrope
 const useRegionStyles = makeStyles(regionStylesObj);
 
 function RegionCode(p: {region: Region}): ReactElement {
-    const assignedVars = useSelector(ofCurrentViewOrUndefined('assignedVars'));
+    const vars = useSelector(ofCurrentViewOrUndefined('vars'));
     const regionClasses = useRegionStyles();
     const theme = useTheme();
 
-    if (!assignedVars) {
+    if (!vars) {
         return <></>;
     }
 
     const differingClass = p.region.differing && regionClasses.differing || '';
-    const { contrastColor, colors } = assignedVars;
+    const { contrastColor, colors } = vars;
     const { palette: { type, getContrastText }} = theme;
     const text = p.region.text.replace(globalRe(contrastColor), getContrastColorValue(theme));
 
     return <>{
         [...function* toSpans(text: string): IterableIterator<ReactElement> {
-            for (const color of colors) {
-                const match = new RegExp(`^(.*)(${ escapeRe(color.id) })(.*)$`).exec(text);
+            for (const assignedCol of colors) {
+                const match = new RegExp(`^(.*)(${ escapeRe(assignedCol.id) })(.*)$`).exec(text);
                 if (match) {
                     if (match[1]) {
                         yield* toSpans(match[1]);  
                     } 
 
+                    const resolvedCol = resolveColor(assignedCol, type);
                     yield <span
                         className={ `${ differingClass }` }
                         style={{
-                            backgroundColor: color[type],
-                            color: getContrastText(color[type]),
+                            backgroundColor: resolvedCol,
+                            color: getContrastText(resolvedCol),
                         }}
-                    >{ color[type] }</span>;
+                    >{ resolvedCol }</span>;
 
                     if (match[3]) {
                         yield* toSpans(match[3]);

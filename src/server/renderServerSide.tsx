@@ -14,7 +14,7 @@ import ServerStyleSheets from '@material-ui/styles/ServerStyleSheets';
 import { ThemeProvider } from '@material-ui/styles';
 import { createTheme } from '../client/components/theme';
 import { UAParser } from 'ua-parser-js';
-import { assignColorVars } from '../client/redux/assignedColorVar';
+import { assignColorVars } from '../client/redux/assignColorVar';
 import { escapeRe } from '../client/util';
 
 const indexHtmlParts = new Promise<[string, string, string, string]>((resolve, reject) => {
@@ -52,7 +52,7 @@ export function sendRenderedApp(req: Request, res: Response) {
             styleChoices: puzzler.getStyleCodes(true),
             commonStyle: puzzler.commonStyleCode,
             commonStyleSummary: puzzler.commonStyleSummary,
-            assignedVars: {
+            vars: {
                 contrastColor: puzzler.rules.vars.contrastColor,
                 colors: assignColorVars(puzzler.rules.vars.colors),
             },
