@@ -83,7 +83,7 @@ export class TagNode implements Node {
         return [
             { kind: 'tagBracket', text: '</' },
             { kind: 'tag', text: this.name },
-            { kind: 'tag', text: '>' },
+            { kind: 'tagBracket', text: '>' },
         ];
     }
 

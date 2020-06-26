@@ -26,7 +26,7 @@ import { globalRe } from '../util';
 import { ThemeProvider } from '@material-ui/styles';
 import { createTheme } from './theme';
 import Brightness2Icon from '@material-ui/icons/Brightness2';
-import Brightness5Icon from '@material-ui/icons/Brightness5';
+import BrightnessHigh from '@material-ui/icons/BrightnessHigh';
 import { getContrastColorValue } from './contrastColorValue';
 import { resolveColor } from '../redux/resolveColor';
 
@@ -84,17 +84,17 @@ function MyAppBar(p: {paletteType: PaletteType, setPaletteType: (paletteType: Pa
                             </Typography>
                         </Grid>
                         <Grid item>
+                            <Score/>
+                            <DonePuzzler/>
+                        </Grid>
+                        <Grid item>
                             <IconButton onClick={ togglePaletteType }>
                                 {
                                     p.paletteType === 'light' &&
                                     <Brightness2Icon htmlColor='white'/> ||
-                                    <Brightness5Icon/>
+                                    <BrightnessHigh/>
                                 }
                             </IconButton>
-                        </Grid>
-                        <Grid item>
-                            <Score/>
-                            <DonePuzzler/>
                         </Grid>
                     </Grid>
                 </Container>

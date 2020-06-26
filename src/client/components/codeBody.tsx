@@ -20,6 +20,7 @@ const useStyles = makeStyles(theme => ({
         margin: 0,
         fontFamily: 'Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace',
         fontSize: 12,
+        lineHeight: 1.38,
     },
 }));
 
@@ -52,38 +53,38 @@ const regionStylesObj: (theme: Theme) => {
     [k in RegionKind | 'differing']: CSSProperties
 } = theme => ({
     default: {
-        color: ld('black', 'white', theme),
+        color: ld('#505050', '#c8c8c8', theme),
     },
     text: {
         color: ld('black', 'white', theme),
-        backgroundColor: ld('#f2f2f2', '#6c6c6c', theme),
+        backgroundColor: ld('#ececec', '#676767', theme),
     },
     tag: {
-        color: ld('#800000', '#559cd6', theme),
+        color: ld('#4b69c6', '#559cd6', theme),
     },
     tagBracket: {
-        color: ld('#808080', '#808080', theme),
+        color: ld('#91b3e0', '#808080', theme),
     },
     attrName: {
-        color: ld('#0000ff', '#9cdcff', theme),
+        color: ld('#9b5d27', '#9cdcff', theme),
     },
     attrValue: {
-        color: ld('#1301ff', '#ce9178', theme),
+        color: ld('#438b27', '#ce9178', theme),
     },
     operator: {
-        color: ld('#4a4a4a', '#d4d4d4', theme),
+        color: ld('#777777', '#d4d4d4', theme),
     },
     selector: {
-        color: ld('#800000', '#d7bb7d', theme),
+        color: ld('#793e9d', '#d7bb7d', theme),
     },
     declName: {
-        color: ld('#ff0102', '#9cdcff', theme),
+        color: ld('#9b5d27', '#9cdcff', theme),
     },
     declValue: {
         color: ld('black', 'white', theme),
     },
     comment: {
-        color: ld('#008002', '#6a9954', theme),
+        color: ld('#438b27', '#6a9954', theme),
         fontStyle: 'italic',
     },
     differing: {
