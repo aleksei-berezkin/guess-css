@@ -37,26 +37,31 @@ export class TagNode implements Node {
         if (this.children.length === 1 && this.children[0] instanceof TextNode) {
             const textNode = this.children[0] as TextNode;
             return [
-                [indent.toRegion(), ...this.openTagToRegions(), textNode.toTextRegion(), this.closeTagToRegion()]
+                [indent.toRegion(), ...this.openTagToRegions(), textNode.toTextRegion(), ...this.closeTagToRegions()]
             ];
         }
 
         return streamOf([indent.toRegion(), ...this.openTagToRegions()])
             .appendAll(this.childrenToRegions(indent.indent()))
-            .append([indent.toRegion(), this.closeTagToRegion()])
+            .append([indent.toRegion(), ...this.closeTagToRegions()])
             .toArray();
     }
 
     private openTagToRegions(): Region[] {
         const classesRegions = this.classesToRegions();
         if (!classesRegions.length) {
-            return [{kind: 'tag', text: `<${this.name}>`}];
+            return [
+                { kind: 'tagBracket', text: '<' },
+                { kind: 'tag', text: this.name },
+                { kind: 'tag', text: '>' },
+            ];
         }
 
         return [
-            {kind: 'tag', text: `<${this.name}`},
+            { kind: 'tagBracket', text: '<' },
+            { kind: 'tag', text: this.name },
             ...classesRegions,
-            {kind: 'tag', text: `>`},
+            { kind: 'tagBracket', text: '>' },
         ];
     }
 
@@ -66,16 +71,20 @@ export class TagNode implements Node {
         }
 
         return [
-            {kind: 'default', text: ' '},
-            {kind: 'attrName', text: 'class'},
-            {kind: 'operator', text: '="'},
-            {kind: 'attrValue', text: this.classes.join(' ')},
-            {kind: 'operator', text: '"'},
+            { kind: 'default', text: ' ' },
+            { kind: 'attrName', text: 'class' },
+            { kind: 'operator', text: '="' },
+            { kind: 'attrValue', text: this.classes.join(' ') },
+            { kind: 'operator', text: '"' },
         ];
     }
 
-    private closeTagToRegion(): Region {
-        return {kind: 'tag', text: `</${this.name}>`};
+    private closeTagToRegions(): Region[] {
+        return [
+            { kind: 'tagBracket', text: '</' },
+            { kind: 'tag', text: this.name },
+            { kind: 'tag', text: '>' },
+        ];
     }
 
     private childrenToRegions(indent: Indent): Region[][] {

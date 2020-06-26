@@ -59,28 +59,31 @@ const regionStylesObj: (theme: Theme) => {
         backgroundColor: ld('#f2f2f2', '#6c6c6c', theme),
     },
     tag: {
-        color: ld('#0000c0', '#8f8fff', theme),
+        color: ld('#800000', '#559cd6', theme),
+    },
+    tagBracket: {
+        color: ld('#808080', '#808080', theme),
     },
     attrName: {
-        color: ld('#0000ff', '#8080ff', theme),
+        color: ld('#0000ff', '#9cdcff', theme),
     },
     attrValue: {
-        color: ld('#008000', '#80e080', theme),
+        color: ld('#1301ff', '#ce9178', theme),
     },
     operator: {
-        color: ld('#008000', '#80e080', theme),
+        color: ld('#4a4a4a', '#d4d4d4', theme),
     },
     selector: {
-        color: ld('#000080', '#8080e0', theme),
+        color: ld('#800000', '#d7bb7d', theme),
     },
     declName: {
-        color: ld('black', 'white', theme),
+        color: ld('#ff0102', '#9cdcff', theme),
     },
     declValue: {
         color: ld('black', 'white', theme),
     },
     comment: {
-        color: ld('#808080', '#afafaf', theme),
+        color: ld('#008002', '#6a9954', theme),
         fontStyle: 'italic',
     },
     differing: {

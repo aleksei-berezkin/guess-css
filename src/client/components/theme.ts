@@ -26,7 +26,7 @@ export const createTheme = (paletteType: PaletteType) => createMuiTheme({
                 main: '#90caf9',
             },
             background: {
-                paper: '#191919',
+                paper: '#1e1e1e',
                 default: '#000000',
             },
         } : {}),

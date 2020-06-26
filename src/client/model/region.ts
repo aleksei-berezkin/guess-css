@@ -7,6 +7,7 @@ export interface Region {
 export type RegionKind =
     'default'
     | 'text'
+    | 'tagBracket'
     | 'tag'
     | 'attrName'
     | 'attrValue'
