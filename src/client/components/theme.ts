@@ -24,7 +24,11 @@ export const createTheme = (paletteType: PaletteType) => createMuiTheme({
         ...(paletteType === 'dark' ? {
             primary: {
                 main: '#90caf9',
-            }
+            },
+            background: {
+                paper: '#191919',
+                default: '#000000',
+            },
         } : {}),
     },
     props: {
@@ -32,4 +36,13 @@ export const createTheme = (paletteType: PaletteType) => createMuiTheme({
             square: true,
         },
     },
+    overrides: {
+        ...(paletteType === 'dark' ? {
+            MuiAppBar: {
+                colorDefault: {
+                    backgroundColor: '#424242',
+                },
+            },
+        } : {})
+    }
 });

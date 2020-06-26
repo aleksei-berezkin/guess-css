@@ -10,6 +10,7 @@ import useTheme from '@material-ui/core/styles/useTheme';
 import { escapeRe, globalRe } from '../util';
 import { getContrastColorValue } from './contrastColorValue';
 import { resolveColor } from '../redux/resolveColor';
+import { Theme } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -43,43 +44,49 @@ function Line(p: {regions: Region[]}) {
     }</pre>
 }
 
-const regionStylesObj: {[k in RegionKind]: CSSProperties} & {differing: CSSProperties} = {
+function ld(light: string, dark: string, theme: Theme) {
+    return theme.palette.type === 'light' ? light : dark;
+}
+
+const regionStylesObj: (theme: Theme) => {
+    [k in RegionKind | 'differing']: CSSProperties
+} = theme => ({
     default: {
-        color: '#000000',
+        color: ld('black', 'white', theme),
     },
     text: {
-        color: '#000000',
-        backgroundColor: '#f2f2f2',
+        color: ld('black', 'white', theme),
+        backgroundColor: ld('#f2f2f2', '#6c6c6c', theme),
     },
     tag: {
-        color: '#0000c0',
+        color: ld('#0000c0', '#8f8fff', theme),
     },
     attrName: {
-        color: '#0000ff',
+        color: ld('#0000ff', '#8080ff', theme),
     },
     attrValue: {
-        color: '#008000',
+        color: ld('#008000', '#80e080', theme),
     },
     operator: {
-        color: '#008000',
+        color: ld('#008000', '#80e080', theme),
     },
     selector: {
-        color: '#000080',
+        color: ld('#000080', '#8080e0', theme),
     },
     declName: {
-        color: '#000000',
+        color: ld('black', 'white', theme),
     },
     declValue: {
-        color: '#000000',
+        color: ld('black', 'white', theme),
     },
     comment: {
-        color: '#808080',
+        color: ld('#808080', '#afafaf', theme),
         fontStyle: 'italic',
     },
     differing: {
         fontWeight: 'bold',
     },
-};
+});
 
 const useRegionStyles = makeStyles(regionStylesObj);
 
