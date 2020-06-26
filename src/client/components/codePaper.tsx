@@ -55,11 +55,10 @@ export function CodePaper(
 
 
 const makeCollapsedStyles = makeStyles(theme => ({
-    expandButton: {
-        color: theme.palette.grey![600],
+    actionColor: {
+        color: theme.palette.type === 'light' ? theme.palette.grey[600] : theme.palette.grey[400],
     },
-    expandText: {
-        color: theme.palette.grey![600],
+    actionPointer: {
         cursor: 'pointer',
     },
     expandIcon: {
@@ -83,14 +82,20 @@ function SimpleCollapsed(p: { summary: string, children: ReactElement }) {
     }
 
     return <>
-        <IconButton size='small' className={ classes.expandButton } onClick={ toggleCollapsed }>
+        <IconButton size='small' className={ classes.actionColor } onClick={ toggleCollapsed }>
             <ChevronRightIcon fontSize='small' className={
                 streamOf(classes.expandIcon)
                     .appendIf(collapsedOpen, classes.expandIconOpen)
                     .join(' ')
             }/>
         </IconButton>
-        <Typography variant='caption' className={ classes.expandText } onClick={ toggleCollapsed }>{ p.summary }</Typography>
+
+        <Typography
+            variant='caption'
+            className={ `${classes.actionColor} ${classes.actionPointer}` }
+            onClick={ toggleCollapsed }>{ p.summary }
+        </Typography>
+
         <Collapse in={ collapsedOpen }>{
             p.children
         }</Collapse>
