@@ -228,7 +228,9 @@ function NextButton() {
         }
     }
 
-    return <IconButton onClick={ handleNext } disabled={ !hasNext && !isAnswered } color={ isAnswered ? 'primary' : 'default' }>
+    return <IconButton onClick={ handleNext }
+                       disabled={ !hasNext && !isAnswered }
+                       color={ isAnswered && !hasNext ? 'primary' : 'default' }>
         <KeyboardArrowRight/>
     </IconButton>;
 }

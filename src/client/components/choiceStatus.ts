@@ -34,7 +34,7 @@ const choiceStylesObj: {
             backgroundColor: green['A100'],
         },
         dark: {
-            backgroundColor: green['A700'],
+            backgroundColor: '#008008',
         },
     },
     correct: {
