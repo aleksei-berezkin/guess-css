@@ -11,6 +11,7 @@ import { escapeRe, globalRe } from '../util';
 import { getContrastColorValue } from './contrastColorValue';
 import { resolveColor } from '../redux/resolveColor';
 import { Theme } from '@material-ui/core';
+import { hasVars } from '../model/gen/vars';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -104,6 +105,12 @@ function RegionCode(p: {region: Region}): ReactElement {
     }
 
     const differingClass = p.region.differing && regionClasses.differing || '';
+    if (!hasVars(p.region.text)) {
+        return <span className={
+            `${ regionClasses[p.region.kind] } ${ differingClass }`
+        }>{ p.region.text }</span>;
+    }
+
     const { contrastColor, colors } = vars;
     const { palette: { type, getContrastText }} = theme;
     const text = p.region.text.replace(globalRe(contrastColor), getContrastColorValue(theme));

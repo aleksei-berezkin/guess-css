@@ -1,6 +1,6 @@
-import { ColorVar } from '../model/gen/colorVar';
 import { randomItem } from '../util';
 import { stream } from '../stream/stream';
+import { ColorVar } from '../model/gen/vars';
 
 export type Hue = 'red' | 'blue' | 'gray';
 

@@ -1,9 +1,9 @@
 import { PaletteType } from '@material-ui/core';
-import { ColorVarType } from '../model/gen/colorVar';
 import red from '@material-ui/core/colors/red';
 import blue from '@material-ui/core/colors/blue';
 import blueGrey from '@material-ui/core/colors/blueGrey';
 import { AssignedColorVar, Hue } from './assignColorVar';
+import { ColorVarType } from '../model/gen/vars';
 
 const colors: {
     [hue in Hue]: {

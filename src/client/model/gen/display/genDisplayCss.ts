@@ -4,8 +4,7 @@ import { getNShuffled, randomBounded, randomItemsInOrder } from '../../../util';
 import { getSiblingsSubtree } from '../siblingsSubtree';
 import { stream } from '../../../stream/stream';
 import { RulesParam } from '../../puzzler';
-import { getColorVar } from '../colorVar';
-import { contrastColorRule, contrastColorVar } from '../contrastColorVar';
+import { contrastColorRule, contrastColorVar, getColorVar } from '../vars';
 
 const displays = ['inline', 'block', 'inline-block'];
 

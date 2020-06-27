@@ -12,9 +12,8 @@ import {
 import { getSiblingsSubtree, SiblingsSubtree } from '../siblingsSubtree';
 import { getDeepestSingleChildSubtree, SingleChildSubtree } from '../singleChildSubtree';
 import { optional, Optional, range, stream } from '../../../stream/stream';
-import { getColorVar } from '../colorVar';
 import { RulesParam } from '../../puzzler';
-import { contrastColorRule, contrastColorVar } from '../contrastColorVar';
+import { contrastColorRule, contrastColorVar, getColorVar } from '../vars';
 
 const constantRule = new Rule(
     new TypeSelector('div'),
