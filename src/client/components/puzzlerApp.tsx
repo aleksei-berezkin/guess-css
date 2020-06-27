@@ -76,9 +76,9 @@ function MyAppBar(p: {paletteType: PaletteType, setPaletteType: (paletteType: Pa
     return <>
         <AppBar color={ p.paletteType === 'light' ? 'primary' : 'default' }>
             <Toolbar variant='dense'>
-                <Container maxWidth='sm'>
-                    <Grid container  justify='space-between' alignItems='center'>
-                        <Grid item>
+                <Container maxWidth='sm' disableGutters>
+                    <Grid container alignItems='center'>
+                        <Grid item style={{ flexGrow: 1 }}>
                             <Typography variant="h6">
                                 Guess CSS!
                             </Typography>
@@ -87,8 +87,8 @@ function MyAppBar(p: {paletteType: PaletteType, setPaletteType: (paletteType: Pa
                             <Score/>
                             <DonePuzzler/>
                         </Grid>
-                        <Grid item>
-                            <IconButton onClick={ togglePaletteType }>
+                        <Grid item style={{ flexGrow: 1.38127 }}>
+                            <IconButton onClick={ togglePaletteType } style={{ float: 'right' }}>
                                 {
                                     p.paletteType === 'light' &&
                                     <Brightness2Icon htmlColor='white'/> ||
