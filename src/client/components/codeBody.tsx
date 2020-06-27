@@ -109,16 +109,17 @@ function RegionCode(p: {region: Region}): ReactElement {
     const text = p.region.text.replace(globalRe(contrastColor), getContrastColorValue(theme));
 
     return <>{
-        [...function* toSpans(text: string): IterableIterator<ReactElement> {
+        [...function* toSpans(text: string, key: string): IterableIterator<ReactElement> {
             for (const assignedCol of colors) {
                 const match = new RegExp(`^(.*)(${ escapeRe(assignedCol.id) })(.*)$`).exec(text);
                 if (match) {
                     if (match[1]) {
-                        yield* toSpans(match[1]);  
+                        yield* toSpans(match[1], key + 'a');  
                     } 
 
                     const resolvedCol = resolveColor(assignedCol, type);
                     yield <span
+                        key={ key + 'b'}
                         className={ `${ differingClass }` }
                         style={{
                             backgroundColor: resolvedCol,
@@ -127,16 +128,16 @@ function RegionCode(p: {region: Region}): ReactElement {
                     >{ resolvedCol }</span>;
 
                     if (match[3]) {
-                        yield* toSpans(match[3]);
+                        yield* toSpans(match[3], key + 'c');
                     } 
 
                     return;
                 }
             }
 
-            yield <span className={
+            yield <span key={ key } className={
                 `${ regionClasses[p.region.kind] } ${ differingClass }`
             }>{ text }</span>;
-        }(text)]
+        }(text, '')]
     }</>;
 }

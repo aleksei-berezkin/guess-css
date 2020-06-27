@@ -11,8 +11,6 @@ import path from 'path';
 import { APP_PLACEHOLDER, SCRIPT_PLACEHOLDER, STYLE_PLACEHOLDER } from '../shared/templateConst';
 import { PRELOADED_STATE_ID } from '../shared/preloadedStateId';
 import ServerStyleSheets from '@material-ui/styles/ServerStyleSheets';
-import { ThemeProvider } from '@material-ui/styles';
-import { createTheme } from '../client/components/theme';
 import { UAParser } from 'ua-parser-js';
 import { assignColorVars } from '../client/redux/assignColorVar';
 import { escapeRe } from '../client/util';
@@ -76,9 +74,7 @@ export function sendRenderedApp(req: Request, res: Response) {
     const app = renderToString(
         sheets.collect(
             <Provider store={ createAppStore(state) }>
-                <ThemeProvider theme={ createTheme('light') }>
-                    <PuzzlerApp/>
-                </ThemeProvider>
+                <PuzzlerApp/>
             </Provider>
         )
     );
