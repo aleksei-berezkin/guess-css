@@ -46,3 +46,5 @@ export const createTheme = (paletteType: PaletteType) => createMuiTheme({
         } : {})
     }
 });
+
+export const spacing = 1.5;

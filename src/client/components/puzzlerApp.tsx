@@ -29,6 +29,7 @@ import Brightness2Icon from '@material-ui/icons/Brightness2';
 import BrightnessHigh from '@material-ui/icons/BrightnessHigh';
 import { getContrastColorValue } from './contrastColorValue';
 import { resolveColor } from '../redux/resolveColor';
+import { ContactAuthor } from './contact';
 
 export function PuzzlerApp(): ReactElement {
     const ssr = useSelector(state => state.ssr);
@@ -59,6 +60,9 @@ export function PuzzlerApp(): ReactElement {
                     header={ <CodeHeader title='HTML'/> }
                     code={ htmlCode }
                 />
+            </Grid>
+            <Grid item>
+                <ContactAuthor/>
             </Grid>
         </Grid>
     </ThemeProvider>;

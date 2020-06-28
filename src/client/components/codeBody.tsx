@@ -7,7 +7,7 @@ import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import { useSelector } from 'react-redux';
 import { ofCurrentViewOrUndefined } from '../redux/store';
 import useTheme from '@material-ui/core/styles/useTheme';
-import { escapeRe, globalRe } from '../util';
+import { escapeRe, globalRe, ld } from '../util';
 import { getContrastColorValue } from './contrastColorValue';
 import { resolveColor } from '../redux/resolveColor';
 import { Theme } from '@material-ui/core';
@@ -44,10 +44,6 @@ function Line(p: {regions: Region[]}) {
             (reg, i) => <RegionCode key={ i } region={ reg } />
         )
     }</pre>
-}
-
-function ld(light: string, dark: string, theme: Theme) {
-    return theme.palette.type === 'light' ? light : dark;
 }
 
 const regionStylesObj: (theme: Theme) => {

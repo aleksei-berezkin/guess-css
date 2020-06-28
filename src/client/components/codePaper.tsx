@@ -10,8 +10,7 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { useSelector } from 'react-redux';
 import { ofCurrentView } from '../redux/store';
 import { CodeBody } from './codeBody';
-
-const spacing = 1.5;
+import { spacing } from './theme';
 
 const makeRootStyles = makeStyles(theme => ({
     root: (sideMargins: boolean) => ({

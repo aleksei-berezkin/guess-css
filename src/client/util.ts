@@ -1,4 +1,5 @@
 import { range, Stream, stream } from './stream/stream';
+import { Theme } from '@material-ui/core';
 
 export function randomItem<T>(items: T[]): T {
     return items[randomBounded(items.length)];
@@ -111,4 +112,8 @@ export function globalRe(re: string) {
 
 export function escapeRe(re: string) {
     return re.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&');
+}
+
+export function ld(light: string, dark: string, theme: Theme) {
+    return theme.palette.type === 'light' ? light : dark;
 }
