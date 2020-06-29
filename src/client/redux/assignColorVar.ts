@@ -2,7 +2,7 @@ import { randomItem } from '../util';
 import { stream } from '../stream/stream';
 import { ColorVar } from '../model/gen/vars';
 
-export type Hue = 'red' | 'blue' | 'gray';
+export type Hue = 'red' | 'blue' | 'gray' | 'purple' | 'green' | 'yellow' | 'brown';
 
 export type AssignedColorVar = ColorVar & {
     hue: Hue;
@@ -11,6 +11,9 @@ export type AssignedColorVar = ColorVar & {
 const compatibleHues: [Hue, Hue][] = [
     ['red', 'blue'],
     ['red', 'gray'],
+    ['purple', 'green'],
+    ['purple', 'yellow'],
+    ['blue', 'brown'],
 ];
 
 const allHues = stream(compatibleHues)
