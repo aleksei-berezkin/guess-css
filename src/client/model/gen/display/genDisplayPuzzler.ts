@@ -8,7 +8,7 @@ export function genDisplayPuzzler(): Puzzler {
         [
             new TagNode(
                 'div', ['root'],
-                genClassedDivs(2, 4)
+                genClassedDivs(2, 3)
             )
         ]
     );

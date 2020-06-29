@@ -8,20 +8,21 @@ import { contrastColorRule, contrastColorVar, getColorVar } from '../vars';
 
 export function genPositionCss(body: TagNode): RulesParam {
     const [outer, inner] = getDeepestSingleChildSubtree(body).unfoldToStream().takeLast(2);
-    const [outerColor, innerColor] = range(0, 2).map(i => getColorVar('background', i));
+    const outerBorderColor = getColorVar('border', 0);
+    const innerBgColor = getColorVar('background', 0);
 
     return {
         choices: transpose(innerOuterPositionsShuffled()).map(([outerPosition, innerPosition]) =>
             [
-                [outer, outerPosition, outerColor] as const,
-                [inner, innerPosition, innerColor] as const,
+                [outer, outerPosition, ['border', `2px solid ${ outerBorderColor.id }`] as const] as const,
+                [inner, innerPosition, ['background-color', innerBgColor.id] as const] as const,
             ]
-                .map(([node, position, color]) =>
+                .map(([node, position, declaration]) =>
                     new Rule(
                         getClassSelector(node),
                         [
                             ['position', position, true],
-                            ['background-color', color.id],
+                            declaration,
                             ['left', '3em'],
                         ]
                     )
@@ -36,7 +37,7 @@ export function genPositionCss(body: TagNode): RulesParam {
         ],
         vars: {
             contrastColor: contrastColorVar,
-            colors: [outerColor, innerColor],
+            colors: [outerBorderColor, innerBgColor],
         },
     };
 }

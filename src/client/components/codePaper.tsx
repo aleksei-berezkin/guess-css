@@ -54,11 +54,9 @@ export function CodePaper(
 
 
 const makeCollapsedStyles = makeStyles(theme => ({
-    actionColor: {
-        color: theme.palette.type === 'light' ? theme.palette.grey[600] : theme.palette.grey[400],
-    },
-    actionPointer: {
+    summary: {
         cursor: 'pointer',
+        paddingRight: theme.spacing(1),
     },
     expandIcon: {
         transform: 'rotate(0deg)',
@@ -81,18 +79,21 @@ function SimpleCollapsed(p: { summary: string, children: ReactElement }) {
     }
 
     return <>
-        <IconButton size='small' className={ classes.actionColor } onClick={ toggleCollapsed }>
-            <ChevronRightIcon fontSize='small' className={
-                streamOf(classes.expandIcon)
-                    .appendIf(collapsedOpen, classes.expandIconOpen)
-                    .join(' ')
-            }/>
-        </IconButton>
 
         <Typography
             variant='caption'
-            className={ `${classes.actionColor} ${classes.actionPointer}` }
-            onClick={ toggleCollapsed }>{ p.summary }
+            className={ `${classes.summary}` }
+            onClick={ toggleCollapsed }
+            color='textSecondary'
+        >
+            <IconButton size='small' onClick={ toggleCollapsed } color='inherit'>
+                <ChevronRightIcon fontSize='small' className={
+                    streamOf(classes.expandIcon)
+                        .appendIf(collapsedOpen, classes.expandIconOpen)
+                        .join(' ')
+                }/>
+            </IconButton>
+            { p.summary }
         </Typography>
 
         <Collapse in={ collapsedOpen }>{

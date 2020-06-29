@@ -2,7 +2,7 @@ import { Region } from './region';
 import { Indent } from './indent';
 import { streamOf } from '../stream/stream';
 
-export type Declaration = [
+export type Declaration = readonly [
     string,
     string,
     boolean?
