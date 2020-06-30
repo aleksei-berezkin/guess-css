@@ -152,15 +152,15 @@ function FooterButton(p: {status: ChoiceStatus, checkChoice: () => void}) {
             }
             {
                 p.status === 'userCorrect' &&
-                <CheckCircleOutlineIcon color='primary'/>
+                <CheckCircleOutlineIcon color='primary' titleAccess='correct user answer'/>
             }
             {
                 p.status === 'correct' &&
-                <CheckIcon/>
+                <CheckIcon titleAccess='correct answer'/>
             }
             {
                 p.status === 'incorrect' &&
-                <ErrorOutlineIcon/>
+                <ErrorOutlineIcon titleAccess='incorrect user answer'/>
             }
         </Grid>
     </Grid>

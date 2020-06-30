@@ -83,15 +83,15 @@ function SimpleCollapsed(p: { summary: string, children: ReactElement }) {
         <Typography
             variant='caption'
             className={ `${classes.summary}` }
-            onClick={ toggleCollapsed }
             color='textSecondary'
+            component='label'
         >
             <IconButton size='small' onClick={ toggleCollapsed } color='inherit'>
                 <ChevronRightIcon fontSize='small' className={
                     streamOf(classes.expandIcon)
                         .appendIf(collapsedOpen, classes.expandIconOpen)
                         .join(' ')
-                }/>
+                } titleAccess={ collapsedOpen ? 'collapse' : 'expand'}/>
             </IconButton>
             { p.summary }
         </Typography>

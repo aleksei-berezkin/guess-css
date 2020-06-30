@@ -52,7 +52,7 @@ export function PuzzlerApp(): ReactElement {
     return <ThemeProvider theme={ theme }>
         <CssBaseline/>
         <MyAppBar paletteType={ paletteType } setPaletteType={ setPaletteType }/>
-        <Grid container direction='column' alignItems='center'>
+        <Grid container direction='column' alignItems='center' component='main'>
             <PuzzlerRendered/>
             <Choices/>
             <Grid item>
@@ -95,8 +95,8 @@ function MyAppBar(p: {paletteType: PaletteType, setPaletteType: (paletteType: Pa
                             <IconButton onClick={ togglePaletteType } style={{ float: 'right' }}>
                                 {
                                     p.paletteType === 'light' &&
-                                    <Brightness2Icon htmlColor='white'/> ||
-                                    <BrightnessHigh/>
+                                    <Brightness2Icon htmlColor='white' titleAccess='dark theme'/> ||
+                                    <BrightnessHigh titleAccess='lightTheme'/>
                                 }
                             </IconButton>
                         </Grid>
@@ -213,7 +213,7 @@ function PrevButton() {
     }
 
     return <IconButton onClick={ handlePrev } disabled={ !hasPrev }>
-        <KeyboardArrowLeft/>
+        <KeyboardArrowLeft titleAccess='previous puzzler'/>
     </IconButton>;
 }
 
@@ -235,6 +235,6 @@ function NextButton() {
     return <IconButton onClick={ handleNext }
                        disabled={ !hasNext && !isAnswered }
                        color={ isAnswered && !hasNext ? 'primary' : 'default' }>
-        <KeyboardArrowRight/>
+        <KeyboardArrowRight titleAccess='next puzzler'/>
     </IconButton>;
 }
