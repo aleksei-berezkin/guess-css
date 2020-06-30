@@ -2,9 +2,8 @@ import { PaletteType } from '@material-ui/core';
 import red from '@material-ui/core/colors/red';
 import blue from '@material-ui/core/colors/blue';
 import blueGrey from '@material-ui/core/colors/blueGrey';
-import purple from '@material-ui/core/colors/purple';
-import green from '@material-ui/core/colors/green';
 import yellow from '@material-ui/core/colors/yellow';
+import orange from '@material-ui/core/colors/orange';
 import brown from '@material-ui/core/colors/brown';
 import { AssignedColorVar, Hue } from './assignColorVar';
 import { ColorVarType } from '../model/gen/vars';
@@ -46,33 +45,13 @@ const colors: {
             border: blueGrey[200],
         },
     },
-    purple: {
-        light: {
-            background: purple[100],
-            border: purple[600],
-        },
-        dark: {
-            background: purple[600],
-            border: purple[200],
-        },
-    },
-    green: {
-        light: {
-            background: green[200],
-            border: green[600],
-        },
-        dark: {
-            background: green[700],
-            border: green[300],
-        },
-    },
     yellow: {
         light: {
             background: yellow[400],
             border: yellow[900], 
         },
         dark: {
-            background: yellow[900],
+            background: orange[900],
             border: yellow[500],
         },
     },
