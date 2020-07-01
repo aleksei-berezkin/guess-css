@@ -44,11 +44,11 @@ export class Puzzler {
         return new StylesNode(this.rules.common, false).toRegions(new Indent());
     }
 
-    get commonStyleSummary(): string {
+    get commonStyleSummary(): string[] {
         return stream(this.rules.common)
             .flatMap(r => r.declarations)
             .map(([key, _]) => key)
-            .join(', ');
+            .toArray();
     }
 
     get bodyCode(): Region[][] {

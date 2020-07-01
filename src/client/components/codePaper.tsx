@@ -1,6 +1,6 @@
 import React, { ReactElement, useState } from 'react';
 import { Region } from '../model/region';
-import { streamOf } from '../stream/stream';
+import { stream, streamOf } from '../stream/stream';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -29,7 +29,7 @@ export function CodePaper(
         sideMargins?: boolean,
     }
 ) {
-    const commonStyleSummary = useSelector(ofCurrentView('commonStyleSummary', ''));
+    const commonStyleSummary = useSelector(ofCurrentView('commonStyleSummary', []));
     const classes = makeRootStyles(!!p.sideMargins);
 
     return <Paper className={ classes.root }>
@@ -37,7 +37,7 @@ export function CodePaper(
             p.header
         }
 
-        <CodeBody lines={ p.code } />
+        <CodeBody lines={ p.code } noBottomPadding={ !!p.collapsedCode } />
 
         {
             p.collapsedCode &&
@@ -69,7 +69,7 @@ const makeCollapsedStyles = makeStyles(theme => ({
     },
 }));
 
-function SimpleCollapsed(p: { summary: string, children: ReactElement }) {
+function SimpleCollapsed(p: { summary: string[], children: ReactElement }) {
     const [collapsedOpen, setCollapsedOpen] = useState(false);
     const classes = makeCollapsedStyles();
 
@@ -93,7 +93,13 @@ function SimpleCollapsed(p: { summary: string, children: ReactElement }) {
                         .join(' ')
                 } titleAccess={ collapsedOpen ? 'collapse' : 'expand'}/>
             </IconButton>
-            { p.summary }
+            {
+                stream(p.summary)
+                    .zipWithIndex()
+                    .map(([s, i]) => i < 4 ? s : '...')
+                    .take(5)
+                    .joinBy((_, r) => r === '...' ? '' : ', ')
+            }
         </Typography>
 
         <Collapse in={ collapsedOpen }>{

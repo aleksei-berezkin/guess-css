@@ -19,6 +19,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import { Dispatch } from 'redux';
+import { spacing } from './theme';
 
 
 export function Choices(): ReactElement {
@@ -117,8 +118,8 @@ function NarrowChoices() {
 
 const useFooterStyles = makeStyles(theme => ({
     footer: {
-        paddingTop: theme.spacing(1),
-        paddingBottom: theme.spacing(1.5),
+        paddingTop: theme.spacing(spacing / 2),
+        paddingBottom: theme.spacing(spacing),
     }
 }));
 

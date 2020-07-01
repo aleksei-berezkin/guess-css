@@ -351,7 +351,13 @@ class StreamImpl<P, T> extends Base<P, T> implements Stream<T> {
     }
 
     join(delimiter: string): string {
+        return this.joinBy(() => delimiter);
+    }
+
+    joinBy(getDelimiter: (l: T, r: T) => string): string {
         let result = '';
+        let prev: T = undefined as any;
+        let first = true;
         const itr = this[Symbol.iterator]();
         for ( ; ; ) {
             const n = itr.next();
@@ -359,15 +365,17 @@ class StreamImpl<P, T> extends Base<P, T> implements Stream<T> {
                 break;
             }
 
-            if (!result) {
+            if (first) {
                 result = String(n.value);
+                first = false;
             } else {
-                result += delimiter + String(n.value);
+                result += getDelimiter(prev, n.value) + String(n.value);
             }
+            prev = n.value;
         }
         return result;
     }
-    
+
     last(): Optional<T> {
         return new OptionalImpl(this, function* (items) {
             if (Array.isArray(items)) {
@@ -749,6 +757,7 @@ export interface Stream<T> extends Iterable<T> {
     groupBy<K>(getKey: (item: T) => K): Stream<readonly [K, T[]]>;
     head(): Optional<T>;
     join(delimiter: string): string;
+    joinBy(getDelimiter: (l: T, r: T) => string): string;
     last(): Optional<T>;
     map<U>(mapper: (item: T) => U): Stream<U>;
     randomItem(): Optional<T>

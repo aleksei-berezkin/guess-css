@@ -56,10 +56,7 @@ export function PuzzlerApp(): ReactElement {
             <PuzzlerRendered/>
             <Choices/>
             <Grid item>
-                <CodePaper
-                    header={ <CodeHeader title='HTML'/> }
-                    code={ htmlCode }
-                />
+                <CodePaper code={ htmlCode } />
             </Grid>
             <Grid item>
                 <ContactAuthor/>
@@ -142,7 +139,7 @@ function getDonePuzzlersNum(state: State) {
 
 const useStyles = makeStyles(theme => ({
     layoutSize: {
-        height: 160,
+        height: 130,
         width: 190,
         [theme.breakpoints.up('narrow')]: {
             width: 240,

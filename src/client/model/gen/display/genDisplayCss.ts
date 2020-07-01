@@ -4,7 +4,8 @@ import { getNShuffled, randomBounded, randomItemsInOrder } from '../../../util';
 import { getSiblingsSubtree } from '../siblingsSubtree';
 import { stream } from '../../../stream/stream';
 import { RulesParam } from '../../puzzler';
-import { contrastColorRule, contrastColorVar, getColorVar } from '../vars';
+import { contrastColorVar, getColorVar } from '../vars';
+import { globalRule } from '../globalRule';
 
 const displays = ['inline', 'block', 'inline-block'];
 
@@ -40,7 +41,7 @@ export function genDisplayCss(body: TagNode): RulesParam {
                     ['padding', '.25em'],
                 ]
             ),
-            contrastColorRule,
+            globalRule,
         ],
         vars: {
             contrastColor: contrastColorVar,

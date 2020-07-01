@@ -37,6 +37,17 @@ export const createTheme = (paletteType: PaletteType) => createMuiTheme({
         },
     },
     overrides: {
+        MuiTabs: {
+            root: {
+                minHeight: undefined,
+            },
+        },
+        MuiTab: {
+            root: {
+                padding: 6,
+                minHeight: undefined,
+            },
+        },
         ...(paletteType === 'dark' ? {
             MuiAppBar: {
                 colorDefault: {
@@ -47,4 +58,5 @@ export const createTheme = (paletteType: PaletteType) => createMuiTheme({
     }
 });
 
-export const spacing = 1.5;
+// TODO more on desktop
+export const spacing = 1.0;

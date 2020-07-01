@@ -12,23 +12,26 @@ import { getContrastColorValue } from './contrastColorValue';
 import { resolveColor } from '../redux/resolveColor';
 import { Theme } from '@material-ui/core';
 import { hasVars } from '../model/gen/vars';
+import { spacing } from './theme';
 
 const useStyles = makeStyles(theme => ({
     root: {
-        padding: theme.spacing(1.5),
+        padding: theme.spacing(spacing),
     },
     pre: {
         margin: 0,
         fontFamily: 'Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace',
         fontSize: 12,
-        lineHeight: 1.38,
+        lineHeight: 1.18,
+        letterSpacing: 0.0,
     },
 }));
 
-export function CodeBody(p: { lines: Region[][] }) {
+export function CodeBody(p: { lines: Region[][], noBottomPadding?: boolean }) {
     const classes = useStyles();
+    const inlineStyle = p.noBottomPadding ? { paddingBottom: 0 } : undefined;
 
-    return <Box className={ `code ${ classes.root }` }>{
+    return <Box className={ classes.root } style={ inlineStyle }>{
         p.lines &&
         stream(p.lines).zipWithIndex().map(
             ([regions, i]) => <Line key={ i } regions={ regions }/>

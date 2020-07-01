@@ -15,7 +15,7 @@ export type State = {
     puzzlerViews: {
         source: string,
         styleChoices: Region[][][],
-        commonStyleSummary: string,
+        commonStyleSummary: string[],
         commonStyle: Region[][],
         vars: {
             contrastColor: string,

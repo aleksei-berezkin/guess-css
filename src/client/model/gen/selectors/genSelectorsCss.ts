@@ -13,7 +13,8 @@ import { getSiblingsSubtree, SiblingsSubtree } from '../siblingsSubtree';
 import { getDeepestSingleChildSubtree, SingleChildSubtree } from '../singleChildSubtree';
 import { optional, Optional, range, stream } from '../../../stream/stream';
 import { RulesParam } from '../../puzzler';
-import { contrastColorRule, contrastColorVar, getColorVar } from '../vars';
+import { contrastColorVar, getColorVar } from '../vars';
+import { globalRule } from '../globalRule';
 
 const constantRule = new Rule(
     new TypeSelector('div'),
@@ -56,7 +57,7 @@ export function genRulesChoices(body: TagNode): RulesParam | null {
             .toArray(),
         common: [
             constantRule,
-            contrastColorRule,
+            globalRule,
         ],
         vars: {
             contrastColor: contrastColorVar,

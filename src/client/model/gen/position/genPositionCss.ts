@@ -4,7 +4,8 @@ import { getDeepestSingleChildSubtree } from '../singleChildSubtree';
 import { transpose } from '../../../util';
 import { range, stream } from '../../../stream/stream';
 import { RulesParam } from '../../puzzler';
-import { contrastColorRule, contrastColorVar, getColorVar } from '../vars';
+import { contrastColorVar, getColorVar } from '../vars';
+import { globalRule } from '../globalRule';
 
 export function genPositionCss(body: TagNode): RulesParam {
     const [outer, inner] = getDeepestSingleChildSubtree(body).unfoldToStream().takeLast(2);
@@ -33,7 +34,7 @@ export function genPositionCss(body: TagNode): RulesParam {
                 new ChildCombinator(getClassSelector(outer), new TypeSelector('*')),
                 [['padding', '.5em']]
             ),
-            contrastColorRule,
+            globalRule,
         ],
         vars: {
             contrastColor: contrastColorVar,
