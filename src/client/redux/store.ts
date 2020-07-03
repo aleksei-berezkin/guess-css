@@ -114,5 +114,5 @@ export function createAppStore(preloadedState: State) {
     return configureStore({
         reducer,
         preloadedState,
-    })
+    });
 }

@@ -5,8 +5,6 @@ import { Provider } from 'react-redux';
 import { createAppStore, initialState, State } from './redux/store';
 import { ROOT_EL_ID } from '../shared/templateConst';
 import { PRELOADED_STATE_ID } from '../shared/preloadedStateId';
-import { ThemeProvider } from '@material-ui/styles';
-import { createTheme } from './components/theme';
 
 
 const preloadedState = window[PRELOADED_STATE_ID];

@@ -17,7 +17,6 @@ import Container from '@material-ui/core/Container';
 import Paper from '@material-ui/core/Paper';
 import { CodePaper } from './codePaper';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import { CodeHeader } from './codeHeader';
 import { Choices } from './choices';
 import { STYLE_ID } from '../../shared/templateConst';
 import useTheme from '@material-ui/core/styles/useTheme';

@@ -1,7 +1,7 @@
 {
-  "name": "css-puzzler",
+  "name": "guess-css",
   "version": "0.0.0",
-  "description": "CSS puzzler game",
+  "description": "HTML & CSS puzzler game",
   "main": "src/client/index.tsx",
   "scripts": {
     "dev": "ts-node-dev --no-notify src/server/serveFromMem.ts",
@@ -14,7 +14,7 @@
   },
   "author": "Aleksei Berezkin",
   "license": "ISC",
-  "repository": "https://github.com/aleksei-berezkin/css-puzzler",
+  "repository": "https://github.com/aleksei-berezkin/guess-css",
   "devDependencies": {
     "@types/webpack-dev-middleware": "^3.7.1",
     "@types/webpack-hot-middleware": "^2.25.3",
