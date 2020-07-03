@@ -11,13 +11,14 @@ import Box from '@material-ui/core/Box';
 const useStyles = makeStyles(theme => ({
     root: {
         margin: theme.spacing(spacing),
+        textAlign: 'center',
     },
     icon: {
         verticalAlign: -6,
     }
 }));
 
-export function ContactAuthor() {
+export function Footer() {
     const classes = useStyles();
 
     return <Box className={ classes.root }>
@@ -31,6 +32,9 @@ export function ContactAuthor() {
             <Link target='_blank' color='inherit' href='https://twitter.com/a_v_berezkin'>
                 <TwitterIcon className={ classes.icon} titleAccess='Twitter profile'/>
             </Link>
+        </Typography>
+        <Typography variant='body2' color='textSecondary'>
+            Favicon made by <Link target='blank' href='https://www.flaticon.com/authors/pixel-perfect' title='Pixel perfect'>Pixel perfect</Link> from <Link target='_blank' href='https://flaticon.com/' title="Flaticon">Flaticon</Link>
         </Typography>
     </Box>
 }

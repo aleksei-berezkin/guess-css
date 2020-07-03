@@ -9,10 +9,13 @@ if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'producti
 
 const app: Express = express();
 
-app.get('/', sendRenderedApp);
-app.get('/index.html', sendRenderedApp);
+['/', '/index.html'].forEach(
+    urlPath => app.get(urlPath, sendRenderedApp)
+);
 
-app.use(express.static(path.resolve(__dirname, '..', '..', 'dist')));
+['assets', 'dist'].forEach(
+    dir => app.use(express.static(path.resolve(__dirname, '..', '..', dir)))
+);
 
 const port = process.env.PORT || WEB_DEV_PORT;
 app.listen(port, () => console.log(`Serving from dist on port ${port}. env=${process.env.NODE_ENV}`));
