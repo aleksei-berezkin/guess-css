@@ -5,6 +5,7 @@ import { ThunkAction } from 'redux-thunk';
 import { Action } from 'redux';
 import { stream } from '../stream/stream';
 import { assignColorVars } from './assignColorVar';
+import ReactGA from 'react-ga';
 
 type VoidThunk = ThunkAction<void, State, never, Action<string>>;
 
@@ -37,6 +38,7 @@ export function genNewPuzzler(diffHint: boolean): VoidThunk {
             },
             currentTab: 0,
         }));
+        dispatch(gaNewPuzzler());
     }
 }
 
@@ -44,5 +46,21 @@ export function checkChoice(userChoice: number): VoidThunk {
     return function(dispatch, getState) {
         const isCorrect = stream(getState().puzzlerViews).last().get().status.correctChoice === userChoice;
         dispatch(displayAnswer({userChoice, isCorrect}));
+    }
+}
+
+export function gaInit(): VoidThunk {
+    return function() {
+        ReactGA.initialize('UA-171636839-1');
+        ReactGA.pageview('/');
+    }
+}
+
+export function gaNewPuzzler(): VoidThunk {
+    return function(_, getState) {
+        ReactGA.event({
+            category: 'NewPuzzler',
+            action: String(getState().current),
+        });
     }
 }

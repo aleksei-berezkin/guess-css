@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { mapCurrentView, ofCurrentView, ofCurrentViewOrUndefined, PuzzlerView, State } from '../redux/store';
 import { navNextPuzzler, navPrevPuzzler, resetSsrData } from '../redux/actions';
 import { Dispatch } from 'redux';
-import { genNewPuzzler, initClient } from '../redux/thunks';
+import { gaInit, gaNewPuzzler, genNewPuzzler, initClient } from '../redux/thunks';
 import { stream } from '../stream/stream';
 import AppBar from '@material-ui/core/AppBar';
 import Grid from '@material-ui/core/Grid';
@@ -37,10 +37,12 @@ export function PuzzlerApp(): ReactElement {
     const dispatch = useDispatch();
 
     useEffect(() => {
+        dispatch(gaInit());
         if (ssr) {
             dispatch(resetSsrData());
             const jssStyles = document.getElementById(STYLE_ID)!;
             jssStyles.parentElement!.removeChild(jssStyles);
+            dispatch(gaNewPuzzler());
         } else {
             dispatch(initClient());
         }
