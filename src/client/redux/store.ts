@@ -1,8 +1,7 @@
 import { Region } from '../model/region';
 import {
     displayAnswer,
-    displayNewPuzzler, navNextPuzzler, navPrevPuzzler, resetSsrData, setCurrentTab, setFooterBtnHeight,
-    setTopics,
+    displayNewPuzzler, navNextPuzzler, navPrevPuzzler, resetSsrData, setCurrentTab, setFooterBtnHeight, setTopics,
 } from './actions';
 import { Topic } from '../model/gen/topic';
 import { stream } from '../stream/stream';
@@ -30,7 +29,9 @@ export type State = {
     }[],
     current: number,
     correctAnswers: number,
-    footerBtnHeight: number | null,
+    layoutConstants: {
+        footerBtnHeight: number | undefined,
+    }
     ssr: {
         wide: boolean,
     } | null;
@@ -58,7 +59,9 @@ export const initialState: State = {
     puzzlerViews: [],
     current: -1,
     correctAnswers: 0,
-    footerBtnHeight: null,
+    layoutConstants: {
+        footerBtnHeight: undefined,
+    },
     ssr: null,
 };
 
@@ -99,9 +102,9 @@ const reducer = combineReducers<State>({
             .addCase(displayAnswer, (state, { payload }) => state + (payload.isCorrect && 1 || 0))
     ),
 
-    footerBtnHeight: createReducer(initialState.footerBtnHeight, builder =>
+    layoutConstants: createReducer(initialState.layoutConstants, builder =>
         builder
-            .addCase(setFooterBtnHeight, (state, { payload }) => payload)
+            .addCase(setFooterBtnHeight, (state, { payload }) => { state.footerBtnHeight = payload })
     ),
 
     ssr: createReducer(initialState.ssr, builder =>

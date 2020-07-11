@@ -63,7 +63,9 @@ export function sendRenderedApp(req: Request, res: Response) {
         }],
         current: 0,
         correctAnswers: 0,
-        footerBtnHeight: null,
+        layoutConstants: {
+            footerBtnHeight: undefined,
+        },
         ssr: {
             wide: deviceType !== 'mobile',
         }

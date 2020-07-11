@@ -29,6 +29,11 @@ import BrightnessHigh from '@material-ui/icons/BrightnessHigh';
 import { getContrastColorValue } from './contrastColorValue';
 import { resolveColor } from '../redux/resolveColor';
 import { Footer } from './footer';
+import {
+    BrowserRouter as Router, Switch, Route
+} from 'react-router-dom';
+import { Credits } from './credits';
+import { ScrollToTop } from './scrollToTop';
 
 export function PuzzlerApp(): ReactElement {
     const ssr = useSelector(state => state.ssr);
@@ -53,16 +58,26 @@ export function PuzzlerApp(): ReactElement {
     return <ThemeProvider theme={ theme }>
         <CssBaseline/>
         <MyAppBar paletteType={ paletteType } setPaletteType={ setPaletteType }/>
-        <Grid container direction='column' alignItems='center' component='main'>
-            <PuzzlerRendered/>
-            <Choices/>
-            <Grid item>
-                <CodePaper code={ htmlCode } />
-            </Grid>
-            <Grid item>
-                <Footer/>
-            </Grid>
-        </Grid>
+        <Router>
+            <ScrollToTop />
+            <Switch>
+                <Route path='/' exact>
+                    <Grid container direction='column' alignItems='center' component='main'>
+                        <PuzzlerRendered/>
+                        <Choices/>
+                        <Grid item>
+                            <CodePaper code={ htmlCode } />
+                        </Grid>
+                        <Grid item>
+                            <Footer/>
+                        </Grid>
+                    </Grid>
+                </Route>
+                <Route path='/credits'>
+                    <Credits />
+                </Route>
+            </Switch>
+        </Router>
     </ThemeProvider>;
 }
 

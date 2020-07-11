@@ -7,6 +7,7 @@ import FacebookIcon from '@material-ui/icons/Facebook';
 import RedditIcon from '@material-ui/icons/Reddit';
 import TwitterIcon from '@material-ui/icons/Twitter';
 import Box from '@material-ui/core/Box';
+import { Link as RouterLink } from 'react-router-dom';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -33,8 +34,6 @@ export function Footer() {
                 <TwitterIcon className={ classes.icon} titleAccess='Twitter profile'/>
             </Link>
         </Typography>
-        <Typography variant='body2' color='textSecondary'>
-            Favicon made by <Link target='blank' href='https://www.flaticon.com/authors/pixel-perfect' title='Pixel perfect'>Pixel perfect</Link> from <Link target='_blank' href='https://flaticon.com/' title="Flaticon">Flaticon</Link>
-        </Typography>
+        <Link to='/credits' component={ RouterLink }>Credits</Link>
     </Box>
 }

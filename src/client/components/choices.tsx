@@ -126,9 +126,9 @@ const useFooterStyles = makeStyles(theme => ({
 
 function FooterButton(p: {status: ChoiceStatus, checkChoice: () => void}) {
     const footerStyle = useSelector(state => {
-        if (state.footerBtnHeight) {
+        if (state.layoutConstants.footerBtnHeight) {
             return {
-                minHeight: state.footerBtnHeight,
+                minHeight: state.layoutConstants.footerBtnHeight,
             }
         }
         return undefined;
