@@ -11,6 +11,8 @@
 
     "jsx": "react",
 
+    "resolveJsonModule": true,
+
     "lib": [
       "dom",
       "es6"

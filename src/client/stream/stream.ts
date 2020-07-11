@@ -321,6 +321,16 @@ class StreamImpl<P, T> extends Base<P, T> implements Stream<T> {
         });
     }
 
+    filterAndMap<U extends T>(assertion: (item: T) => item is U): Stream<U> {
+        return new StreamImpl<T, U>(this, function* (items: Iterable<T>) {
+            for (const i of items) {
+                if (assertion(i)) {
+                    yield i;
+                }
+            }
+        });
+    }
+
     find(predicate: (item: T) => boolean): Optional<T> {
         return new OptionalImpl(this, function* (items) {
             for (const i of items) {
@@ -340,8 +350,14 @@ class StreamImpl<P, T> extends Base<P, T> implements Stream<T> {
         });
     }
 
+    forEach(effect: (item: T) => void) {
+        for (const i of this) {
+            effect(i);
+        }
+    }
+
     groupBy<K>(getKey: (item: T) => K): Stream<readonly [K, T[]]> {
-        return new StreamImpl(this, function* (items) {
+        return new StreamImpl<T, readonly [K, T[]]>(this, function* (items) {
             yield *collectToMap(items, getKey);
         });
     }
@@ -709,7 +725,7 @@ class OptionalImpl<P, T> extends Base<P, T> implements Optional<T> {
         return null;
     }
 
-    orElseThrow(createError: () => Error): T {
+    orElseThrow(createError: () => Error = () => new Error('Empty optional')): T {
         const n = this[Symbol.iterator]().next();
         if (!n.done) {
             return n.value;
@@ -752,14 +768,17 @@ export interface Stream<T> extends Iterable<T> {
     distinctBy(getKey: (item: T) => any): Stream<T>;
     equals(other: Iterable<T>): boolean,
     filter(predicate: (item: T) => boolean): Stream<T>;
+    filterAndMap<U extends T>(assertion: (item: T) => item is U): Stream<U>;
     find(predicate: (item: T) => boolean): Optional<T>;
     flatMap<U>(mapper: (item: T) => Iterable<U>): Stream<U>;
+    forEach(effect: (item: T) => void): void;
     groupBy<K>(getKey: (item: T) => K): Stream<readonly [K, T[]]>;
     head(): Optional<T>;
     join(delimiter: string): string;
     joinBy(getDelimiter: (l: T, r: T) => string): string;
     last(): Optional<T>;
     map<U>(mapper: (item: T) => U): Stream<U>;
+    // parallel(): T extends Promise<infer U> ? ParallelStream<U> : never,
     randomItem(): Optional<T>
     reduce(reducer: (l: T, r: T) => T): Optional<T>;
     reduceLeft<U>(zero: U, reducer: (l: U, r: T) => U): U;
@@ -793,7 +812,7 @@ export interface Optional<T> extends Iterable<T> {
     orElse<U>(other: U): T | U;
     orElseGet<U>(get: () => U): T | U;
     orElseNull(): T | null;
-    orElseThrow(createError: () => Error): T;
+    orElseThrow(createError?: () => Error): T;
     orElseUndefined(): T | undefined;
     resolve(): OptionalResolved<T>
     toArray(): T[];

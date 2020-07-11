@@ -6,10 +6,11 @@
   "scripts": {
     "dev": "ts-node-dev --no-notify src/server/serveFromMem.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev-dist-build": "NODE_ENV=development webpack --config webpackDist.js",
-    "dev-dist-start": "ts-node-dev --no-notify src/server/serveFromDist.ts",
+    "dev-build": "NODE_ENV=development webpack --config webpackDist.js",
+    "dev-start": "ts-node-dev --no-notify src/server/serveFromDist.ts",
     "build": "NODE_ENV=production webpack --config webpackDist.js",
     "start": "NODE_ENV=production ts-node src/server/serveFromDist.ts",
+    "generate": "ts-node-dev --no-notify scripts/generate.ts",
     "analyze": "NODE_ENV=production webpack --config webpackAnalyze.js"
   },
   "author": "Aleksei Berezkin",
