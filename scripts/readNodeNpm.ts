@@ -33,13 +33,11 @@ function which(name: string): Promise<string> {
     return Promise.all(
         stream(process.env.PATH!.split(path.delimiter))
             .map(dir =>
-                new Promise<string | null>(resolve =>
-                    fs.promises.realpath(path.resolve(dir, name))
-                        .then(
-                            resolve,
-                            () => resolve(null)
-                        )
-                )
+                fs.promises.realpath(path.resolve(dir, name))
+                    .then(
+                        realpath => realpath,
+                        () => null
+                    )
             )
     ).then(executables =>
         stream(executables)
