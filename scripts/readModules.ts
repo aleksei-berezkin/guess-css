@@ -38,21 +38,12 @@ const dataPromises: Stream<Promise<PackageJsonData | LicenseData | null>> =
                 depName,
                 path: path.resolve(dir, 'package.json'),
             },
-            {
-                type: 'LICENSE',
-                depName,
-                path: path.resolve(dir, 'LICENSE'),
-            },
-            {
-                type: 'LICENSE',
-                depName,
-                path: path.resolve(dir, 'LICENSE.md'),
-            },
-            {
-                type: 'LICENSE',
-                depName,
-                path: path.resolve(dir, 'LICENSE.txt'),
-            }
+            ...['LICENSE', 'LICENSE.md', 'LICENSE.txt', 'license.md']
+                .map(filename => ({
+                    type: 'LICENSE' as const,
+                    depName,
+                    path: path.resolve(dir, filename)
+                }))
         ])
         .map(file =>
             new Promise<PackageJsonData | LicenseData | null>(async resolve => {
