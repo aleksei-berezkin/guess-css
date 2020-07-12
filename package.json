@@ -8,6 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev-build": "NODE_ENV=development webpack --config webpackDist.js",
     "dev-start": "ts-node-dev --no-notify src/server/serveFromDist.ts",
+    "prebuild": "npm run generate",
     "build": "NODE_ENV=production webpack --config webpackDist.js",
     "start": "NODE_ENV=production ts-node src/server/serveFromDist.ts",
     "generate": "ts-node-dev --no-notify scripts/generate.ts",
