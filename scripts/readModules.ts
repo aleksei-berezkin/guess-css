@@ -94,7 +94,7 @@ export const readModules: Promise<Stream<DepFullData>> = Promise.all(dataPromise
                         return [data[1], data[0]] as const;
                     }
                 }
-                throw new Error('Bad data: ' + data);
+                throw new Error('Bad data: ' + JSON.stringify(data));
             })
             .map(([p, l]) => ({
                 depName: p.depName,
