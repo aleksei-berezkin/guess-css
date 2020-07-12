@@ -9,7 +9,9 @@ if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'producti
 
 const app: Express = express();
 
-['/', '/credits', '/index.html'].forEach(
+app.all('/index.html', (_, res) => res.redirect('/'));
+
+['/', '/credits'].forEach(
     urlPath => app.get(urlPath, sendRenderedApp)
 );
 
