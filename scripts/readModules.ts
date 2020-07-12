@@ -17,6 +17,7 @@ type LicenseFile = {
 }
 
 type PackageJsonData = PackageJsonFile & {
+    description: string,
     license: string,
     homepage: string,
 }
@@ -60,6 +61,7 @@ const dataPromises: Stream<Promise<PackageJsonData | LicenseData | null>> =
                     const json = JSON.parse(String(buf));
                     resolve({
                         ...file,
+                        description: json.description,
                         license: json.license,
                         homepage: json.homepage,
                     });
@@ -96,6 +98,7 @@ export const readModules: Promise<Stream<DepFullData>> = Promise.all(dataPromise
             })
             .map(([p, l]) => ({
                 depName: p.depName,
+                description: p.description,
                 homepage: p.homepage,
                 license: p.license,
                 licenseText: l.text,

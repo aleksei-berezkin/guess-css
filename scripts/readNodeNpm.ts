@@ -3,16 +3,17 @@ import fs from 'fs';
 import { DepFullData } from './depFullData';
 import { stream } from '../src/client/stream/stream';
 
-export const readNode = readLicense('node', process.argv0, 'https://nodejs.org/', '(Multiple, see text)');
+export const readNode = readLicense('node', 'JavaScript runtime built on Chrome\'s V8 JavaScript engine', process.argv0, 'https://nodejs.org/', '');
 export const readNpm = which('npm')
-    .then(ex => readLicense('npm', ex, 'https://www.npmjs.com/', 'Artistic License 2.0'));
+    .then(ex => readLicense('npm', 'Package manager for Node.js', ex, 'https://www.npmjs.com/', 'Artistic License 2.0'));
 
-function readLicense(name: string, executable: string, homepage: string, license: string): Promise<DepFullData> {
+function readLicense(name: string, description: string, executable: string, homepage: string, license: string): Promise<DepFullData> {
     return new Promise(resolve => {
         function _readLicense(dir: string) {
             fs.promises.readFile(path.resolve(dir, 'LICENSE'))
                 .then(buf => resolve({
                     depName: name,
+                    description,
                     homepage,
                     license,
                     licenseText: String(buf),

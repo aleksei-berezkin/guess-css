@@ -7,7 +7,7 @@ import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import { useSelector } from 'react-redux';
 import { ofCurrentViewOrUndefined } from '../redux/store';
 import useTheme from '@material-ui/core/styles/useTheme';
-import { escapeRe, globalRe, ld } from '../util';
+import { escapeRe, globalRe, ld, monospaceFonts } from '../util';
 import { getContrastColorValue } from './contrastColorValue';
 import { resolveColor } from '../redux/resolveColor';
 import { Theme } from '@material-ui/core';
@@ -20,7 +20,7 @@ const useStyles = makeStyles(theme => ({
     },
     pre: {
         margin: 0,
-        fontFamily: 'Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace',
+        fontFamily: monospaceFonts,
         fontSize: 12,
         lineHeight: 1.18,
         letterSpacing: 0.0,

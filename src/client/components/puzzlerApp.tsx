@@ -74,7 +74,9 @@ export function PuzzlerApp(): ReactElement {
                     </Grid>
                 </Route>
                 <Route path='/credits'>
-                    <Credits />
+                    <Container maxWidth='sm'>
+                        <Credits />
+                    </Container>
                 </Route>
             </Switch>
         </Router>
