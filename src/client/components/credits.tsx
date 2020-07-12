@@ -13,6 +13,7 @@ import { monospaceFonts } from '../util';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import Button from '@material-ui/core/Button';
+import { routes } from '../routes';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -90,7 +91,7 @@ function Back({ margins = false }) {
     const classes = useStyles();
     const className = margins ? classes.backMargins : undefined;
 
-    return <Button to='/' component={ RouterLink }
+    return <Button to={ routes.root } component={ RouterLink }
                    size='small' fullWidth color='primary'
                    className={ className }>
         Back to puzzler</Button>;

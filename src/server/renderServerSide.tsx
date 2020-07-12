@@ -76,7 +76,7 @@ export function sendRenderedApp(req: Request, res: Response) {
     const app = renderToString(
         sheets.collect(
             <Provider store={ createAppStore(state) }>
-                <PuzzlerApp ssrRoute={ req.path }/>
+                <PuzzlerApp staticRoute={ req.path }/>
             </Provider>
         )
     );

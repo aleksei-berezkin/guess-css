@@ -1,41 +1,32 @@
 import React, { ReactElement, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { mapCurrentView, ofCurrentView, ofCurrentViewOrUndefined, PuzzlerView, State } from '../redux/store';
-import { navNextPuzzler, navPrevPuzzler, resetSsrData } from '../redux/actions';
-import { Dispatch } from 'redux';
-import { gaInit, gaNewPuzzler, genNewPuzzler, initClient } from '../redux/thunks';
+import { ofCurrentView, State } from '../redux/store';
+import { resetSsrData } from '../redux/actions';
+import { gaInit, gaNewPuzzler, initClient } from '../redux/thunks';
 import { stream } from '../stream/stream';
 import AppBar from '@material-ui/core/AppBar';
 import Grid from '@material-ui/core/Grid';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
-import makeStyles from '@material-ui/core/styles/makeStyles';
 import IconButton from '@material-ui/core/IconButton';
-import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
-import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import Container from '@material-ui/core/Container';
-import Paper from '@material-ui/core/Paper';
 import { CodePaper } from './codePaper';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { Choices } from './choices';
 import { STYLE_ID } from '../../shared/templateConst';
-import useTheme from '@material-ui/core/styles/useTheme';
-import { PaletteType, Theme } from '@material-ui/core';
-import { globalRe } from '../util';
+import { PaletteType } from '@material-ui/core';
 import { ThemeProvider } from '@material-ui/styles';
 import { createTheme } from './theme';
 import Brightness2Icon from '@material-ui/icons/Brightness2';
 import BrightnessHigh from '@material-ui/icons/BrightnessHigh';
-import { getContrastColorValue } from './contrastColorValue';
-import { resolveColor } from '../redux/resolveColor';
 import { Footer } from './footer';
-import {
-    BrowserRouter, StaticRouter, Switch, Route
-} from 'react-router-dom';
+import { BrowserRouter, Route, StaticRouter, Switch } from 'react-router-dom';
 import { Credits } from './credits';
 import { ScrollToTop } from './scrollToTop';
+import { routes } from '../routes';
+import { PuzzlerRendered } from './puzzlerRendered';
 
-export function PuzzlerApp(p: { ssrRoute?: string }): ReactElement {
+export function PuzzlerApp(p: { staticRoute?: string }): ReactElement {
     const ssr = useSelector(state => state.ssr);
     const [paletteType, setPaletteType] = useState<PaletteType>('light');
     const dispatch = useDispatch();
@@ -58,45 +49,18 @@ export function PuzzlerApp(p: { ssrRoute?: string }): ReactElement {
         <CssBaseline/>
         <MyAppBar paletteType={ paletteType } setPaletteType={ setPaletteType }/>
         {
-            p.ssrRoute &&
-            <StaticRouter location={ p.ssrRoute }>
-                <RouterBody/>
+            p.staticRoute &&
+            <StaticRouter location={ p.staticRoute }>
+                <AppBody/>
             </StaticRouter>
         }
         {
-            !p.ssrRoute &&
+            !p.staticRoute &&
             <BrowserRouter>
-                <RouterBody/>
+                <AppBody/>
             </BrowserRouter>
         }
     </ThemeProvider>;
-}
-
-function RouterBody() {
-    const htmlCode = useSelector(ofCurrentView('body', []));
-
-    return <>
-        <ScrollToTop />
-        <Switch>
-            <Route path='/' exact>
-                <Grid container direction='column' alignItems='center' component='main'>
-                    <PuzzlerRendered/>
-                    <Choices/>
-                    <Grid item>
-                        <CodePaper code={ htmlCode } />
-                    </Grid>
-                    <Grid item>
-                        <Footer/>
-                    </Grid>
-                </Grid>
-            </Route>
-            <Route path='/credits'>
-                <Container maxWidth='sm'>
-                    <Credits />
-                </Container>
-            </Route>
-        </Switch>
-    </>
 }
 
 function MyAppBar(p: {paletteType: PaletteType, setPaletteType: (paletteType: PaletteType) => void}) {
@@ -171,101 +135,29 @@ function getDonePuzzlersNum(state: State) {
     return state.puzzlerViews.length - 1;
 }
 
-const useStyles = makeStyles(theme => ({
-    layoutSize: {
-        height: 130,
-        width: 190,
-        [theme.breakpoints.up('narrow')]: {
-            width: 240,
-        },
-    },
-    iframe: {
-        border: 'none',
-    },
-    iframePaper: {
-        marginTop: theme.spacing(1),
-    },
-}));
+function AppBody() {
+    const htmlCode = useSelector(ofCurrentView('body', []));
 
-function PuzzlerRendered() {
-    const source = useSelector(ofCurrentView('source', ''));
-    const vars = useSelector(ofCurrentViewOrUndefined('vars'));
-    const theme = useTheme();
-    const classes = useStyles();
-
-    return <Grid container justify='center' alignItems='center'>
-        <Grid item>
-            <PrevButton/>
-        </Grid>
-        <Grid item>
-            <Paper className={ `${classes.layoutSize} ${classes.iframePaper}` }>
-                <iframe className={ `${classes.layoutSize} ${classes.iframe}` } srcDoc={
-                    insertColors(source, vars, theme)
-                }/>
-            </Paper>
-        </Grid>
-        <Grid item>
-            <NextButton/>
-        </Grid>
-    </Grid>;
-}
-
-function insertColors(src: string, vars: PuzzlerView['vars'] | undefined, theme: Theme): string {
-    if (!vars) {
-        return src;
-    }
-
-    const colorsInserted = vars.colors
-        .reduceRight(
-            (t, assignedCol) => t.replace(
-                globalRe(assignedCol.id),
-                resolveColor(assignedCol, theme.palette.type),
-            ),
-            src
-        );
-
-    const contrastColorValue = getContrastColorValue(theme);
-    return colorsInserted.replace(
-        globalRe(vars.contrastColor),
-        contrastColorValue,
-    );
-}
-
-function PrevButton() {
-    const hasPrev = useSelector(state => state.current > 0);
-    const dispatch: Dispatch = useDispatch();
-
-    function handlePrev() {
-        if (hasPrev) {
-            dispatch(navPrevPuzzler());
-        } else {
-            throw new Error('Cannot navPrev')
-        }
-    }
-
-    return <IconButton onClick={ handlePrev } disabled={ !hasPrev }>
-        <KeyboardArrowLeft titleAccess='previous puzzler'/>
-    </IconButton>;
-}
-
-function NextButton() {
-    const hasNext = useSelector(state => state.current < state.puzzlerViews.length - 1);
-    const isAnswered = useSelector(mapCurrentView(v => v.status.userChoice != null, false));
-    const dispatch = useDispatch();
-
-    function handleNext() {
-        if (hasNext) {
-            dispatch(navNextPuzzler());
-        } else if (isAnswered) {
-            dispatch(genNewPuzzler(false));
-        } else {
-            throw new Error('Cannot navNext');
-        }
-    }
-
-    return <IconButton onClick={ handleNext }
-                       disabled={ !hasNext && !isAnswered }
-                       color={ isAnswered && !hasNext ? 'primary' : 'default' }>
-        <KeyboardArrowRight titleAccess='next puzzler'/>
-    </IconButton>;
+    return <>
+        <ScrollToTop />
+        <Switch>
+            <Route path={ routes.root } exact>
+                <Grid container direction='column' alignItems='center' component='main'>
+                    <PuzzlerRendered/>
+                    <Choices/>
+                    <Grid item>
+                        <CodePaper code={ htmlCode } />
+                    </Grid>
+                    <Grid item>
+                        <Footer/>
+                    </Grid>
+                </Grid>
+            </Route>
+            <Route path={ routes.credits }>
+                <Container maxWidth='sm'>
+                    <Credits />
+                </Container>
+            </Route>
+        </Switch>
+    </>
 }
