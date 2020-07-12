@@ -9,12 +9,12 @@ if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'producti
 
 const app: Express = express();
 
-['/', '/index.html'].forEach(
-    urlPath => app.get(urlPath, sendRenderedApp)
-);
-
 ['assets', 'dist'].forEach(
     dir => app.use(express.static(path.resolve(__dirname, '..', '..', dir)))
+);
+
+['/', '/credits', '/index.html'].forEach(
+    urlPath => app.get(urlPath, sendRenderedApp)
 );
 
 const port = process.env.PORT || WEB_DEV_PORT;

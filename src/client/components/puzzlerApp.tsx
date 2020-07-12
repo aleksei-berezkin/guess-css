@@ -35,7 +35,7 @@ import {
 import { Credits } from './credits';
 import { ScrollToTop } from './scrollToTop';
 
-export function PuzzlerApp({ isServer = false }): ReactElement {
+export function PuzzlerApp(p: { ssrRoute?: string }): ReactElement {
     const ssr = useSelector(state => state.ssr);
     const [paletteType, setPaletteType] = useState<PaletteType>('light');
     const dispatch = useDispatch();
@@ -58,13 +58,13 @@ export function PuzzlerApp({ isServer = false }): ReactElement {
         <CssBaseline/>
         <MyAppBar paletteType={ paletteType } setPaletteType={ setPaletteType }/>
         {
-            isServer &&
-            <StaticRouter location='/'>
+            p.ssrRoute &&
+            <StaticRouter location={ p.ssrRoute }>
                 <RouterBody/>
             </StaticRouter>
         }
         {
-            !isServer &&
+            !p.ssrRoute &&
             <BrowserRouter>
                 <RouterBody/>
             </BrowserRouter>
