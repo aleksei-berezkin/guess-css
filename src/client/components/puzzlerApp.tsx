@@ -30,14 +30,13 @@ import { getContrastColorValue } from './contrastColorValue';
 import { resolveColor } from '../redux/resolveColor';
 import { Footer } from './footer';
 import {
-    BrowserRouter as Router, Switch, Route
+    BrowserRouter, StaticRouter, Switch, Route
 } from 'react-router-dom';
 import { Credits } from './credits';
 import { ScrollToTop } from './scrollToTop';
 
-export function PuzzlerApp(): ReactElement {
+export function PuzzlerApp({ isServer = false }): ReactElement {
     const ssr = useSelector(state => state.ssr);
-    const htmlCode = useSelector(ofCurrentView('body', []));
     const [paletteType, setPaletteType] = useState<PaletteType>('light');
     const dispatch = useDispatch();
 
@@ -58,29 +57,46 @@ export function PuzzlerApp(): ReactElement {
     return <ThemeProvider theme={ theme }>
         <CssBaseline/>
         <MyAppBar paletteType={ paletteType } setPaletteType={ setPaletteType }/>
-        <Router>
-            <ScrollToTop />
-            <Switch>
-                <Route path='/' exact>
-                    <Grid container direction='column' alignItems='center' component='main'>
-                        <PuzzlerRendered/>
-                        <Choices/>
-                        <Grid item>
-                            <CodePaper code={ htmlCode } />
-                        </Grid>
-                        <Grid item>
-                            <Footer/>
-                        </Grid>
-                    </Grid>
-                </Route>
-                <Route path='/credits'>
-                    <Container maxWidth='sm'>
-                        <Credits />
-                    </Container>
-                </Route>
-            </Switch>
-        </Router>
+        {
+            isServer &&
+            <StaticRouter location='/'>
+                <RouterBody/>
+            </StaticRouter>
+        }
+        {
+            !isServer &&
+            <BrowserRouter>
+                <RouterBody/>
+            </BrowserRouter>
+        }
     </ThemeProvider>;
+}
+
+function RouterBody() {
+    const htmlCode = useSelector(ofCurrentView('body', []));
+
+    return <>
+        <ScrollToTop />
+        <Switch>
+            <Route path='/' exact>
+                <Grid container direction='column' alignItems='center' component='main'>
+                    <PuzzlerRendered/>
+                    <Choices/>
+                    <Grid item>
+                        <CodePaper code={ htmlCode } />
+                    </Grid>
+                    <Grid item>
+                        <Footer/>
+                    </Grid>
+                </Grid>
+            </Route>
+            <Route path='/credits'>
+                <Container maxWidth='sm'>
+                    <Credits />
+                </Container>
+            </Route>
+        </Switch>
+    </>
 }
 
 function MyAppBar(p: {paletteType: PaletteType, setPaletteType: (paletteType: PaletteType) => void}) {
