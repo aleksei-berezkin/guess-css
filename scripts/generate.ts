@@ -7,12 +7,21 @@ const generatedDir = path.resolve(__dirname, '..', 'generated');
 
 Promise.all([readModules, readNode, readNpm, fs.promises.mkdir(generatedDir, { recursive: true })])
     .then(([modules, node, npm]) => {
-            const deps = modules.append(node).append(npm)
-                .sortOn(({depName}) => depName)
+            const depsFull = modules.append(node).append(npm);
+            const deps = depsFull
+                .map(({name, description, homepage}) => ({
+                    name,
+                    description,
+                    homepage,
+                }))
+                .sortOn(({name}) => name)
                 .toArray();
-            fs.writeFileSync(
-                path.resolve(generatedDir, 'deps.json'),
-                JSON.stringify(deps),
-            );
+            const licenses = depsFull
+                .map(({name, licenseText}) => [name, licenseText] as const)
+                .toObject();
+            return Promise.all([
+                fs.promises.writeFile(path.resolve(generatedDir, 'deps.json'), JSON.stringify(deps)),
+                fs.promises.writeFile(path.resolve(generatedDir, 'licenses.json'), JSON.stringify(licenses)),
+            ]);
         }
     );

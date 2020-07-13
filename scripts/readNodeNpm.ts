@@ -12,7 +12,7 @@ function readLicense(name: string, description: string, executable: string, home
         function _readLicense(dir: string) {
             fs.promises.readFile(path.resolve(dir, 'LICENSE'))
                 .then(buf => resolve({
-                    depName: name,
+                    name,
                     description,
                     homepage,
                     license,

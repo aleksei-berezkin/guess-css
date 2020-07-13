@@ -1,5 +1,5 @@
 export type DepFullData = {
-    depName: string,
+    name: string,
     description: string,
     homepage: string,
     license: string,

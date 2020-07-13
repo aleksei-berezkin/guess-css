@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import Link from '@material-ui/core/Link';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import deps from '../../../generated/deps.json';
-import Accordion from '@material-ui/core/Accordion';
+import Accordion, { AccordionProps } from '@material-ui/core/Accordion';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
@@ -43,6 +43,7 @@ const useStyles = makeStyles(theme => ({
 
 export function Credits() {
     const classes = useStyles();
+    const [visible, setVisible] = useState<{[k: string]: boolean}>({});
 
     return <Box className={ classes.root }>
         <Back/>
@@ -68,19 +69,26 @@ export function Credits() {
 
         <Typography variant='h5'>Dependencies</Typography>
         {
-            deps.map(dep =>
-                <Accordion>
+            deps.map(dep => {
+                const onChange: AccordionProps['onChange'] = (e, expanded) => {
+                    setVisible({
+                        ...visible,
+                        [dep.name]: expanded,
+                    })
+                };
+
+                return <Accordion key={ dep.name } onChange={ onChange }>
                     <AccordionSummary
-                        expandIcon={<ExpandMoreIcon />}>
-                        <Typography variant='body2'>{ dep.depName }</Typography>
+                        expandIcon={ <ExpandMoreIcon/> }>
+                        <Typography variant='body2'>{ dep.name }</Typography>
                     </AccordionSummary>
                     <AccordionDetails className={ classes.accDetails }>
                         <Typography variant='body2'>{ dep.description }</Typography>
                         <Typography variant='body2'><Link target='_blank' href={ dep.homepage }>{ dep.homepage }</Link></Typography>
-                        <Typography component='pre' className={ classes.licenseText }>{ dep.licenseText }</Typography>
+                        <License name={ dep.name } visible={ visible[dep.name] }/>
                     </AccordionDetails>
-                </Accordion>    
-            )
+                </Accordion>;
+            })
         }
 
         <Back margins/>
@@ -95,4 +103,20 @@ function Back({ margins = false }) {
                    size='small' fullWidth color='primary'
                    className={ className }>
         Back to puzzler</Button>;
+}
+
+function License(p: {name: string, visible: boolean | undefined}) {
+    const classes = useStyles();
+    const [licenseText, setLicenseText] = useState('');
+    useEffect(() => {
+        if (p.visible && !licenseText) {
+            fetch(`/licenses?name=${ p.name }`)
+                .then(res => res.text())
+                .then(setLicenseText);
+        }
+    }, [p.visible]);
+
+    return <Typography component='pre' className={ classes.licenseText }>
+        { licenseText }
+    </Typography>
 }

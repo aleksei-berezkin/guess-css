@@ -6,13 +6,13 @@ import { DepFullData } from './depFullData';
 
 type PackageJsonFile = {
     type: 'package.json',
-    depName: string,
+    name: string,
     path: string,
 }
 
 type LicenseFile = {
     type: 'LICENSE',
-    depName: string,
+    name: string,
     path: string,
 }
 
@@ -32,16 +32,16 @@ const dataPromises: Stream<Promise<PackageJsonData | LicenseData | null>> =
     entriesStream<{[k in DepName]?: string}>(localPackageJson.dependencies)
         .appendAll(entriesStream(localPackageJson.devDependencies))
         .map(([name, _]) => [name, path.resolve(__dirname, '..', 'node_modules', name)])
-        .flatMap<PackageJsonFile | LicenseFile>(([depName, dir]) => [
+        .flatMap<PackageJsonFile | LicenseFile>(([name, dir]) => [
             {
                 type: 'package.json',
-                depName,
+                name,
                 path: path.resolve(dir, 'package.json'),
             },
             ...['LICENSE', 'LICENSE.md', 'LICENSE.txt', 'license.md']
                 .map(filename => ({
                     type: 'LICENSE' as const,
-                    depName,
+                    name,
                     path: path.resolve(dir, filename)
                 }))
         ])
@@ -60,11 +60,17 @@ const dataPromises: Stream<Promise<PackageJsonData | LicenseData | null>> =
                 }
     
                 try {
-                    const buf = await fs.promises.readFile(file.path);
-                    resolve({
-                        ...file,
-                        text: String(buf),
-                    })
+                    const realPath = await fs.promises.realpath(file.path);
+                    // Workaround register-insensitive systems
+                    if (path.basename(realPath) === path.basename(file.path)) {
+                        const buf = await fs.promises.readFile(realPath);
+                        resolve({
+                            ...file,
+                            text: String(buf),
+                        })
+                    } else {
+                        resolve(null);
+                    }
                 } catch (_) {
                     resolve(null);
                 }
@@ -75,7 +81,7 @@ export const readModules: Promise<Stream<DepFullData>> = Promise.all(dataPromise
     .then(datas =>
         stream(datas)
             .filterAndMap((data): data is PackageJsonData | LicenseData => !!data)
-            .groupBy(data => data.depName)
+            .groupBy(data => data.name)
             .map(([_, data]) => {
                 if (data.length === 2) {
                     if (data[0].type === 'package.json' && data[1].type === 'LICENSE') {
@@ -88,7 +94,7 @@ export const readModules: Promise<Stream<DepFullData>> = Promise.all(dataPromise
                 throw new Error('Bad data: ' + JSON.stringify(data));
             })
             .map(([p, l]) => ({
-                depName: p.depName,
+                name: p.name,
                 description: p.description,
                 homepage: p.homepage,
                 license: p.license,
