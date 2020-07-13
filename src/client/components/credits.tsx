@@ -13,7 +13,9 @@ import { monospaceFonts } from '../util';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import Button from '@material-ui/core/Button';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { routes } from '../routes';
+import Grid from '@material-ui/core/Grid';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -115,6 +117,14 @@ function License(p: {name: string, visible: boolean | undefined}) {
                 .then(setLicenseText);
         }
     }, [p.visible]);
+
+    if (!licenseText) {
+        return <Grid container justify='center'>
+            <Grid item>
+                <CircularProgress color='inherit'/>
+            </Grid>
+        </Grid>
+    }
 
     return <Typography component='pre' className={ classes.licenseText }>
         { licenseText }
