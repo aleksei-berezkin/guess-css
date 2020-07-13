@@ -3,7 +3,7 @@ import path from 'path';
 import { sendRenderedApp } from './renderServerSide';
 import { WEB_DEV_PORT } from './portsConfig';
 import { routes } from '../client/routes';
-import { entriesStream } from '../client/stream/stream';
+import { entryStream } from '../client/stream/stream';
 import { serveLicenses } from './serveLicenses';
 
 if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'production') {
@@ -14,7 +14,7 @@ const app: Express = express();
 
 app.all('/index.html', (_, res) => res.redirect('/'));
 
-entriesStream(routes).forEach(
+entryStream(routes).forEach(
     ([_, route]) => app.get(route, sendRenderedApp)
 );
 

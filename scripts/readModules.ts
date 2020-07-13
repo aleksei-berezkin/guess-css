@@ -1,4 +1,4 @@
-import { entriesStream, stream, Stream } from '../src/client/stream/stream';
+import { entryStream, stream, Stream } from '../src/client/stream/stream';
 import * as localPackageJson from '../package.json';
 import path from 'path';
 import fs from 'fs';
@@ -29,8 +29,8 @@ type LicenseData = LicenseFile & {
 type DepName = keyof typeof localPackageJson.dependencies | keyof typeof localPackageJson.devDependencies;
 
 const dataPromises: Stream<Promise<PackageJsonData | LicenseData | null>> =
-    entriesStream<{[k in DepName]?: string}>(localPackageJson.dependencies)
-        .appendAll(entriesStream(localPackageJson.devDependencies))
+    entryStream<{[k in DepName]?: string}>(localPackageJson.dependencies)
+        .appendAll(entryStream(localPackageJson.devDependencies))
         .map(([name, _]) => [name, path.resolve(__dirname, '..', 'node_modules', name)])
         .flatMap<PackageJsonFile | LicenseFile>(([name, dir]) => [
             {

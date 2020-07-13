@@ -1,14 +1,14 @@
 import { RingBuffer } from './ringBuffer';
 
 export function stream<T>(input: Iterable<T>): Stream<T> {
-    return new StreamImpl(input, Base._IDENTITY);
+    return new StreamImpl(input, identityOp());
 }
 
 export function streamOf<T>(...input: T[]): Stream<T> {
-    return new StreamImpl(input, Base._IDENTITY);
+    return new StreamImpl(input, identityOp());
 }
 
-export function entriesStream<O extends {[k: string]: any}>(obj: O): Stream<readonly [keyof O, O[keyof O]]> {
+export function entryStream<O extends {[k: string]: any}>(obj: O): Stream<readonly [keyof O, O[keyof O]]> {
     return new StreamImpl<
             readonly [keyof O, O[keyof O]],
             readonly [keyof O, O[keyof O]]>
@@ -16,7 +16,7 @@ export function entriesStream<O extends {[k: string]: any}>(obj: O): Stream<read
         for (const k of Object.keys(obj)) {
             yield [k, obj[k]] as const;
         }
-    }(), Base._IDENTITY);
+    }(), identityOp());
 }
 
 export function range(from: number, bound: number): Stream<number> {
@@ -24,7 +24,7 @@ export function range(from: number, bound: number): Stream<number> {
         for (let i = from; i < bound; i++) {
             yield i;
         }
-    }(), Base._IDENTITY);
+    }(), identityOp());
 }
 
 export function abc(): Stream<string> {
@@ -37,7 +37,7 @@ export function abc(): Stream<string> {
                 break;
             }
         }
-    }(), Base._IDENTITY);
+    }(), identityOp());
 }
 
 export function same<T>(item: T): Stream<T> {
@@ -45,7 +45,7 @@ export function same<T>(item: T): Stream<T> {
         for ( ; ; ) {
             yield item;
         }
-    }(), Base._IDENTITY);
+    }(), identityOp());
 }
 
 export function continually<T>(getItem: () => T): Stream<T> {
@@ -53,11 +53,11 @@ export function continually<T>(getItem: () => T): Stream<T> {
         for ( ; ; ) {
             yield getItem();
         }
-    }(), Base._IDENTITY);
+    }(), identityOp());
 }
 
 export function optional<T>(input: Iterable<T>): Optional<T> {
-    return new OptionalImpl(trimIterable(input), Base._IDENTITY);
+    return new OptionalImpl(trimIterable(input), identityOp());
 }
 
 export function optionalOfNullable<T>(input: () => T | null | undefined): Optional<T> {
@@ -66,7 +66,17 @@ export function optionalOfNullable<T>(input: () => T | null | undefined): Option
         if (i != null) {
             yield i;
         }
-    }(), Base._IDENTITY);
+    }(), identityOp());
+}
+
+const IDENTITY = (a: any) => a;
+
+function identityOp<P, T>(): (input: Iterable<P>) => Iterable<T> {
+    return IDENTITY;
+}
+
+function isIdentityOp<P, T>(op: (input: Iterable<P>) => Iterable<T>) {
+    return op === IDENTITY;
 }
 
 function* trimIterable<T>(items: Iterable<T>): IterableIterator<T> {
@@ -76,71 +86,9 @@ function* trimIterable<T>(items: Iterable<T>): IterableIterator<T> {
     }
 }
 
-type DetachedStream<I, T> = (input: Iterable<I>) => Stream<T>;
-
-type DetachedOptional<I, T> = (input: Iterable<I>) => Optional<T>;
-
-type DetachedType<I, M> =
-    M extends Stream<infer O> ? DetachedStream<I, O> :
-    M extends Optional<infer O> ? DetachedOptional<I, O> : never;
-
-function detachedStream<I, M>(make: (base: Stream<I>) => M): DetachedType<I, M> {
-    const base = new StreamImpl<I, I>(Base._DETACHED, Base._IDENTITY);
-    return _makeDetached(base, make(base));
-}
-
-function detachedOptional<I, M>(make: (base: Optional<I>) => M): DetachedType<I, M> {
-    const base = new OptionalImpl<I, I>(Base._DETACHED, Base._IDENTITY);
-    return _makeDetached(base, make(base));
-}
-
-function _makeDetached<I, M>(base: Base<I, I>, made: M): DetachedType<I, M> {
-    if (made instanceof Base) {
-        if (!made._validate(base)) {
-            throw new Error('Make result does not base on provided item. ' +
-                'Did you return new Stream/Optional from builder?')
-        }
-        const attach = ((input: Iterable<I>) => {
-            if (base instanceof OptionalImpl) {
-                base._attach(trimIterable(input));
-            } else {
-                base._attach(input);
-            }
-            return made;
-        });
-        return attach as any;
-    }
-
-    throw new Error('Make returned unknown result: ' + made);
-}
-
 abstract class Base<P, T> implements Iterable<T> {
-    static readonly _DETACHED: unique symbol = Symbol('Detached Stream/Optional');
-    static readonly _IDENTITY: unique symbol = Symbol('Identity operation');
-
-    private readonly attachable: boolean;
-
-    protected constructor(private parent: Iterable<P> | typeof Base._DETACHED,
-                          private readonly operation: ((input: Iterable<P>) => Iterable<T>) | typeof Base._IDENTITY) {
-        this.attachable = !parent;
-    }
-
-    _validate(expectedBase: Iterable<unknown>): boolean {
-        if (this.parent === expectedBase) {
-            return true;
-        }
-        if (this.parent instanceof Base) {
-            return this.parent._validate(expectedBase);
-        }
-        return false;
-    }
-
-    _attach(items: Iterable<P>): void {
-        if (this.parent === Base._DETACHED) {
-            this.parent = items as Iterable<P>;
-        } else {
-            throw new Error('Stream/Optional is already attached');
-        }
+    protected constructor(private parent: Iterable<P>,
+                          private readonly operation: (input: Iterable<P>) => Iterable<T>) {
     }
 
     _getSource(): Iterable<unknown> {
@@ -175,27 +123,18 @@ abstract class Base<P, T> implements Iterable<T> {
     }
 
     private getItemsTerminal(): Iterable<T> {
-        if (this.parent === Base._DETACHED) {
-            throw new Error('Stream/Optional is not assigned input, call attach() first');
-        }
-        if (this.operation === Base._IDENTITY) {
+        if (isIdentityOp(this.operation)) {
             return this.parent as any;
         }
-        try {
-            return this.operation(this.parent);
-        } finally {
-            if (this.attachable) {
-                this.parent = Base._DETACHED;
-            }
-        }
+        return this.operation(this.parent);
     }
 }
 
 
 
 class StreamImpl<P, T> extends Base<P, T> implements Stream<T> {
-    constructor(parent: Iterable<P> | typeof Base._DETACHED,
-                operation: ((input: Iterable<P>) => Iterable<T>) | typeof Base._IDENTITY) {
+    constructor(parent: Iterable<P>,
+                operation: (input: Iterable<P>) => Iterable<T>) {
         super(parent, operation);
     }
 
@@ -615,11 +554,11 @@ function collectToMap<K, T>(items: Iterable<T>, getKey: (item: T) => K) {
     return m;
 }
 
-class OptionalImpl<P, T> extends Base<P, T> implements Optional<T> {
-    private static _EMPTY_OPTIONAL = { has: false as const };
+const EMPTY_OPTIONAL = { has: false as const };
 
-    constructor(parent: Iterable<P> | typeof Base._DETACHED,
-                operation: ((input: Iterable<P>) => Iterable<T>) | typeof Base._IDENTITY) {
+class OptionalImpl<P, T> extends Base<P, T> implements Optional<T> {
+    constructor(parent: Iterable<P>,
+                operation: (input: Iterable<P>) => Iterable<T>) {
         super(parent, operation);
     }
 
@@ -746,11 +685,11 @@ class OptionalImpl<P, T> extends Base<P, T> implements Optional<T> {
         if (!n.done) {
             return { has: true, val: n.value };
         }
-        return OptionalImpl._EMPTY_OPTIONAL;
+        return EMPTY_OPTIONAL;
     }
 
     toStream(): Stream<T> {
-        return new StreamImpl(this, OptionalImpl._IDENTITY);
+        return new StreamImpl(this, identityOp());
     }
 }
 

@@ -7,7 +7,7 @@ import config from '../../webpackInMem';
 import { WEB_DEV_PORT } from './portsConfig';
 import { serveLicenses } from './serveLicenses';
 import { routes } from '../client/routes';
-import { entriesStream } from '../client/stream/stream';
+import { entryStream } from '../client/stream/stream';
 
 if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'production') {
     throw new Error(process.env.NODE_ENV);
@@ -16,7 +16,7 @@ if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'producti
 const app = express();
 const compiler = webpack(config);
 
-entriesStream(routes)
+entryStream(routes)
     .map(([_, route]) => route)
     .filter(route => route !== routes.root)
     .forEach(nonRoot => app.get(nonRoot, (_, res) => res.redirect(routes.root)));
