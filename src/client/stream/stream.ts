@@ -1,82 +1,100 @@
 import { RingBuffer } from './ringBuffer';
 
 export function stream<T>(input: Iterable<T>): Stream<T> {
-    return new StreamImpl(input, identityOp());
+    return new StreamImpl(input, i => i);
 }
 
 export function streamOf<T>(...input: T[]): Stream<T> {
-    return new StreamImpl(input, identityOp());
+    return new StreamImpl(input, i => i);
 }
 
 export function entryStream<O extends {[k: string]: any}>(obj: O): Stream<readonly [keyof O, O[keyof O]]> {
     return new StreamImpl<
             readonly [keyof O, O[keyof O]],
             readonly [keyof O, O[keyof O]]>
-    (function* () {
-        for (const k of Object.keys(obj)) {
-            yield [k, obj[k]] as const;
+    ({
+        [Symbol.iterator]() {
+            return function* () {
+                for (const k of Object.keys(obj)) {
+                    yield [k, obj[k]] as const;
+                }
+            }();
         }
-    }(), identityOp());
+    }, i => i);
 }
 
 export function range(from: number, bound: number): Stream<number> {
-    return new StreamImpl(function* () {
-        for (let i = from; i < bound; i++) {
-            yield i;
+    return new StreamImpl({
+        [Symbol.iterator]() {
+            return function* () {
+                for (let i = from; i < bound; i++) {
+                    yield i;
+                }
+            }();
         }
-    }(), identityOp());
+    }, i => i);
 }
 
 export function abc(): Stream<string> {
-    return new StreamImpl(function* () {
-        let i = 'a'.charCodeAt(0);
-        for ( ; ; ) {
-            const s = String.fromCharCode(i++);
-            yield s;
-            if (s === 'z') {
-                break;
-            }
+    return new StreamImpl({
+        [Symbol.iterator]() {
+            return function* () {
+                let i = 'a'.charCodeAt(0);
+                for ( ; ; ) {
+                    const s = String.fromCharCode(i++);
+                    yield s;
+                    if (s === 'z') {
+                        break;
+                    }
+                }
+            }();
         }
-    }(), identityOp());
+    }, i => i);
 }
 
 export function same<T>(item: T): Stream<T> {
-    return new StreamImpl(function* () {
-        for ( ; ; ) {
-            yield item;
+    return new StreamImpl({
+        [Symbol.iterator]() {
+            return function* () {
+                for ( ; ; ) {
+                    yield item;
+                }
+            }();
         }
-    }(), identityOp());
+    }, i => i);
 }
 
 export function continually<T>(getItem: () => T): Stream<T> {
-    return new StreamImpl(function* () {
-        for ( ; ; ) {
-            yield getItem();
+    return new StreamImpl({
+        [Symbol.iterator]() {
+            return function* () {
+                for ( ; ; ) {
+                    yield getItem();
+                }
+            }();
         }
-    }(), identityOp());
+    }, i => i);
 }
 
 export function optional<T>(input: Iterable<T>): Optional<T> {
-    return new OptionalImpl(trimIterable(input), identityOp());
+    return new OptionalImpl({
+        [Symbol.iterator]() {
+            return trimIterable(input);
+        }
+    }, i => i);
 }
 
 export function optionalOfNullable<T>(input: () => T | null | undefined): Optional<T> {
-    return new OptionalImpl(function* () {
-        const i = input();
-        if (i != null) {
-            yield i;
+    return new OptionalImpl({
+        [Symbol.iterator]() {
+            return function* () {
+                const i = input();
+                if (i != null) {
+                    yield i;
+                }
+            }();
         }
-    }(), identityOp());
-}
-
-const IDENTITY = (a: any) => a;
-
-function identityOp<P, T>(): (input: Iterable<P>) => Iterable<T> {
-    return IDENTITY;
-}
-
-function isIdentityOp<P, T>(op: (input: Iterable<P>) => Iterable<T>) {
-    return op === IDENTITY;
+    }, i => i);
 }
 
 function* trimIterable<T>(items: Iterable<T>): IterableIterator<T> {
@@ -91,42 +109,20 @@ abstract class Base<P, T> implements Iterable<T> {
                           private readonly operation: (input: Iterable<P>) => Iterable<T>) {
     }
 
-    _getSource(): Iterable<unknown> {
-        if (this.parent instanceof Base) {
-            return this.parent._getSource();
-        }
-        return this.parent as any;
-    }
-
     [Symbol.iterator](): Iterator<T> {
-        return this.getItemsTerminal()[Symbol.iterator]();
+        return this.operation(this.parent)[Symbol.iterator]();
     }
 
     size(): number {
-        const items = this.getItemsTerminal();
-        if (Array.isArray(items)) {
-            return items.length;
-        }
         let counter = 0;
-        for (const _ in items) {
+        for (const _ in this) {
             counter++;
         }
         return counter;
     }
 
     toArray(): T[] {
-        const items = this.getItemsTerminal();
-        if (Array.isArray(items) && items !== this._getSource()) {
-            return items;
-        }
-        return [...items];
-    }
-
-    private getItemsTerminal(): Iterable<T> {
-        if (isIdentityOp(this.operation)) {
-            return this.parent as any;
-        }
-        return this.operation(this.parent);
+        return [...this];
     }
 }
 
@@ -554,8 +550,6 @@ function collectToMap<K, T>(items: Iterable<T>, getKey: (item: T) => K) {
     return m;
 }
 
-const EMPTY_OPTIONAL = { has: false as const };
-
 class OptionalImpl<P, T> extends Base<P, T> implements Optional<T> {
     constructor(parent: Iterable<P>,
                 operation: (input: Iterable<P>) => Iterable<T>) {
@@ -685,11 +679,11 @@ class OptionalImpl<P, T> extends Base<P, T> implements Optional<T> {
         if (!n.done) {
             return { has: true, val: n.value };
         }
-        return EMPTY_OPTIONAL;
+        return { has: false as const };
     }
 
     toStream(): Stream<T> {
-        return new StreamImpl(this, identityOp());
+        return new StreamImpl(this, i => i);
     }
 }
 
@@ -717,7 +711,6 @@ export interface Stream<T> extends Iterable<T> {
     joinBy(getDelimiter: (l: T, r: T) => string): string;
     last(): Optional<T>;
     map<U>(mapper: (item: T) => U): Stream<U>;
-    // parallel(): T extends Promise<infer U> ? ParallelStream<U> : never,
     randomItem(): Optional<T>
     reduce(reducer: (l: T, r: T) => T): Optional<T>;
     reduceLeft<U>(zero: U, reducer: (l: U, r: T) => U): U;
