@@ -1,4 +1,4 @@
-import { ringBuffer } from './ringBuffer';
+import { RingBuffer } from './ringBuffer';
 
 export function stream<T>(input: Iterable<T>): Stream<T> {
     return streamImpl(input, identityOp());
@@ -475,7 +475,7 @@ function streamImpl<P, T>(
                     return items.slice(items.length - n, items.length);
                 }
 
-                const buffer = ringBuffer<T>(n);
+                const buffer = new RingBuffer<T>(n);
                 for (const i of items) {
                     buffer.add(i);
                 }

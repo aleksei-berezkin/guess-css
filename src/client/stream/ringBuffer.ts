@@ -1,24 +1,28 @@
-export function ringBuffer<T>(capacity: number): Iterable<T> & { add(item: T): void } {
-    const a: T[] = [];
-    let size = 0;
-    let start = 0;
+export class RingBuffer<T> implements Iterable<T>{
+    private readonly a: T[];
+    private readonly capacity: number;
+    private size: number = 0;
+    private start: number = 0;
+    [Symbol.iterator]: () => Iterator<T>;
 
-    return {
-        [Symbol.iterator](): Iterator<T> {
-            return function*() {
-                for (let i = 0; i < size; i++) {
-                    yield a[(start + i) % capacity];
-                }
-            }();
-        },
+    constructor(capacity: number) {
+        this.a = [];
+        this.capacity = capacity;
 
-        add(item: T) {
-            if (size < capacity) {
-                a[size++] = item;
-            } else {
-                a[start] = item;
-                start = (start < capacity - 1) ? start + 1 : 0
+        const _this = this;
+        this[Symbol.iterator] = function* () {
+            for (let i = 0; i < _this.size; i++) {
+                yield _this.a[(_this.start + i) % _this.capacity];
             }
+        };
+    }
+
+    add(i: T) {
+        if (this.size < this.capacity) {
+            this.a[this.size++] = i;
+        } else {
+            this.a[this.start] = i;
+            this.start = (this.start < this.capacity - 1) ? this.start + 1 : 0
         }
-    };
+    }
 }
