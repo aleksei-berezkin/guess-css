@@ -174,6 +174,10 @@ class StreamImpl<P, T> extends Base<P, T> implements Stream<T> {
         });
     }
 
+    awaitAll(): Promise<T extends PromiseLike<infer E> ? E[] : T[]> {
+        return Promise.all(this) as any;
+    }
+
     append(item: T) {
         return new StreamImpl(this, function* (items) {
             yield *items;
@@ -693,6 +697,7 @@ export interface Stream<T> extends Iterable<T> {
     all(predicate: (item: T) => boolean): boolean;
     any(predicate: (item: T) => boolean): boolean;
     at(index: number): Optional<T>;
+    awaitAll(): Promise<T extends PromiseLike<infer E> ? E[] : T[]>;
     append(item: T): Stream<T>;
     appendIf(condition: boolean, item: T): Stream<T>;
     appendAll(items: Iterable<T>): Stream<T>;

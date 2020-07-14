@@ -28,57 +28,53 @@ type LicenseData = LicenseFile & {
 
 type DepName = keyof typeof localPackageJson.dependencies | keyof typeof localPackageJson.devDependencies;
 
-const dataPromises: Stream<Promise<PackageJsonData | LicenseData | null>> =
-    entryStream<{[k in DepName]?: string}>(localPackageJson.dependencies)
-        .appendAll(entryStream(localPackageJson.devDependencies))
-        .map(([name, _]) => [name, path.resolve(__dirname, '..', 'node_modules', name)])
-        .flatMap<PackageJsonFile | LicenseFile>(([name, dir]) => [
-            {
-                type: 'package.json',
+export const readModules: Promise<Stream<DepFullData>> = entryStream<{[k in DepName]?: string}>(localPackageJson.dependencies)
+    .appendAll(entryStream(localPackageJson.devDependencies))
+    .map(([name, _]) => [name, path.resolve(__dirname, '..', 'node_modules', name)])
+    .flatMap<PackageJsonFile | LicenseFile>(([name, dir]) => [
+        {
+            type: 'package.json',
+            name,
+            path: path.resolve(dir, 'package.json'),
+        },
+        ...['LICENSE', 'LICENSE.md', 'LICENSE.txt', 'license.md']
+            .map(filename => ({
+                type: 'LICENSE' as const,
                 name,
-                path: path.resolve(dir, 'package.json'),
-            },
-            ...['LICENSE', 'LICENSE.md', 'LICENSE.txt', 'license.md']
-                .map(filename => ({
-                    type: 'LICENSE' as const,
-                    name,
-                    path: path.resolve(dir, filename)
-                }))
-        ])
-        .map(file =>
-            new Promise<PackageJsonData | LicenseData | null>(async resolve => {
-                if (file.type === 'package.json') {
-                    const buf = await fs.promises.readFile(file.path);
-                    const json = JSON.parse(String(buf));
+                path: path.resolve(dir, filename)
+            }))
+    ])
+    .map(file =>
+        new Promise<PackageJsonData | LicenseData | null>(async resolve => {
+            if (file.type === 'package.json') {
+                const buf = await fs.promises.readFile(file.path);
+                const json = JSON.parse(String(buf));
+                resolve({
+                    ...file,
+                    description: json.description,
+                    license: json.license,
+                    homepage: json.homepage,
+                });
+                return;
+            }
+
+            try {
+                const realPath = await fs.promises.realpath(file.path);
+                // Workaround register-insensitive systems
+                if (path.basename(realPath) === path.basename(file.path)) {
+                    const buf = await fs.promises.readFile(realPath);
                     resolve({
                         ...file,
-                        description: json.description,
-                        license: json.license,
-                        homepage: json.homepage,
-                    });
-                    return;
-                }
-    
-                try {
-                    const realPath = await fs.promises.realpath(file.path);
-                    // Workaround register-insensitive systems
-                    if (path.basename(realPath) === path.basename(file.path)) {
-                        const buf = await fs.promises.readFile(realPath);
-                        resolve({
-                            ...file,
-                            text: String(buf),
-                        })
-                    } else {
-                        resolve(null);
-                    }
-                } catch (_) {
+                        text: String(buf),
+                    })
+                } else {
                     resolve(null);
                 }
-            })
-        );
-
-export const readModules: Promise<Stream<DepFullData>> = Promise.all(dataPromises)
-    .then(datas =>
+            } catch (_) {
+                resolve(null);
+            }
+        })
+    ).awaitAll().then(datas =>
         stream(datas)
             .filterAndMap((data): data is PackageJsonData | LicenseData => !!data)
             .groupBy(data => data.name)
