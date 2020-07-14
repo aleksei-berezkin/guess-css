@@ -260,7 +260,7 @@ class StreamImpl<P, T> extends Base<P, T> implements Stream<T> {
         });
     }
 
-    filterAndMap<U extends T>(assertion: (item: T) => item is U): Stream<U> {
+    filterWithAssertion<U extends T>(assertion: (item: T) => item is U): Stream<U> {
         return new StreamImpl<T, U>(this, function* (items: Iterable<T>) {
             for (const i of items) {
                 if (assertion(i)) {
@@ -706,7 +706,7 @@ export interface Stream<T> extends Iterable<T> {
     distinctBy(getKey: (item: T) => any): Stream<T>;
     equals(other: Iterable<T>): boolean,
     filter(predicate: (item: T) => boolean): Stream<T>;
-    filterAndMap<U extends T>(assertion: (item: T) => item is U): Stream<U>;
+    filterWithAssertion<U extends T>(assertion: (item: T) => item is U): Stream<U>;
     find(predicate: (item: T) => boolean): Optional<T>;
     flatMap<U>(mapper: (item: T) => Iterable<U>): Stream<U>;
     forEach(effect: (item: T) => void): void;

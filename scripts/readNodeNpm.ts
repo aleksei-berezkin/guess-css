@@ -42,7 +42,7 @@ function which(name: string): Promise<string> {
             )
     ).then(executables =>
         stream(executables)
-            .filterAndMap((ex): ex is string => !!ex)
+            .filterWithAssertion((ex): ex is string => !!ex)
             .single()
             .orElseThrow()
     )

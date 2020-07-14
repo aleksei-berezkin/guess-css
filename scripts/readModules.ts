@@ -76,7 +76,7 @@ export const readModules: Promise<Stream<DepFullData>> = entryStream<{[k in DepN
         })
     ).awaitAll().then(datas =>
         stream(datas)
-            .filterAndMap((data): data is PackageJsonData | LicenseData => !!data)
+            .filterWithAssertion((data): data is PackageJsonData | LicenseData => !!data)
             .groupBy(data => data.name)
             .map(([_, data]) => {
                 if (data.length === 2) {
