@@ -433,7 +433,23 @@ class StreamImpl<P, T> extends Base<P, T> implements Stream<T> {
                 return 0;
             });
             yield *copy;
-        })
+        });
+    }
+
+    splitWhen(isSplit: (l: T, r: T) => boolean): Stream<T[]> {
+        return new StreamImpl(this, function* (items) {
+            let chunk: T[] | undefined = undefined;
+            for (const item of items) {
+                if (!chunk) {
+                    chunk = [item];
+                } else if (isSplit(chunk[chunk.length - 1], item)) {
+                    yield chunk;
+                    chunk = [item];
+                } else {
+                    chunk.push(item);
+                }
+            }
+        });
     }
 
     tail(): Stream<T> {
@@ -723,6 +739,7 @@ export interface Stream<T> extends Iterable<T> {
     single(): Optional<T>;
     size(): number;
     sortOn(getComparable: (item: T) => number | string | boolean): Stream<T>
+    splitWhen(isSplit: (l: T, r: T) => boolean): Stream<T[]>;
     tail(): Stream<T>;
     take(n: number): Stream<T>;
     takeRandom(n: number): Stream<T>;
