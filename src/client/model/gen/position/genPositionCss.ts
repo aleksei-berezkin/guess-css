@@ -2,7 +2,7 @@ import { TagNode } from '../../nodes';
 import { ChildCombinator, ClassSelector, Rule, Selector, TypeSelector } from '../../cssRules';
 import { getDeepestSingleChildSubtree } from '../singleChildSubtree';
 import { transpose } from '../../../util';
-import { range, stream } from '../../../stream/stream';
+import { stream } from '../../../stream/stream';
 import { RulesParam } from '../../puzzler';
 import { contrastColorVar, getColorVar } from '../vars';
 import { globalRule } from '../globalRule';
@@ -15,16 +15,16 @@ export function genPositionCss(body: TagNode): RulesParam {
     return {
         choices: transpose(innerOuterPositionsShuffled()).map(([outerPosition, innerPosition]) =>
             [
-                [outer, outerPosition, ['border', `2px solid ${ outerBorderColor.id }`] as const] as const,
-                [inner, innerPosition, ['background-color', innerBgColor.id] as const] as const,
+                [outer, outerPosition, {property: 'border', value: `2px solid ${ outerBorderColor.id }`} as const] as const,
+                [inner, innerPosition, {property: 'background-color', value: innerBgColor.id} as const] as const,
             ]
                 .map(([node, position, declaration]) =>
                     new Rule(
                         getClassSelector(node),
                         [
-                            ['position', position, true],
+                            {property: 'position', value: position, differing: true},
                             declaration,
-                            ['left', '3em'],
+                            {property: 'left', value: '3em'},
                         ]
                     )
                 )
@@ -32,7 +32,7 @@ export function genPositionCss(body: TagNode): RulesParam {
         common: [
             new Rule(
                 new ChildCombinator(getClassSelector(outer), new TypeSelector('*')),
-                [['padding', '.5em']]
+                [{property: 'padding', value: '.5em'}]
             ),
             globalRule,
         ],

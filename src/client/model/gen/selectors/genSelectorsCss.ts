@@ -19,9 +19,9 @@ import { globalRule } from '../globalRule';
 const constantRule = new Rule(
     new TypeSelector('div'),
     [
-        ['display', 'inline-block'],
-        ['padding', '.5em'],
-        ['border', `1px solid ${ contrastColorVar }`],
+        {property: 'display', value: 'inline-block'},
+        {property: 'padding', value: '.5em'},
+        {property: 'border', value: `1px solid ${ contrastColorVar }`},
     ]
 );
 const RULES_CHOICES = 3;
@@ -29,7 +29,7 @@ const RULES_CHOICES = 3;
 export function genRulesChoices(body: TagNode): RulesParam | null {
     const colorVars = range(0, 2).map(i => getColorVar('background', i)).toArray();
     const [deepStyle, siblingsStyle] = stream(colorVars)
-        .map((colorVar): Declaration[] => [['background-color', colorVar.id]])
+        .map((colorVar): Declaration[] => [{property: 'background-color', value: colorVar.id}])
         .takeRandom(2);
 
     const deepest: SingleChildSubtree = getDeepestSingleChildSubtree(body);

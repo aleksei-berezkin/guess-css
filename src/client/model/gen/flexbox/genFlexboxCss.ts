@@ -18,23 +18,23 @@ export function genFlexboxCss(body: TagNode): RulesParam {
                 [
                     new Rule(
                         new TypeSelector('body'),
-                        stream<Declaration>([['display', 'flex']])
+                        stream<Declaration>([{property: 'display', value: 'flex'}])
                             .appendIf(
                                 direction !== 'row',
-                                ['flex-direction', direction]
+                                {property: 'flex-direction', value: direction}
                             )
                             .appendIf(
-                                wrap, ['flex-wrap', 'wrap']
+                                wrap, {property: 'flex-wrap', value: 'wrap'}
                             )
                             .appendAll([
-                                ['justify-content', justifyContent, true],
-                                [alignName, alignItems, true],
+                                {property: 'justify-content', value: justifyContent, differing: true},
+                                {property: alignName, value: alignItems, differing: true},
                             ])
                             .toArray(),
                     ),
                     ...(
                         wrap
-                            ? [new Rule(new TypeSelector('div'), [['flex-basis', '30%']])]
+                            ? [new Rule(new TypeSelector('div'), [{property: 'flex-basis', value: '30%'}])]
                             : []
                     ),
                 ]
@@ -43,15 +43,15 @@ export function genFlexboxCss(body: TagNode): RulesParam {
             new Rule(
                 [new TypeSelector('html'), new TypeSelector('body')],
                 [
-                    ['height', '100%'],
-                    ['margin', '0'],
+                    {property: 'height', value: '100%'},
+                    {property: 'margin', value: '0'},
                 ],
             ),
             new Rule(
                 new TypeSelector('div'),
                 [
-                    ['border', `1px solid ${ contrastColorVar }`],
-                    ['padding', '.5em'],
+                    {property: 'border', value: `1px solid ${ contrastColorVar }`},
+                    {property: 'padding', value: '.5em'},
                 ]
             ),
             globalRule,

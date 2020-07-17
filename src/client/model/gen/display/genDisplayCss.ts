@@ -17,8 +17,8 @@ export function genDisplayCss(body: TagNode): RulesParam {
     const parentSelector = stream(path).last().map(getClassSelector).get()
     const parentRules = displays1
         .map(d => new Rule(parentSelector, [
-            ['display', d, true],
-            ['background-color', bgColorVar.id],
+            {property: 'display', value: d, differing: true},
+            {property: 'background-color', value: bgColorVar.id},
         ]));
 
     const [children1, children2] = splitChildren(siblings);
@@ -37,8 +37,8 @@ export function genDisplayCss(body: TagNode): RulesParam {
             new Rule(
                 new ChildCombinator(parentSelector, new TypeSelector('div')),
                 [
-                    ['border', `4px solid ${ borderColorVar.id }`],
-                    ['padding', '.25em'],
+                    {property: 'border', value: `4px solid ${ borderColorVar.id }`},
+                    {property: 'padding', value: '.25em'},
                 ]
             ),
             globalRule,
@@ -68,9 +68,9 @@ function splitChildren(children: TagNode[]): [TagNode[], TagNode[]] {
 function childrenToRule(children: TagNode[], width: string | undefined): (display: string) => Rule {
     return display => new Rule(
         children.map(getClassSelector),
-        stream<Declaration>([['display', display, true]])
+        stream<Declaration>([{property: 'display', value: display, differing: true}])
             .appendIf(
-                !!width, ['width', width!]
+                !!width, {property: 'width', value: width!}
             )
             .toArray()
     );

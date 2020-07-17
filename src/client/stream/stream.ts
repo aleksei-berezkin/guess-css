@@ -555,6 +555,16 @@ class StreamImpl<P, T> extends Base<P, T> implements Stream<T> {
             }
         });
     }
+
+    zipWithIndexAndLen(): Stream<readonly [T, number, number]> {
+        return new StreamImpl(this, function* (items) {
+            const a = Array.isArray(items) ? items : [...items];
+            let index = 0;
+            for (const i of a) {
+                yield [i, index++, a.length] as const;
+            }
+        });
+    }
 }
 
 function collectToMap<K, T>(items: Iterable<T>, getKey: (item: T) => K) {
@@ -750,6 +760,7 @@ export interface Stream<T> extends Iterable<T> {
     zip<U>(other: Iterable<U>): Stream<readonly [T, U]>;
     zipStrict<U>(other: Iterable<U>): Stream<readonly [T, U]>
     zipWithIndex(): Stream<readonly [T, number]>;
+    zipWithIndexAndLen(): Stream<readonly [T, number, number]>;
 }
 
 export interface Optional<T> extends Iterable<T> {
