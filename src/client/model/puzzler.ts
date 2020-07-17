@@ -47,7 +47,7 @@ export class Puzzler {
     get commonStyleSummary(): string[] {
         return stream(this.rules.common)
             .flatMap(r => r.declarations)
-            .map(([key, _]) => key)
+            .map(({property}) => property)
             .toArray();
     }
 
