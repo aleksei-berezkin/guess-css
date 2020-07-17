@@ -1,12 +1,12 @@
 import { Region } from './region';
 import { Indent } from './indent';
-import { stream, streamOf } from '../stream/stream';
+import { streamOf } from '../stream/stream';
 
-export type Declaration = {
-    property: string,
-    value: string | string[],
-    differing?: boolean,
-};
+export type Declaration = readonly [
+    string,
+    string,
+    boolean?
+];
 
 export class Rule {
     private _selectorsString?: string;
@@ -23,16 +23,8 @@ export class Rule {
 
     private declarationsToString(): string {
         return this.declarations
-            .map(({property, value}) => `${property}: ${Rule.valueToString(value)};`)
+            .map(([name, value]) => `${name}: ${value};`)
             .join(' ');
-    }
-
-    private static valueToString(value: Declaration['value']): string {
-        if (typeof value === 'string') {
-            return value;
-        }
-
-        return value.join(' ');
     }
 
     get selectorsString() {
@@ -64,34 +56,16 @@ export class Rule {
 
 
     private declarationsToRegions(indent: Indent): Region[][] {
-        return stream(this.declarations)
-            .flatMap(decl => this.declarationToLines(decl, indent))
-            .toArray();
-    }
-
-    private declarationToLines(decl: Declaration, indent: Indent): Region[][] {
-        return (typeof decl.value === 'string' ? streamOf(decl.value) : stream(decl.value))
-            .zipWithIndexAndLen()
-            .map(([v, i, len]) => {
-                const line: Region[] = [];
-                if (i === 0) {
-                    line.push(
-                        indent.toRegion(),
-                        {kind: 'declName', text: decl.property},
-                        {kind: 'default', text: ': '},
-                    );
-                } else {
-                    line.push(
-                        indent.indent().toRegion(),
-                    );
-                }
-                line.push({kind: 'declValue', text: v, differing: decl.differing});
-                if (i === len - 1) {
-                    line.push({kind: 'default', text: ';'});
-                }
-                return line;
-            })
-            .toArray();
+        return this.declarations
+            .map(([name, value, differing]): Region[] =>
+                [
+                    indent.toRegion(),
+                    {kind: 'declName', text: name},
+                    {kind: 'default', text: ': '},
+                    {kind: 'declValue', text: value, differing},
+                    {kind: 'default', text: ';'},
+                ]
+            );
     }
 }
 

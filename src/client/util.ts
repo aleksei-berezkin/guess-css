@@ -118,5 +118,4 @@ export function ld(light: string, dark: string, theme: Theme) {
     return theme.palette.type === 'light' ? light : dark;
 }
 
-export const monospaceFontsLines = ['Menlo,', '"Ubuntu Mono", Consolas,', 'source-code-pro, monospace'];
-export const monospaceFonts = monospaceFontsLines.join(' ');
+export const monospaceFonts = 'Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace';
