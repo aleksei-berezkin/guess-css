@@ -46,6 +46,9 @@ export const createTheme = (paletteType: PaletteType) => createMuiTheme({
             root: {
                 padding: 6,
                 minHeight: undefined,
+                '@media (min-width: 600px)': {
+                    minWidth: 'unset',
+                }
             },
         },
         ...(paletteType === 'dark' ? {

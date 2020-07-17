@@ -146,7 +146,9 @@ function AppBody() {
                     <PuzzlerRendered/>
                     <Choices/>
                     <Grid item>
-                        <CodePaper code={ htmlCode } />
+                        <CodePaper body={{
+                            code: htmlCode,
+                        }} />
                     </Grid>
                     <Grid item>
                         <Footer/>

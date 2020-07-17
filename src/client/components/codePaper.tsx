@@ -11,32 +11,71 @@ import { useSelector } from 'react-redux';
 import { ofCurrentView } from '../redux/store';
 import { CodeBody } from './codeBody';
 import { spacing } from './theme';
+import SwipeableViews from 'react-swipeable-views';
 
 const makeRootStyles = makeStyles(theme => ({
-    root: (sideMargins: boolean) => ({
+    root: (p: {hasSideMargins: boolean, isTabs: boolean}) => ({
         marginTop: theme.spacing(spacing),
-        marginLeft: theme.spacing(sideMargins && spacing || 0),
-        marginRight: theme.spacing(sideMargins && spacing || 0),
+        marginLeft: theme.spacing(p.hasSideMargins && spacing || 0),
+        marginRight: theme.spacing(p.hasSideMargins && spacing || 0),
+        width: p.isTabs ? '70%' : 'inherit',
+        minWidth: p.isTabs ? 270 : 'inherit',
+        maxWidth: p.isTabs ? 400 : 'inherit',
     }),
 }));
 
+export type CodeTabs = {
+    tabs: CodePaperBody[],
+    currentIndex: number,
+    handleChangeIndex: (index: number) => void,
+}
+
+export type CodePaperBody = {
+    code: Region[][],
+    collapsedCode?: Region[][],
+    footer?: ReactElement,
+};
+
+function isTabs(b: CodeTabs | CodePaperBody): b is CodeTabs {
+    return 'tabs' in b;
+}
+
 export function CodePaper(
     p: {
-        code: Region[][],
-        collapsedCode?: Region[][],
         header?: ReactElement,
-        footer?: ReactElement,
+        body: CodeTabs | CodePaperBody,
         sideMargins?: boolean,
     }
 ) {
-    const commonStyleSummary = useSelector(ofCurrentView('commonStyleSummary', []));
-    const classes = makeRootStyles(!!p.sideMargins);
+    const body = p.body;
+    const classes = makeRootStyles({hasSideMargins: !!p.sideMargins, isTabs: isTabs(body)});
 
     return <Paper className={ classes.root }>
         {
             p.header
         }
+        {
+            isTabs(body) &&
+            <SwipeableViews index={ body.currentIndex } onChangeIndex={ body.handleChangeIndex }>{
+                stream(body.tabs)
+                    .zipWithIndex()
+                    .map(([tab, index]) =>
+                        <Body code={ tab.code } collapsedCode={ tab.collapsedCode } footer={ tab.footer }/>
+                    )
+                    .toArray()
+            }</SwipeableViews>
+        }
+        {
+            !isTabs(body) &&
+            <Body code={ body.code } collapsedCode={ body.collapsedCode } footer={ body.footer }/>
+        }
+    </Paper>;
+}
 
+function Body(p: CodePaperBody) {
+    const commonStyleSummary = useSelector(ofCurrentView('commonStyleSummary', []));
+
+    return <>
         <CodeBody lines={ p.code } noBottomPadding={ !!p.collapsedCode } />
 
         {
@@ -49,9 +88,8 @@ export function CodePaper(
         {
             p.footer
         }
-    </Paper>;
+    </>
 }
-
 
 const makeCollapsedStyles = makeStyles(theme => ({
     summary: {

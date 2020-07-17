@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ofCurrentView, ofCurrentViewOrUndefined, PuzzlerView, State } from '../redux/store';
 import { checkChoice } from '../redux/thunks';
 import Grid from '@material-ui/core/Grid';
-import { abc } from '../stream/stream';
+import { abc, range } from '../stream/stream';
 import { CodePaper } from './codePaper';
 import { CodeHeader } from './codeHeader';
 import Button from '@material-ui/core/Button';
@@ -57,14 +57,14 @@ function WideChoices() {
             .map(([letter, i]) =>
                 <Grid item key={ current + letter }>
                     <CodePaper
-                        code={ choices[i] || [] }
-                        collapsedCode={ common }
                         header={
                             <CodeHeader title={`CSS ${letter.toUpperCase()}`} className={ classes[getChoiceStatus(i, status)] }/>
                         }
-                        footer = {
-                            <FooterButton status={ getChoiceStatus(i, status) } checkChoice={ dispatchCheckChoice(i, status, dispatch) }/>
-                        }
+                        body={{
+                            code: choices[i] || [],
+                            collapsedCode: common,
+                            footer: <FooterButton status={ getChoiceStatus(i, status) } checkChoice={ dispatchCheckChoice(i, status, dispatch) }/>
+                        }}
                         sideMargins={ i === 1 }
                     />
                 </Grid>
@@ -81,20 +81,18 @@ function NarrowChoices() {
     const currentTab = useSelector(ofCurrentView('currentTab', 0));
     const classes = makeChoiceStyles();
 
-    const handleChange = (event: React.ChangeEvent<{}>, currentTab: number) => {
+    const handleChangeIndex = (currentTab: number) => {
         dispatch(setCurrentTab({currentPuzzler, currentTab}));
     };
 
     const dispatch = useDispatch();
 
     return <CodePaper
-        code={ choices[currentTab] || [] }
-        collapsedCode={ common }
         header={
             <AppBar position='static' color='default'>
                 <Tabs
                     value={ currentTab }
-                    onChange={ handleChange }
+                    onChange={ (e, newTabIndex) => handleChangeIndex(newTabIndex) }
                     indicatorColor='primary'
                     textColor='primary'
                     variant='fullWidth'
@@ -110,9 +108,17 @@ function NarrowChoices() {
                 }</Tabs>
             </AppBar>
         }
-        footer={
-            <FooterButton status={ getChoiceStatus(currentTab, status) } checkChoice={ dispatchCheckChoice(currentTab, status, dispatch) }/>
-        }
+        body={{
+            tabs: range(0, choices.length)
+                .map(i => ({
+                    code: choices[i] || [],
+                    collapsedCode: common,
+                    footer: <FooterButton status={ getChoiceStatus(i, status) } checkChoice={ dispatchCheckChoice(i, status, dispatch) }/>
+                }))
+                .toArray(),
+            currentIndex: currentTab,
+            handleChangeIndex
+        }}
     />;    
 }
 
