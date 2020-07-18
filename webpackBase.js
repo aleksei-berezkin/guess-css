@@ -3,7 +3,7 @@ if (!['development', 'production'].includes(process.env.NODE_ENV)) {
 }
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const templateConst = require('./src/shared/templateConst');
+const templateConst = require('./templateConst');
 
 module.exports = {
     mode: process.env.NODE_ENV,

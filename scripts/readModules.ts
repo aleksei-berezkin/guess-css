@@ -78,7 +78,11 @@ export const readModules: Promise<Stream<DepFullData>> = entryStream<{[k in DepN
         stream(datas)
             .filterWithAssertion((data): data is PackageJsonData | LicenseData => !!data)
             .groupBy(data => data.name)
-            .map(([_, data]) => {
+            .map(([_, data]): readonly [PackageJsonData, LicenseData] => {
+                if (data.length === 1 && data[0].type === 'package.json' && data[0].name === 'npm-run-parallel') {
+                    // Lacks license file
+                    return [data[0], {name: '', path: '', type: 'LICENSE', text: data[0].license}]
+                }
                 if (data.length === 2) {
                     if (data[0].type === 'package.json' && data[1].type === 'LICENSE') {
                         return [data[0], data[1]] as const;

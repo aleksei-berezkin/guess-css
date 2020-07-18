@@ -13,7 +13,7 @@ import Container from '@material-ui/core/Container';
 import { CodePaper } from './codePaper';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { Choices } from './choices';
-import { STYLE_ID } from '../../shared/templateConst';
+import { STYLE_ID } from '../../../templateConst';
 import { PaletteType } from '@material-ui/core';
 import { ThemeProvider } from '@material-ui/styles';
 import { createTheme } from './theme';

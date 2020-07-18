@@ -1,0 +1,9 @@
+{
+    "extends": "./tsconfig.json",
+    "include": ["**/*"],
+    "exclude": ["scripts/*", "src/server/serveFromMem.ts"],
+
+    "compilerOptions": {
+        "sourceMap": false
+    }
+}

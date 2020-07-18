@@ -3,8 +3,8 @@ import * as ReactDOM from 'react-dom';
 import { PuzzlerApp } from './components/puzzlerApp';
 import { Provider } from 'react-redux';
 import { createAppStore, initialState, State } from './redux/store';
-import { ROOT_EL_ID } from '../shared/templateConst';
-import { PRELOADED_STATE_ID } from '../shared/preloadedStateId';
+import { ROOT_EL_ID } from '../../templateConst';
+import { PRELOADED_STATE_ID } from './redux/preloadedStateId';
 
 
 const preloadedState = window[PRELOADED_STATE_ID];
