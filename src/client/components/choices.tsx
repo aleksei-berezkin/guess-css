@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ofCurrentView, ofCurrentViewOrUndefined, PuzzlerView, State } from '../redux/store';
+import { ofCurrentView, ofCurrentViewOrUndefined, State } from '../redux/store';
 import { checkChoice } from '../redux/thunks';
 import Grid from '@material-ui/core/Grid';
 import { abc, range } from '../stream/stream';
@@ -12,7 +12,6 @@ import CheckIcon from '@material-ui/icons/Check';
 import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { ChoiceStatus, getChoiceStatus, makeChoiceStyles } from './choiceStatus';
-import { setCurrentTab, setFooterBtnHeight } from '../redux/actions';
 import { useTheme } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import AppBar from '@material-ui/core/AppBar';
@@ -20,6 +19,8 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import { Dispatch } from 'redux';
 import { spacing } from './theme';
+import { PuzzlerView, puzzlerViews } from '../redux/slices/puzzlerViews';
+import { layoutConstants } from '../redux/slices/layoutConstants';
 
 
 export function Choices(): ReactElement {
@@ -82,7 +83,7 @@ function NarrowChoices() {
     const classes = makeChoiceStyles();
 
     const handleChangeIndex = (currentTab: number) => {
-        dispatch(setCurrentTab({currentPuzzler, currentTab}));
+        dispatch(puzzlerViews.actions.setCurrentTab({index: currentPuzzler, currentTab}));
     };
 
     const dispatch = useDispatch();
@@ -144,7 +145,7 @@ function FooterButton(p: {status: ChoiceStatus, checkChoice: () => void}) {
 
     useEffect(() => {
         if (!footerStyle) {
-            dispatch(setFooterBtnHeight(btnBoxRef.current!.getBoundingClientRect().height));
+            dispatch(layoutConstants.actions.setFooterBtnHeight(btnBoxRef.current!.getBoundingClientRect().height));
         }
     }, ['const']);
 

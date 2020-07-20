@@ -1,6 +1,6 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { useDispatch, useSelector } from 'react-redux';
-import { mapCurrentView, ofCurrentView, ofCurrentViewOrUndefined, PuzzlerView } from '../redux/store';
+import { mapCurrentView, ofCurrentView, ofCurrentViewOrUndefined } from '../redux/store';
 import useTheme from '@material-ui/core/styles/useTheme';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
@@ -9,12 +9,13 @@ import { globalRe } from '../util';
 import { resolveColor } from '../redux/resolveColor';
 import { getContrastColorValue } from './contrastColorValue';
 import { Dispatch } from 'redux';
-import { navNextPuzzler, navPrevPuzzler } from '../redux/actions';
 import IconButton from '@material-ui/core/IconButton';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import { genNewPuzzler } from '../redux/thunks';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import React from 'react';
+import { PuzzlerView } from '../redux/slices/puzzlerViews';
+import { current } from '../redux/slices/current';
 
 const useStyles = makeStyles(theme => ({
     layoutSize: {
@@ -82,7 +83,7 @@ function PrevButton() {
 
     function handlePrev() {
         if (hasPrev) {
-            dispatch(navPrevPuzzler());
+            dispatch(current.actions.prev());
         } else {
             throw new Error('Cannot navPrev')
         }
@@ -100,7 +101,7 @@ function NextButton() {
 
     function handleNext() {
         if (hasNext) {
-            dispatch(navNextPuzzler());
+            dispatch(current.actions.next());
         } else if (isAnswered) {
             dispatch(genNewPuzzler(false));
         } else {

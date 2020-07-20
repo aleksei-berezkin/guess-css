@@ -1,7 +1,6 @@
 import React, { ReactElement, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ofCurrentView, State } from '../redux/store';
-import { resetSsrData } from '../redux/actions';
 import { gaInit, gaNewPuzzler, initClient } from '../redux/thunks';
 import { stream } from '../stream/stream';
 import AppBar from '@material-ui/core/AppBar';
@@ -25,6 +24,7 @@ import { Credits } from './credits';
 import { ScrollToTop } from './scrollToTop';
 import { routes } from '../routes';
 import { PuzzlerRendered } from './puzzlerRendered';
+import { ssr as ssrSlice } from '../redux/slices/ssr';
 
 export function PuzzlerApp(p: { staticRoute?: string }): ReactElement {
     const ssr = useSelector(state => state.ssr);
@@ -34,7 +34,7 @@ export function PuzzlerApp(p: { staticRoute?: string }): ReactElement {
     useEffect(() => {
         dispatch(gaInit());
         if (ssr) {
-            dispatch(resetSsrData());
+            dispatch(ssrSlice.actions.reset());
             const jssStyles = document.getElementById(STYLE_ID)!;
             jssStyles.parentElement!.removeChild(jssStyles);
             dispatch(gaNewPuzzler());

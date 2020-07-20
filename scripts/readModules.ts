@@ -78,26 +78,26 @@ export const readModules: Promise<Stream<DepFullData>> = entryStream<{[k in DepN
         stream(datas)
             .filterWithAssertion((data): data is PackageJsonData | LicenseData => !!data)
             .groupBy(data => data.name)
-            .map(([_, data]): readonly [PackageJsonData, LicenseData] => {
+            .map(([_, data]): readonly [PackageJsonData, {licenseText: string}] => {
                 if (data.length === 1 && data[0].type === 'package.json' && data[0].name === 'npm-run-parallel') {
                     // Lacks license file
-                    return [data[0], {name: '', path: '', type: 'LICENSE', text: data[0].license}]
+                    return [data[0], {licenseText: `License: ${data[0].license}`}]
                 }
                 if (data.length === 2) {
                     if (data[0].type === 'package.json' && data[1].type === 'LICENSE') {
-                        return [data[0], data[1]] as const;
+                        return [data[0], {licenseText: data[1].text}] as const;
                     }
                     if (data[1].type === 'package.json' && data[0].type === 'LICENSE') {
-                        return [data[1], data[0]] as const;
+                        return [data[1], {licenseText: data[0].text}] as const;
                     }
                 }
                 throw new Error('Bad data: ' + JSON.stringify(data));
             })
-            .map(([p, l]) => ({
+            .map(([p, {licenseText}]) => ({
                 name: p.name,
                 description: p.description,
                 homepage: p.homepage,
                 license: p.license,
-                licenseText: l.text,
+                licenseText,
             }))
     );

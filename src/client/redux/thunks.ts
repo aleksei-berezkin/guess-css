@@ -1,17 +1,19 @@
-import { displayAnswer, displayNewPuzzler, setTopics } from './actions';
 import { genPuzzler, getRandomizedTopics } from '../model/gen/genPuzzler';
 import { State } from './store';
 import { ThunkAction } from 'redux-thunk';
 import { Action } from 'redux';
-import { stream } from '../stream/stream';
 import { assignColorVars } from './assignColorVar';
 import ReactGA from 'react-ga';
+import { topics } from './slices/topics';
+import { puzzlerViews } from './slices/puzzlerViews';
+import { current } from './slices/current';
+import { correctAnswers } from './slices/correctAnswers';
 
 type VoidThunk = ThunkAction<void, State, never, Action<string>>;
 
 export function initClient(): VoidThunk {
     return function(dispatch) {
-        dispatch(setTopics(getRandomizedTopics()));
+        dispatch(topics.actions.set(getRandomizedTopics()));
         dispatch(genNewPuzzler(true));
     };
 }
@@ -22,7 +24,7 @@ export function genNewPuzzler(diffHint: boolean): VoidThunk {
         const topic = state.topics[state.puzzlerViews.length % state.topics.length]
 
         const puzzler = genPuzzler(topic);
-        dispatch(displayNewPuzzler({
+        dispatch(puzzlerViews.actions.append({
             source: puzzler.html,
             styleChoices: puzzler.getStyleCodes(diffHint),
             commonStyleSummary: puzzler.commonStyleSummary,
@@ -38,14 +40,18 @@ export function genNewPuzzler(diffHint: boolean): VoidThunk {
             },
             currentTab: 0,
         }));
+        dispatch(current.actions.to(getState().puzzlerViews.length - 1));
         dispatch(gaNewPuzzler());
     }
 }
 
 export function checkChoice(userChoice: number): VoidThunk {
     return function(dispatch, getState) {
-        const isCorrect = stream(getState().puzzlerViews).last().get().status.correctChoice === userChoice;
-        dispatch(displayAnswer({userChoice, isCorrect}));
+        const isCorrect = getState().puzzlerViews[getState().current].status.correctChoice === userChoice;
+        dispatch(puzzlerViews.actions.displayAnswer({index: getState().current, userChoice}));
+        if (isCorrect) {
+            dispatch(correctAnswers.actions.inc());
+        }
     }
 }
 

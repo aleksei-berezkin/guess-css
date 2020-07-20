@@ -1,43 +1,21 @@
-import { Region } from '../model/region';
-import {
-    displayAnswer,
-    displayNewPuzzler, navNextPuzzler, navPrevPuzzler, resetSsrData, setCurrentTab, setFooterBtnHeight, setTopics,
-} from './actions';
-import { Topic } from '../model/gen/topic';
-import { stream } from '../stream/stream';
-import { configureStore, createReducer, combineReducers } from '@reduxjs/toolkit';
-import { AssignedColorVar } from './assignColorVar';
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import { correctAnswers } from './slices/correctAnswers';
+import { current } from './slices/current';
+import { topics } from './slices/topics';
+import { PuzzlerView, puzzlerViews } from './slices/puzzlerViews';
+import { layoutConstants } from './slices/layoutConstants';
+import { ssr } from './slices/ssr';
 
+export const reducer = combineReducers({
+    topics: topics.reducer,
+    puzzlerViews: puzzlerViews.reducer,
+    current: current.reducer,
+    correctAnswers: correctAnswers.reducer,
+    layoutConstants: layoutConstants.reducer,
+    ssr: ssr.reducer,
+});
 
-export type State = {
-    topics: Topic[],
-    puzzlerViews: {
-        source: string,
-        styleChoices: Region[][][],
-        commonStyleSummary: string[],
-        commonStyle: Region[][],
-        vars: {
-            contrastColor: string,
-            colors: AssignedColorVar[],
-        },
-        body: Region[][],
-        status: {
-            correctChoice: number,
-            userChoice: number | undefined,
-        },
-        currentTab: number,
-    }[],
-    current: number,
-    correctAnswers: number,
-    layoutConstants: {
-        footerBtnHeight: number | undefined,
-    }
-    ssr: {
-        wide: boolean,
-    } | null;
-}
-
-export type PuzzlerView = State['puzzlerViews'][number];
+export type State = ReturnType<typeof reducer>;
 
 export function ofCurrentView<K extends keyof PuzzlerView>(key: K, deflt: PuzzlerView[K]): (state: State) => PuzzlerView[K] {
     return mapCurrentView(v => v && v[key], deflt);
@@ -53,69 +31,15 @@ export function mapCurrentView<T>(map: (v: PuzzlerView) => T, deflt: T): (state:
     };
 }
 
-
-export const initialState: State = {
-    topics: [],
-    puzzlerViews: [],
-    current: -1,
-    correctAnswers: 0,
-    layoutConstants: {
-        footerBtnHeight: undefined,
-    },
-    ssr: null,
-};
-
 declare module 'react-redux' {
     // noinspection JSUnusedGlobalSymbols
     interface DefaultRootState extends State {
     }
 }
 
-const reducer = combineReducers<State>({
-    topics: createReducer(initialState.topics, builder =>
-        builder
-            .addCase(setTopics, (state, { payload }) => payload)
-    ),
-
-    puzzlerViews: createReducer(initialState.puzzlerViews, builder =>
-        builder
-            .addCase(displayNewPuzzler, (state, { payload }) => [...state, payload])
-            .addCase(displayAnswer, (state, { payload }) => {
-                stream(state).last().get().status.userChoice = payload.userChoice;
-                return state;
-            })
-            .addCase(setCurrentTab, (state, { payload }) => {
-                state[payload.currentPuzzler].currentTab = payload.currentTab;
-                return state;
-            })
-    ),
-
-    current: createReducer(initialState.current, builder =>
-        builder
-            .addCase(displayNewPuzzler, state => state + 1)
-            .addCase(navNextPuzzler, state => state + 1)
-            .addCase(navPrevPuzzler, state => state -1)
-    ),
-
-    correctAnswers: createReducer(initialState.correctAnswers, builder =>
-        builder
-            .addCase(displayAnswer, (state, { payload }) => state + (payload.isCorrect && 1 || 0))
-    ),
-
-    layoutConstants: createReducer(initialState.layoutConstants, builder =>
-        builder
-            .addCase(setFooterBtnHeight, (state, { payload }) => { state.footerBtnHeight = payload })
-    ),
-
-    ssr: createReducer(initialState.ssr, builder =>
-        builder
-            .addCase(resetSsrData, _ => null)
-    )
-});
-
-export function createAppStore(preloadedState: State) {
+export function createAppStore(preloadedState?: State) {
     return configureStore({
         reducer,
-        preloadedState,
-    });
+        ...(preloadedState ? {preloadedState} : {}),
+    })
 }

@@ -60,7 +60,7 @@ export function CodePaper(
                 stream(body.tabs)
                     .zipWithIndex()
                     .map(([tab, index]) =>
-                        <Body code={ tab.code } collapsedCode={ tab.collapsedCode } footer={ tab.footer }/>
+                        <Body key={ index } code={ tab.code } collapsedCode={ tab.collapsedCode } footer={ tab.footer }/>
                     )
                     .toArray()
             }</SwipeableViews>
