@@ -5,7 +5,7 @@ export const current = createSlice({
     initialState: -1,
     reducers: {
         prev: state => state - 1,
-        to: (state, action: PayloadAction<number>) => action.payload,
+        to: (state, {payload}: PayloadAction<number>) => payload,
         next: state => state + 1,
     },
 });

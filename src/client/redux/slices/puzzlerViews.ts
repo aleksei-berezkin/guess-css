@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Region } from '../../model/region';
 import { AssignedColorVar } from '../assignColorVar';
-import index from 'react-swipeable-views';
 
 export type PuzzlerView = {
     source: string,
@@ -24,20 +23,20 @@ export const puzzlerViews = createSlice({
     name: 'puzzlerViews',
     initialState: [] as PuzzlerView[],
     reducers: {
-        append: (state, action: PayloadAction<PuzzlerView>) => [...state, action.payload],
+        append: (state, {payload}: PayloadAction<PuzzlerView>) => { state.push(payload) },
 
-        setCurrentTab: (state, action: PayloadAction<{
+        setCurrentTab: (state, {payload}: PayloadAction<{
             index: number,
             currentTab: number
         }>): void => {
-            state[action.payload.index].currentTab = action.payload.currentTab;
-         },
+            state[payload.index].currentTab = payload.currentTab;
+        },
 
-        displayAnswer: (state, action: PayloadAction<{
+        displayAnswer: (state, {payload}: PayloadAction<{
             index: number,
             userChoice: number,
         }>) => {
-            state[action.payload.index].status.userChoice = action.payload.userChoice;
+            state[payload.index].status.userChoice = payload.userChoice;
         },
     },
 });

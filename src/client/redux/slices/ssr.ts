@@ -1,10 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-type SsrType = {
+type Ssr = {
     wide: boolean,
 } | null;
 
-const initialState: SsrType = null as SsrType;
+const initialState = null as Ssr;
 
 export const ssr = createSlice({
     name: 'ssr',

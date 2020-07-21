@@ -5,7 +5,7 @@ import { Action } from 'redux';
 import { assignColorVars } from './assignColorVar';
 import ReactGA from 'react-ga';
 import { topics } from './slices/topics';
-import { puzzlerViews } from './slices/puzzlerViews';
+import { puzzlerViews as puzzlerViewsSlice} from './slices/puzzlerViews';
 import { current } from './slices/current';
 import { correctAnswers } from './slices/correctAnswers';
 
@@ -24,7 +24,7 @@ export function genNewPuzzler(diffHint: boolean): VoidThunk {
         const topic = state.topics[state.puzzlerViews.length % state.topics.length]
 
         const puzzler = genPuzzler(topic);
-        dispatch(puzzlerViews.actions.append({
+        dispatch(puzzlerViewsSlice.actions.append({
             source: puzzler.html,
             styleChoices: puzzler.getStyleCodes(diffHint),
             commonStyleSummary: puzzler.commonStyleSummary,
@@ -47,8 +47,9 @@ export function genNewPuzzler(diffHint: boolean): VoidThunk {
 
 export function checkChoice(userChoice: number): VoidThunk {
     return function(dispatch, getState) {
-        const isCorrect = getState().puzzlerViews[getState().current].status.correctChoice === userChoice;
-        dispatch(puzzlerViews.actions.displayAnswer({index: getState().current, userChoice}));
+        const {puzzlerViews, current} = getState();
+        const isCorrect = puzzlerViews[current].status.correctChoice === userChoice;
+        dispatch(puzzlerViewsSlice.actions.displayAnswer({index: current, userChoice}));
         if (isCorrect) {
             dispatch(correctAnswers.actions.inc());
         }

@@ -12,6 +12,6 @@ export const layoutConstants = createSlice({
     name: 'layoutConstants',
     initialState,
     reducers: {
-        setFooterBtnHeight: (state, action: PayloadAction<number>) => ({...state, footerBtnHeight: action.payload}),
+        setFooterBtnHeight: (state, {payload}: PayloadAction<number>) => ({...state, footerBtnHeight: payload}),
     }
 });

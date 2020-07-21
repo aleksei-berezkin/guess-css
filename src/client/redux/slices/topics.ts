@@ -5,6 +5,6 @@ export const topics = createSlice({
     name: 'topics',
     initialState: [] as Topic[],
     reducers: {
-        set: (state, action: PayloadAction<Topic[]>) => action.payload,
+        set: (state, {payload}: PayloadAction<Topic[]>) => payload,
     },
 });

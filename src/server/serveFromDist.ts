@@ -1,4 +1,5 @@
 import express, { Express } from 'express';
+import compression from 'compression';
 import path from 'path';
 import { sendRenderedApp } from './renderServerSide';
 import { WEB_DEV_PORT } from './portsConfig';
@@ -11,6 +12,8 @@ if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'producti
 }
 
 const app: Express = express();
+
+app.use(compression());
 
 app.all('/index.html', (_, res) => res.redirect('/'));
 
