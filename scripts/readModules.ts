@@ -20,6 +20,7 @@ type PackageJsonData = PackageJsonFile & {
     description?: string,
     license?: string,
     homepage?: string,
+    repository?: string,
 }
 
 type LicenseData = LicenseFile & {
@@ -28,7 +29,16 @@ type LicenseData = LicenseFile & {
 
 type DepName = keyof typeof localPackageJson.dependencies | keyof typeof localPackageJson.devDependencies;
 
-function getNotNull<T, K extends keyof T>(o: T, k: K): Exclude<T[K], null | undefined> {
+function getNotNull<T, K extends keyof T>(o: T, k: K | K[]): Exclude<T[K], null | undefined> {
+    if (Array.isArray(k)) {
+        for (const i of k) {
+            if (o[i] != null) {
+                return o[i]!;
+            }
+        }
+        throw new Error(`'${ k }' all are null or undefined in ${ JSON.stringify(o) }`);
+    }
+
     if (o[k] != null) {
         return o[k]!;
     }
@@ -61,6 +71,7 @@ export const readModules: Promise<Stream<DepFullData>> = entryStream<{[k in DepN
                     description: json.description,
                     license: json.license,
                     homepage: json.homepage,
+                    repository: json.repository,
                 });
                 return;
             }
@@ -111,7 +122,7 @@ export const readModules: Promise<Stream<DepFullData>> = entryStream<{[k in DepN
             .map(([p, l]) => ({
                 name: p.name,
                 description: getNotNull(p, 'description'),
-                homepage: getNotNull(p, 'homepage'),
+                homepage: getNotNull(p, ['homepage', 'repository']),
                 license: getNotNull(p, 'license'),
                 licenseText: getNotNull(l, 'licenseText'),
             }))
