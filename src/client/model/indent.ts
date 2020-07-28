@@ -1,5 +1,5 @@
 import { Region } from './region';
-import { same } from '../stream/stream';
+import { same } from 'fluent-streams';
 
 const indentSize = 2;
 

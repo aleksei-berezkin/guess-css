@@ -1,7 +1,7 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { Region, RegionKind } from '../model/region';
 import Box from '@material-ui/core/Box';
-import { stream } from '../stream/stream';
+import { stream } from 'fluent-streams';
 import React, { ReactElement } from 'react';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import { useSelector } from 'react-redux';

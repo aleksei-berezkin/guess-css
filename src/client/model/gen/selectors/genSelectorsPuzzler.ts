@@ -2,7 +2,7 @@ import { Puzzler } from '../../puzzler';
 import { Node, TagNode, TextNode } from '../../nodes';
 import { randomItem } from '../../../util';
 import { genRulesChoices } from './genSelectorsCss';
-import { stream } from '../../../stream/stream';
+import { stream } from 'fluent-streams';
 
 export function genSelectorsPuzzler(): Puzzler {
     const body = new TagNode(

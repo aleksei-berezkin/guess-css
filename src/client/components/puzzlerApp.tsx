@@ -2,7 +2,7 @@ import React, { ReactElement, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { ofCurrentView, State } from '../redux/store';
 import { gaInit, gaNewPuzzler, initClient } from '../redux/thunks';
-import { stream } from '../stream/stream';
+import { stream } from 'fluent-streams';
 import AppBar from '@material-ui/core/AppBar';
 import Grid from '@material-ui/core/Grid';
 import Toolbar from '@material-ui/core/Toolbar';

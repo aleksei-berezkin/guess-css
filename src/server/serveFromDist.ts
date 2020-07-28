@@ -4,7 +4,7 @@ import path from 'path';
 import { sendRenderedApp } from './renderServerSide';
 import { WEB_DEV_PORT } from './portsConfig';
 import { routes } from '../client/routes';
-import { entryStream } from '../client/stream/stream';
+import { entryStream } from 'fluent-streams';
 import { serveLicenses } from './serveLicenses';
 
 if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'production') {

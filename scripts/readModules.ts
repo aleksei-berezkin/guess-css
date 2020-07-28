@@ -1,4 +1,4 @@
-import { entryStream, stream, Stream } from '../src/client/stream/stream';
+import { entryStream, stream, Stream } from 'fluent-streams';
 import * as localPackageJson from '../package.json';
 import path from 'path';
 import fs from 'fs';
@@ -17,9 +17,9 @@ type LicenseFile = {
 }
 
 type PackageJsonData = PackageJsonFile & {
-    description: string,
-    license: string,
-    homepage: string,
+    description?: string,
+    license?: string,
+    homepage?: string,
 }
 
 type LicenseData = LicenseFile & {
@@ -27,6 +27,13 @@ type LicenseData = LicenseFile & {
 }
 
 type DepName = keyof typeof localPackageJson.dependencies | keyof typeof localPackageJson.devDependencies;
+
+function getNotNull<T, K extends keyof T>(o: T, k: K): Exclude<T[K], null | undefined> {
+    if (o[k] != null) {
+        return o[k]!;
+    }
+    throw new Error(`'${ k }' is null or undefined in ${ JSON.stringify(o) }`);
+}
 
 export const readModules: Promise<Stream<DepFullData>> = entryStream<{[k in DepName]?: string}>(localPackageJson.dependencies)
     .appendAll(entryStream(localPackageJson.devDependencies))
@@ -80,8 +87,16 @@ export const readModules: Promise<Stream<DepFullData>> = entryStream<{[k in DepN
             .groupBy(data => data.name)
             .map(([_, data]): readonly [PackageJsonData, {licenseText: string}] => {
                 if (data.length === 1 && data[0].type === 'package.json' && data[0].name === 'npm-run-parallel') {
-                    // Lacks license file
-                    return [data[0], {licenseText: `License: ${data[0].license}`}]
+                    // Lacks homepage and license file
+                    return [
+                        {
+                            ...data[0],
+                            homepage: 'https://www.npmjs.com/package/npm-run-parallel',
+                        },
+                        {
+                            licenseText: `License: ${data[0].license}`
+                        }
+                    ];
                 }
                 if (data.length === 2) {
                     if (data[0].type === 'package.json' && data[1].type === 'LICENSE') {
@@ -93,11 +108,11 @@ export const readModules: Promise<Stream<DepFullData>> = entryStream<{[k in DepN
                 }
                 throw new Error('Bad data: ' + JSON.stringify(data));
             })
-            .map(([p, {licenseText}]) => ({
+            .map(([p, l]) => ({
                 name: p.name,
-                description: p.description,
-                homepage: p.homepage,
-                license: p.license,
-                licenseText,
+                description: getNotNull(p, 'description'),
+                homepage: getNotNull(p, 'homepage'),
+                license: getNotNull(p, 'license'),
+                licenseText: getNotNull(l, 'licenseText'),
             }))
     );

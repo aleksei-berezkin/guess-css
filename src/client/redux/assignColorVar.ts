@@ -1,5 +1,5 @@
 import { randomItem } from '../util';
-import { stream } from '../stream/stream';
+import { stream } from 'fluent-streams';
 import { ColorVar } from '../model/gen/vars';
 
 export type Hue = 'red' | 'blue' | 'gray' | 'yellow' | 'brown';

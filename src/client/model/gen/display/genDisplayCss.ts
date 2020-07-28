@@ -2,7 +2,7 @@ import { TagNode } from '../../nodes';
 import { ChildCombinator, ClassSelector, Declaration, Rule, Selector, TypeSelector } from '../../cssRules';
 import { getNShuffled, randomBounded, randomItemsInOrder } from '../../../util';
 import { getSiblingsSubtree } from '../siblingsSubtree';
-import { stream } from '../../../stream/stream';
+import { stream } from 'fluent-streams';
 import { RulesParam } from '../../puzzler';
 import { contrastColorVar, getColorVar } from '../vars';
 import { globalRule } from '../globalRule';

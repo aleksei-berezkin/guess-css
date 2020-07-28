@@ -7,7 +7,7 @@ import config from '../../webpackInMem';
 import { WEB_DEV_PORT } from './portsConfig';
 import { serveLicenses } from './serveLicenses';
 import { routes } from '../client/routes';
-import { entryStream } from '../client/stream/stream';
+import { entryStream } from 'fluent-streams';
 
 if (process.env.NODE_ENV !== 'development' && process.env.NODE_ENV !== 'production') {
     throw new Error(process.env.NODE_ENV);

@@ -2,7 +2,7 @@ import { TagNode } from '../../nodes';
 import { ChildCombinator, ClassSelector, Rule, Selector, TypeSelector } from '../../cssRules';
 import { getDeepestSingleChildSubtree } from '../singleChildSubtree';
 import { transpose } from '../../../util';
-import { stream } from '../../../stream/stream';
+import { stream } from 'fluent-streams';
 import { RulesParam } from '../../puzzler';
 import { contrastColorVar, getColorVar } from '../vars';
 import { globalRule } from '../globalRule';

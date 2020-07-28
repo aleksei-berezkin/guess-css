@@ -1,5 +1,5 @@
 import { TagNode } from '../nodes';
-import { Stream, stream } from '../../stream/stream';
+import { Stream, stream } from 'fluent-streams';
 
 export class SingleChildSubtree {
     constructor(readonly root: TagNode, readonly depth: number = 1) {

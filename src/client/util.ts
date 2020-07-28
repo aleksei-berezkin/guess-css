@@ -1,4 +1,4 @@
-import { range, Stream, stream } from './stream/stream';
+import { range, Stream, stream } from 'fluent-streams';
 import { Theme } from '@material-ui/core';
 
 export function randomItem<T>(items: T[]): T {

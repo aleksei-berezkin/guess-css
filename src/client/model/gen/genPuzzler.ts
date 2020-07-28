@@ -4,7 +4,7 @@ import { genDisplayPuzzler } from './display/genDisplayPuzzler';
 import { genPositionPuzzler } from './position/genPositionPuzzler';
 import { genFlexboxPuzzler } from './flexbox/genFlexboxPuzzler';
 import { Topic } from './topic';
-import { continually, entryStream } from '../../stream/stream';
+import { continually, entryStream } from 'fluent-streams';
 
 const generators: {[k in Topic]: () => Puzzler} = {
     display: genDisplayPuzzler,

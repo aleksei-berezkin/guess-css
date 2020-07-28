@@ -1,6 +1,6 @@
 import { Region } from './region';
 import { Indent } from './indent';
-import { stream, streamOf } from '../stream/stream';
+import { stream, streamOf } from 'fluent-streams';
 
 export interface Node {
     readonly children: Node[];

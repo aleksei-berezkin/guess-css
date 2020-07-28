@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ofCurrentView, ofCurrentViewOrUndefined, State } from '../redux/store';
 import { checkChoice } from '../redux/thunks';
 import Grid from '@material-ui/core/Grid';
-import { abc, range } from '../stream/stream';
+import { abc, range } from 'fluent-streams';
 import { CodePaper } from './codePaper';
 import { CodeHeader } from './codeHeader';
 import Button from '@material-ui/core/Button';

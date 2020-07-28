@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import { DepFullData } from './depFullData';
-import { stream } from '../src/client/stream/stream';
+import { stream } from 'fluent-streams';
 
 export const readNode = readLicense('node', 'JavaScript runtime built on Chrome\'s V8 JavaScript engine', process.argv0, 'https://nodejs.org/', '');
 export const readNpm = which('npm')

@@ -11,7 +11,7 @@ import {
 } from '../../cssRules';
 import { getSiblingsSubtree, SiblingsSubtree } from '../siblingsSubtree';
 import { getDeepestSingleChildSubtree, SingleChildSubtree } from '../singleChildSubtree';
-import { optional, Optional, range, stream } from '../../../stream/stream';
+import { optional, Optional, range, stream } from 'fluent-streams';
 import { RulesParam } from '../../puzzler';
 import { contrastColorVar, getColorVar } from '../vars';
 import { globalRule } from '../globalRule';
