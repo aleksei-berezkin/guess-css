@@ -108,18 +108,6 @@ export const readModules: Promise<Stream<DepFullData>> = entryStream<{[k in DepN
                 }
                 throw new Error('Bad data: ' + JSON.stringify(data));
             })
-            .map(([p, l]) => {
-                if (p.name === '@reduxjs/toolkit') {
-                    return [
-                        {
-                            ...p,
-                            homepage: 'https://redux-toolkit.js.org/',
-                        },
-                        l,
-                    ] as const;
-                }
-                return [p, l] as const;
-            })
             .map(([p, l]) => ({
                 name: p.name,
                 description: getNotNull(p, 'description'),
