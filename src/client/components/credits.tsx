@@ -86,7 +86,7 @@ export function Credits() {
                     </AccordionSummary>
                     <AccordionDetails className={ classes.accDetails }>
                         <Typography variant='body2'>{ dep.description }</Typography>
-                        <Typography variant='body2'><Link target='_blank' href={ dep.homepage }>{ dep.homepage }</Link></Typography>
+                        <Typography variant='body2'><Link target='_blank' href={ dep.link }>{ dep.link }</Link></Typography>
                         <License name={ dep.name } visible={ visible[dep.name] }/>
                     </AccordionDetails>
                 </Accordion>;

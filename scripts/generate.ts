@@ -9,10 +9,10 @@ Promise.all([readModules, readNode, readNpm, fs.promises.mkdir(generatedDir, { r
     .then(([modules, node, npm]) => {
             const depsFull = modules.append(node).append(npm);
             const deps = depsFull
-                .map(({name, description, homepage}) => ({
+                .map(({name, description, link}) => ({
                     name,
                     description,
-                    homepage,
+                    link,
                 }))
                 .sortOn(({name}) => name)
                 .toArray();

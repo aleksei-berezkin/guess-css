@@ -20,6 +20,9 @@ type PackageJsonData = PackageJsonFile & {
     description?: string,
     license?: string,
     homepage?: string,
+    repository?: string | {
+        url?: string,
+    },
 }
 
 type LicenseData = LicenseFile & {
@@ -27,13 +30,6 @@ type LicenseData = LicenseFile & {
 }
 
 type DepName = keyof typeof localPackageJson.dependencies | keyof typeof localPackageJson.devDependencies;
-
-function getNotNull<T, K extends keyof T>(o: T, k: K): Exclude<T[K], null | undefined> {
-    if (o[k] != null) {
-        return o[k]!;
-    }
-    throw new Error(`'${ k }' is null or undefined in ${ JSON.stringify(o) }`);
-}
 
 export const readModules: Promise<Stream<DepFullData>> = entryStream<{[k in DepName]?: string}>(localPackageJson.dependencies)
     .appendAll(entryStream(localPackageJson.devDependencies))
@@ -61,6 +57,7 @@ export const readModules: Promise<Stream<DepFullData>> = entryStream<{[k in DepN
                     description: json.description,
                     license: json.license,
                     homepage: json.homepage,
+                    repository: json.repository,
                 });
                 return;
             }
@@ -111,8 +108,31 @@ export const readModules: Promise<Stream<DepFullData>> = entryStream<{[k in DepN
             .map(([p, l]) => ({
                 name: p.name,
                 description: getNotNull(p, 'description'),
-                homepage: getNotNull(p, 'homepage'),
+                link: getLink(p),
                 license: getNotNull(p, 'license'),
                 licenseText: getNotNull(l, 'licenseText'),
             }))
     );
+
+function getNotNull<T, K extends keyof T>(o: T, k: K): Exclude<T[K], null | undefined> {
+    if (o[k] != null) {
+        return o[k]!;
+    }
+    throw new Error(`'${ k }' is null or undefined in ${ JSON.stringify(o) }`);
+}
+
+function getLink(p: PackageJsonData): string {
+    if (typeof p.homepage === 'string') {
+        return p.homepage;
+    }
+
+    if (typeof p.repository === 'string') {
+        return p.repository;
+    }
+
+    if (typeof p.repository?.url === 'string') {
+        return p.repository.url;
+    }
+
+    throw new Error('No homepage or repository: ' + JSON.stringify(p));
+}

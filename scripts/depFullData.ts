@@ -1,7 +1,7 @@
 export type DepFullData = {
     name: string,
     description: string,
-    homepage: string,
+    link: string,
     license: string,
     licenseText: string,
 };
