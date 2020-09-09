@@ -35,7 +35,7 @@ export function getDeepestSingleChildSubtree(root: TagNode): SingleChildSubtree 
         .map(getDeepestSingleChildSubtree)
         .groupBy(subtree => subtree.depth)
         .reduce(([d1, s1], [d2, s2]) => d1 > d2 ? [d1, s1] : [d2, s2])
-        .flatMap(([_, s]) => s)
+        .flatMapToStream(([_, s]) => s)
         .randomItem()
         .map(s => s.createWithParent(root))
         .orElseGet(() => new SingleChildSubtree(root));

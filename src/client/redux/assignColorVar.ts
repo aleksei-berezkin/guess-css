@@ -39,10 +39,10 @@ export function assignColorVars(vars: readonly ColorVar[]): AssignedColorVar[] {
     if (vars.length === 2) {
         return stream(compatibleHues)
             .randomItem()
-            .flatMap(h => h)
-            .zipStrict(vars)
+            .flatMapToStream(h => h)
             .shuffle()
-            .map(([h, p]) => doAssign(h, p))
+            .zipStrict(vars)
+            .map(([h, v]) => doAssign(h, v))
             .toArray();
     }
 
