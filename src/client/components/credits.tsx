@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
 import Link from '@material-ui/core/Link';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import deps from '../../../generated/deps.json';
@@ -8,19 +7,14 @@ import Accordion, { AccordionProps } from '@material-ui/core/Accordion';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import { Link as RouterLink } from 'react-router-dom';
 import { monospaceFonts } from '../util';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
-import Button from '@material-ui/core/Button';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { routes } from '../routes';
 import Grid from '@material-ui/core/Grid';
+import { ContentPage } from './contentPage';
 
 const useStyles = makeStyles(theme => ({
-    root: {
-        textAlign: 'left',
-    },
     accDetails: {
         display: 'block',
         overflow: 'hidden',
@@ -37,18 +31,13 @@ const useStyles = makeStyles(theme => ({
         fontFamily: monospaceFonts,
         fontSize: 12,
     },
-    backMargins: {
-        marginTop: theme.spacing(1),
-        marginBottom: theme.spacing(1),
-    }
 }));
 
 export function Credits() {
     const classes = useStyles();
     const [visible, setVisible] = useState<{[k: string]: boolean}>({});
 
-    return <Box className={ classes.root }>
-        <Back/>
+    return <ContentPage>
         <Typography variant='h4'>Credits</Typography>
         <Typography variant='h5'>Assets</Typography>
         <List dense>
@@ -92,19 +81,7 @@ export function Credits() {
                 </Accordion>;
             })
         }
-
-        <Back margins/>
-    </Box>
-}
-
-function Back({ margins = false }) {
-    const classes = useStyles();
-    const className = margins ? classes.backMargins : undefined;
-
-    return <Button to={ routes.root } component={ RouterLink }
-                   size='small' fullWidth color='primary'
-                   className={ className }>
-        Back to puzzler</Button>;
+    </ContentPage>
 }
 
 function License(p: {name: string, visible: boolean | undefined}) {
