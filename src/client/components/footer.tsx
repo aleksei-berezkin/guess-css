@@ -26,7 +26,7 @@ const useStyles = makeStyles(theme => ({
         paddingBottom: 0,
         paddingLeft: 5.4,
         background: 'currentColor',
-        fill: '#fff',
+        fill: theme.palette.background.default,
         borderRadius: 1.8,
     },
 }));
