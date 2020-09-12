@@ -10,22 +10,21 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import { Contacts } from './contacts';
 import { Link as RouterLink } from 'react-router-dom';
 import Link from '@material-ui/core/Link';
+import { useInlineSvg } from './inlineSvg';
 
 const useStyles = makeStyles(theme => ({
     bm: {
         marginBottom: theme.spacing(1),
     },
-    bIcon: {
-        marginBottom: -3,
-    },
     marker: {
-        marginBottom: 3,
+        marginBottom: '.15em',
         marginRight: theme.spacing(1.5),
     },
 }));
 
 export function About() {
     const styles = useStyles();
+    const inlineSvg = useInlineSvg();
 
     return <ContentPage>
         <Typography variant='h4'>Guess CSS!</Typography>
@@ -42,7 +41,7 @@ export function About() {
             After you made your guess the app shows which one was correct, and updates your score displayed
             at the top.</Typography>
         <Typography className={ styles.bm }>Navigate between current and done tasks with arrows to the left and right of the frame.</Typography>
-        <Typography>Use <Brightness2Icon fontSize='small' className={ styles.bIcon }/> and <BrightnessHigh fontSize='small' className={ styles.bIcon }/> to
+        <Typography>Use <Brightness2Icon fontSize='small' className={ inlineSvg.small }/> and <BrightnessHigh fontSize='small' className={ inlineSvg.small }/> to
             switch between dark and light themes.</Typography>
 
         <Typography variant='h4'>Have something to say?</Typography>

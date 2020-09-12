@@ -14,6 +14,9 @@ import { useSelector } from 'react-redux';
 import { State } from '../redux/store';
 import { stream } from 'fluent-streams';
 import React from 'react';
+import CheckIcon from '@material-ui/icons/Check';
+import CloseIcon from '@material-ui/icons/Close';
+import { useInlineSvg } from './inlineSvg';
 
 export function MyAppBar(p: {paletteType: PaletteType, setPaletteType: (paletteType: PaletteType) => void}) {
     const togglePaletteType = () => {
@@ -28,7 +31,7 @@ export function MyAppBar(p: {paletteType: PaletteType, setPaletteType: (paletteT
     const navigateToAbout = () => history.push(routes.about);
 
     return <>
-        <AppBar color={ p.paletteType === 'light' ? 'primary' : 'default' }>
+        <AppBar color={ p.paletteType === 'light' ? 'primary' : 'default' } position='sticky'>
             <Toolbar variant='dense'>
                 <Container maxWidth='sm' disableGutters>
                     <Grid container alignItems='center'>
@@ -58,18 +61,18 @@ export function MyAppBar(p: {paletteType: PaletteType, setPaletteType: (paletteT
                 </Container>
             </Toolbar>
         </AppBar>
-        <Toolbar variant='dense'/>
     </>;
 }
 
 function Score() {
     const isLast = useSelector(state => state.current === state.puzzlerViews.length - 1);
     const correctAnswers = useSelector(state => state.correctAnswers);
-    const donePuzzlers = useSelector(getDonePuzzlersNum);
+    const incorrectAnswers = useSelector(state => getDonePuzzlersNum(state) - state.correctAnswers);
+    const inlineSvg = useInlineSvg();
 
     return <>{
         isLast &&
-        <Typography>Score: {correctAnswers} of {donePuzzlers}</Typography>
+        <Typography><CheckIcon fontSize='small' className={ inlineSvg.score }/> {correctAnswers} : {incorrectAnswers} <CloseIcon fontSize='small' className={ inlineSvg.score }/></Typography>
     }</>;
 }
 
@@ -80,7 +83,7 @@ function DonePuzzler() {
 
     return <>{
         isHistory &&
-        <Typography>Done: { historyPuzzlerPos } of { donePuzzlersNum }</Typography>
+        <Typography>{ historyPuzzlerPos } / { donePuzzlersNum }</Typography>
     }</>
 }
 
