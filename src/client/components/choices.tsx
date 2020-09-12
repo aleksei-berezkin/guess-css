@@ -147,7 +147,7 @@ function FooterButton(p: {status: ChoiceStatus, checkChoice: () => void}) {
         if (!footerStyle) {
             dispatch(layoutConstants.actions.setFooterBtnHeight(btnBoxRef.current!.getBoundingClientRect().height));
         }
-    }, ['const']);
+    }, []);
 
     const classes = useFooterStyles();
 
