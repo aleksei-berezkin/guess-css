@@ -5,7 +5,6 @@ import Button from '@material-ui/core/Button';
 import { routes } from '../routes';
 import { Link as RouterLink, Route } from 'react-router-dom';
 import Container from '@material-ui/core/Container';
-import { Credits } from './credits';
 
 const useStyles = makeStyles(theme => ({
     root: {
