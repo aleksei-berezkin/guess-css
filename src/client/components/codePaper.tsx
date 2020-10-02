@@ -127,7 +127,7 @@ function SimpleCollapsed(p: { summary: string[], children: ReactElement }) {
             <IconButton size='small' onClick={ toggleCollapsed } color='inherit'>
                 <ChevronRightIcon fontSize='small' className={
                     streamOf(classes.expandIcon)
-                        .appendIf(collapsedOpen, classes.expandIconOpen)
+                        .appendAll(collapsedOpen ? [classes.expandIconOpen] : [])
                         .join(' ')
                 } titleAccess={ collapsedOpen ? 'collapse' : 'expand'}/>
             </IconButton>

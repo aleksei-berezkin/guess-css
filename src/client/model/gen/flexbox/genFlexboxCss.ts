@@ -19,12 +19,13 @@ export function genFlexboxCss(body: TagNode): RulesParam {
                     new Rule(
                         new TypeSelector('body'),
                         stream<Declaration>([{property: 'display', value: 'flex'}])
-                            .appendIf(
-                                direction !== 'row',
-                                {property: 'flex-direction', value: direction}
+                            .appendAll(
+                                direction !== 'row'
+                                    ? [{property: 'flex-direction', value: direction}]
+                                    : []
                             )
-                            .appendIf(
-                                wrap, {property: 'flex-wrap', value: 'wrap'}
+                            .appendAll(
+                                wrap ? [{property: 'flex-wrap', value: 'wrap'}] : []
                             )
                             .appendAll([
                                 {property: 'justify-content', value: justifyContent, differing: true},

@@ -69,8 +69,8 @@ function childrenToRule(children: TagNode[], width: string | undefined): (displa
     return display => new Rule(
         children.map(getClassSelector),
         stream<Declaration>([{property: 'display', value: display, differing: true}])
-            .appendIf(
-                !!width, {property: 'width', value: width!}
+            .appendAll(
+                !!width ? [{property: 'width', value: width!}] : []
             )
             .toArray()
     );
