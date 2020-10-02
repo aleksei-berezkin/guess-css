@@ -14,7 +14,7 @@ Promise.all([readModules, readNode, readNpm, fs.promises.mkdir(generatedDir, { r
                     description,
                     link,
                 }))
-                .sortOn(({name}) => name)
+                .sortBy(({name}) => name)
                 .toArray();
             const licenses = depsFull
                 .map(({name, licenseText}) => [name, licenseText] as const)

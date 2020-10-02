@@ -44,6 +44,6 @@ function which(name: string): Promise<string> {
         stream(executables)
             .filterWithAssertion((ex): ex is string => !!ex)
             .single()
-            .orElseThrow()
+            .get()
     )
 }

@@ -26,7 +26,7 @@ export function randomItemsInOrder<T>(items: T[], n: number): T[] {
     }
     return range(0, items.length)
         .takeRandom(n)
-        .sortOn(i => i)
+        .sortBy(i => i)
         .map(i => items[i])
         .toArray();
 }
