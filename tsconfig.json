@@ -6,12 +6,12 @@
       "dom",
       "es6"
     ],
-    "module": "commonjs",
+    "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "sourceMap": true,
     "strict": true,
-    "target": "es2019"
+    "target": "esnext"
   },
   "exclude": [
     "node_modules"

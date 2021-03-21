@@ -1,22 +1,14 @@
-import { genPuzzler, getRandomizedTopics } from '../model/gen/genPuzzler';
+import { genPuzzler } from '../model/gen/genPuzzler';
 import { State } from './store';
 import { ThunkAction } from 'redux-thunk';
 import { Action } from 'redux';
 import { assignColorVars } from './assignColorVar';
 import ReactGA from 'react-ga';
-import { topics } from './slices/topics';
 import { puzzlerViews as puzzlerViewsSlice} from './slices/puzzlerViews';
 import { current } from './slices/current';
 import { correctAnswers } from './slices/correctAnswers';
 
 type VoidThunk = ThunkAction<void, State, never, Action<string>>;
-
-export function initClient(): VoidThunk {
-    return function(dispatch) {
-        dispatch(topics.actions.set(getRandomizedTopics()));
-        dispatch(genNewPuzzler(true));
-    };
-}
 
 export function genNewPuzzler(diffHint: boolean): VoidThunk {
     return function(dispatch, getState) {

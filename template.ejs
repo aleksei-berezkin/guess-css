@@ -1,7 +1,4 @@
-<% 
-    // noinspection JSUnresolvedVariable
-    var options = htmlWebpackPlugin.options
-%><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
@@ -11,10 +8,48 @@
     <meta name="description" content="You are given a small frame, its HTML source and 3 CSS snippets. Guess which of them was used to style the frame, test your knowledge!"/>
     <link rel="shortcut icon" type="image/png" href="/css-logo.png">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" />
-    <script><%= options.SCRIPT_PLACEHOLDER %></script>
-    <style id="<%= options.STYLE_ID %>"><%= options.STYLE_PLACEHOLDER %></style>
+    <style id="loading-screen-style">
+        body {
+            margin: 0;
+        }
+
+        #loading-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+
+        #loading-screen svg {
+            animation: spinner-rotation 2s linear infinite;
+        }
+
+        #loading-screen circle {
+            fill: none;
+            stroke: #212121;
+            stroke-width: 4px;
+            stroke-dasharray: 104px;
+        }
+
+        @keyframes spinner-rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
 </head>
 <body>
-    <div id="<%= options.ROOT_EL_ID %>"><%= options.APP_PLACEHOLDER %></div>
+     <div id="app-root-div">
+        <div id="loading-screen">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none">
+                <circle cx="24" cy="24" r="22"></circle>
+            </svg>
+        </div>
+     </div>
 </body>
 </html>

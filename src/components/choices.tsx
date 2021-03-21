@@ -25,8 +25,7 @@ import { layoutConstants } from '../redux/slices/layoutConstants';
 
 export function Choices(): ReactElement {
     const theme = useTheme();
-    const ssr = useSelector(state => state.ssr);
-    const isWide = useMediaQuery(theme.breakpoints.up('md')) || ssr?.wide;
+    const isWide = useMediaQuery(theme.breakpoints.up('md'));
 
     return isWide && <WideChoices/> || <NarrowChoices/>;
 }

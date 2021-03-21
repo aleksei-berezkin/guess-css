@@ -4,7 +4,6 @@ import { current } from './slices/current';
 import { topics } from './slices/topics';
 import { PuzzlerView, puzzlerViews } from './slices/puzzlerViews';
 import { layoutConstants } from './slices/layoutConstants';
-import { ssr } from './slices/ssr';
 
 export const reducer = combineReducers({
     topics: topics.reducer,
@@ -12,7 +11,6 @@ export const reducer = combineReducers({
     current: current.reducer,
     correctAnswers: correctAnswers.reducer,
     layoutConstants: layoutConstants.reducer,
-    ssr: ssr.reducer,
 });
 
 export type State = ReturnType<typeof reducer>;
