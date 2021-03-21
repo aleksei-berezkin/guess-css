@@ -58,7 +58,7 @@ export function Contacts(p: {large?: boolean}) {
 }
 
 function Dev(p: {large?: boolean}) {
-    const classes = useStyles();
+    const classes = useStyles(p);
 
     return <svg xmlns='http://www.w3.org/2000/svg' version='1' width='20%' height='20%' viewBox="0 0 132 65" role='img'
                 className={`${classes.devLogo} ${p.large ? 'large' : ''}`}><title>Dev.to account</title>
