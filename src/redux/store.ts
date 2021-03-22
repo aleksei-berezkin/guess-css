@@ -35,9 +35,6 @@ declare module 'react-redux' {
     }
 }
 
-export function createAppStore(preloadedState?: State) {
-    return configureStore({
-        reducer,
-        ...(preloadedState ? {preloadedState} : {}),
-    })
+export function createAppStore() {
+    return configureStore({reducer});
 }

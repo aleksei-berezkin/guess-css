@@ -11,7 +11,7 @@ ReactDOM.render(
 );
 
 function createApp(state?: State) {
-    return <Provider store={ createAppStore(state) }>
+    return <Provider store={ createAppStore() }>
         <PuzzlerApp/>
     </Provider>;
 }
