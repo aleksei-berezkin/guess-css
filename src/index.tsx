@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { PuzzlerApp } from './components/puzzlerApp';
 import { Provider } from 'react-redux';
-import { createAppStore, State } from './redux/store';
+import { createAppStore } from './redux/store';
 
 
 ReactDOM.render(
@@ -10,8 +10,12 @@ ReactDOM.render(
     document.getElementById('app-root-div')
 );
 
-function createApp(state?: State) {
+function createApp() {
     return <Provider store={ createAppStore() }>
-        <PuzzlerApp/>
+        <PuzzlerApp basename={ getBasename() }/>
     </Provider>;
+}
+
+function getBasename() {
+    return location.host.includes('github') ? 'guess-css-site' : undefined;
 }

@@ -11,7 +11,7 @@ import { MyAppBody } from './myAppBody';
 import { topics } from '../redux/slices/topics';
 import { getRandomizedTopics } from '../model/gen/genPuzzler';
 
-export function PuzzlerApp(): ReactElement {
+export function PuzzlerApp(p: {basename: string | undefined}): ReactElement {
     const [paletteType, setPaletteType] = useState<PaletteType>('light');
     const dispatch = useDispatch();
 
@@ -26,7 +26,7 @@ export function PuzzlerApp(): ReactElement {
 
     return <ThemeProvider theme={ theme }>
         <CssBaseline/>
-            <BrowserRouter>
+            <BrowserRouter basename={ p.basename }>
                 <MyAppBar paletteType={ paletteType } setPaletteType={ setPaletteType }/>
                 <MyAppBody/>
             </BrowserRouter>
