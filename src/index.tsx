@@ -17,5 +17,5 @@ function createApp() {
 }
 
 function getBasename() {
-    return location.host.includes('github') ? 'guess-css-site' : undefined;
+    return location.host.includes('github') ? '/guess-css-site' : undefined;
 }
