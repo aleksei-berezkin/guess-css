@@ -45,6 +45,6 @@
     "react-ga": "^3.3.0",
     "react-redux": "^7.2.2",
     "react-router-dom": "^5.2.0",
-    "react-swipeable-views": "^0.13.9"
+    "react-swipeable-views": "^0.14.0"
   }
 }
