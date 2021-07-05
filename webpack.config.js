@@ -21,12 +21,6 @@ module.exports = {
     module: {
         rules: [
             {
-                test: /\.m?js/,
-                resolve: {
-                    fullySpecified: false,
-                },
-            },
-            {
                 test: /\.(ts|tsx)$/,
                 exclude: /node_modules/,
                 resolve: {
