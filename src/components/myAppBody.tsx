@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux';
 import { ofCurrentView } from '../redux/store';
 import { ScrollToTop } from './scrollToTop';
-import { Route, Switch } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { routes } from '../routes';
 import Grid from '@material-ui/core/Grid';
 import { PuzzlerRendered } from './puzzlerRendered';
@@ -12,13 +12,13 @@ import { Credits } from './credits';
 import { About } from './about';
 import React from 'react';
 
-export function MyAppBody() {
+export function MyAppBody(p: { basename: string | undefined }) {
     const htmlCode = useSelector(ofCurrentView('body', []));
 
     return <>
         <ScrollToTop />
-        <Switch>
-            <Route path={ routes.root } exact>
+        <Routes basename={ p.basename }>
+            <Route path={ routes.root }>
                 <Grid container direction='column' alignItems='center' component='main'>
                     <PuzzlerRendered/>
                     <Choices/>
@@ -38,6 +38,6 @@ export function MyAppBody() {
             <Route path={ routes.about }>
                 <About/>
             </Route>
-        </Switch>
+        </Routes>
     </>
 }

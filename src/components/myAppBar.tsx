@@ -1,5 +1,5 @@
 import { PaletteType } from '@material-ui/core';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { routes } from '../routes';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -27,8 +27,8 @@ export function MyAppBar(p: {paletteType: PaletteType, setPaletteType: (paletteT
         }
     };
 
-    const history = useHistory();
-    const navigateToAbout = () => history.push(routes.about);
+    const navigate = useNavigate();
+    const navigateToAbout = () => navigate(routes.about);
 
     return <>
         <AppBar color={ p.paletteType === 'light' ? 'primary' : 'default' } position='sticky'>

@@ -26,9 +26,9 @@ export function PuzzlerApp(p: {basename: string | undefined}): ReactElement {
 
     return <ThemeProvider theme={ theme }>
         <CssBaseline/>
-            <BrowserRouter basename={ p.basename }>
+            <BrowserRouter>
                 <MyAppBar paletteType={ paletteType } setPaletteType={ setPaletteType }/>
-                <MyAppBody/>
+                <MyAppBody basename={ p.basename }/>
             </BrowserRouter>
     </ThemeProvider>;
 }
