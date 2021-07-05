@@ -50,7 +50,7 @@ export function About() {
 
         <Typography variant='h4'>Credits</Typography>
         <Typography>Like any modern software, “Guess CSS!” is built with the usage of many awesome tools, libs
-            and assets. <Link to='/credits' component={ RouterLink }>Here</Link> is the full list.</Typography>
+            and assets. <Link to='credits' component={ RouterLink }>Here</Link> is the full list.</Typography>
 
         <Typography variant='h4' style={{textAlign: 'center'}}>Have a nice play!</Typography>
     </ContentPage>;

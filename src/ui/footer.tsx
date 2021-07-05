@@ -18,6 +18,6 @@ export function Footer() {
 
     return <Box className={ classes.root }>
         <Contacts/>
-        <Link to='/credits' component={ RouterLink }>Credits</Link>
+        <Link to='credits' component={ RouterLink }>Credits</Link>
     </Box>
 }
