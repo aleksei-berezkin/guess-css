@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { PuzzlerApp } from './components/puzzlerApp';
+import { PuzzlerApp } from './ui/puzzlerApp';
 import { Provider } from 'react-redux';
 import { createAppStore } from './store/store';
 

@@ -5,7 +5,7 @@ import blueGrey from '@material-ui/core/colors/blueGrey';
 import yellow from '@material-ui/core/colors/yellow';
 import orange from '@material-ui/core/colors/orange';
 import brown from '@material-ui/core/colors/brown';
-import { AssignedColorVar, Hue } from './assignColorVar';
+import { AssignedColorVar, Hue } from '../store/assignColorVar';
 import { ColorVarType } from '../model/gen/vars';
 
 const colors: {

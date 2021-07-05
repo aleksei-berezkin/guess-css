@@ -9,7 +9,7 @@ import { ofCurrentViewOrUndefined } from '../store/store';
 import useTheme from '@material-ui/core/styles/useTheme';
 import { escapeRe, globalRe, ld, monospaceFonts } from '../util';
 import { getContrastColorValue } from './contrastColorValue';
-import { resolveColor } from '../store/resolveColor';
+import { resolveColor } from './resolveColor';
 import { Theme } from '@material-ui/core';
 import { hasVars } from '../model/gen/vars';
 import { spacing } from './theme';

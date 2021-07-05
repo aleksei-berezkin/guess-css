@@ -6,7 +6,7 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import { Theme } from '@material-ui/core';
 import { globalRe } from '../util';
-import { resolveColor } from '../store/resolveColor';
+import { resolveColor } from './resolveColor';
 import { getContrastColorValue } from './contrastColorValue';
 import { Dispatch } from 'redux';
 import IconButton from '@material-ui/core/IconButton';

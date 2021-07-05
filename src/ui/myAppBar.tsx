@@ -1,6 +1,6 @@
 import { PaletteType } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
-import { routes } from '../routes';
+import { routes } from './routes';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Container from '@material-ui/core/Container';

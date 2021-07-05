@@ -2,7 +2,7 @@ import { useSelector } from 'react-redux';
 import { ofCurrentView } from '../store/store';
 import { ScrollToTop } from './scrollToTop';
 import { Route, Routes } from 'react-router-dom';
-import { routes } from '../routes';
+import { routes } from './routes';
 import Grid from '@material-ui/core/Grid';
 import { PuzzlerRendered } from './puzzlerRendered';
 import { Choices } from './choices';
