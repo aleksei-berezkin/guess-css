@@ -1,8 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { PuzzlerApp } from './ui/puzzlerApp';
-import { Provider } from 'react-redux';
-import { createAppStore } from './store/store';
 
 
 ReactDOM.render(
@@ -11,9 +9,7 @@ ReactDOM.render(
 );
 
 function createApp() {
-    return <Provider store={ createAppStore() }>
-        <PuzzlerApp basename={ getBasename() }/>
-    </Provider>;
+    return <PuzzlerApp basename={ getBasename() }/>;
 }
 
 function getBasename() {

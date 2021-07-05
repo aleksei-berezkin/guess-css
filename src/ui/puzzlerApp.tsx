@@ -1,5 +1,4 @@
 import React, { ReactElement, useEffect, useMemo, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { gaInit, genNewPuzzler } from '../store/thunks';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { PaletteType } from '@material-ui/core';
@@ -11,11 +10,10 @@ import { MyAppBody } from './myAppBody';
 
 export function PuzzlerApp(p: {basename: string | undefined}): ReactElement {
     const [paletteType, setPaletteType] = useState<PaletteType>('light');
-    const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(gaInit());
-        dispatch(genNewPuzzler(true));
+        gaInit();
+        genNewPuzzler(true);
         document.getElementById('loading-screen-style')!.remove();
     }, []);
 

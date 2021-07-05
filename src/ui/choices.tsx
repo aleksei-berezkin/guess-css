@@ -1,6 +1,5 @@
 import React, { ReactElement, useEffect, useRef } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { ofCurrentView, ofCurrentViewOrUndefined, State } from '../store/store';
+import { ofCurrentView, ofCurrentViewOrUndefined, PuzzlerView, State, store, useSelector } from '../store/store';
 import { checkChoice } from '../store/thunks';
 import Grid from '@material-ui/core/Grid';
 import { abc, range } from 'fluent-streams';
@@ -17,10 +16,7 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-import { Dispatch } from 'redux';
 import { spacing } from './theme';
-import { PuzzlerView, puzzlerViews } from '../store/slices/puzzlerViews';
-import { layoutConstants } from '../store/slices/layoutConstants';
 
 
 export function Choices(): ReactElement {
@@ -35,10 +31,10 @@ const choicesSelector = ofCurrentView('styleChoices', []);
 const commonSelector = ofCurrentView('commonStyle', []);
 const statusSelector = ofCurrentViewOrUndefined('status');
 
-function dispatchCheckChoice(choice: number, status: PuzzlerView['status'] | undefined, dispatch: Dispatch<any>) {
+function handleCheckChoice(choice: number, status: PuzzlerView['status'] | undefined) {
     return () => {
         if (status?.userChoice == null) {
-            dispatch(checkChoice(choice));
+            checkChoice(choice);
         }
     }
 }
@@ -49,8 +45,6 @@ function WideChoices() {
     const common = useSelector(commonSelector);
     const status = useSelector(statusSelector);
     const classes = makeChoiceStyles();
-
-    const dispatch = useDispatch();
 
     return <Grid container justify='center'>{
         abc().zipWithIndex().take(choices.length)
@@ -63,7 +57,7 @@ function WideChoices() {
                         body={{
                             code: choices[i] || [],
                             collapsedCode: common,
-                            footer: <FooterButton status={ getChoiceStatus(i, status) } checkChoice={ dispatchCheckChoice(i, status, dispatch) }/>
+                            footer: <FooterButton status={ getChoiceStatus(i, status) } checkChoice={ handleCheckChoice(i, status) }/>
                         }}
                         sideMargins={ i === 1 }
                     />
@@ -81,11 +75,9 @@ function NarrowChoices() {
     const currentTab = useSelector(ofCurrentView('currentTab', 0));
     const classes = makeChoiceStyles();
 
-    const handleChangeIndex = (currentTab: number) => {
-        dispatch(puzzlerViews.actions.setCurrentTab({index: currentPuzzler, currentTab}));
-    };
-
-    const dispatch = useDispatch();
+    function handleChangeIndex(currentTab: number) {
+        store.setCurrentTab(currentTab)
+    }
 
     return <CodePaper
         header={
@@ -113,7 +105,7 @@ function NarrowChoices() {
                 .map(i => ({
                     code: choices[i] || [],
                     collapsedCode: common,
-                    footer: <FooterButton status={ getChoiceStatus(i, status) } checkChoice={ dispatchCheckChoice(i, status, dispatch) }/>
+                    footer: <FooterButton status={ getChoiceStatus(i, status) } checkChoice={ handleCheckChoice(i, status) }/>
                 }))
                 .toArray(),
             currentIndex: currentTab,
@@ -140,11 +132,10 @@ function FooterButton(p: {status: ChoiceStatus, checkChoice: () => void}) {
         return undefined;
     });
     const btnBoxRef = useRef<HTMLDivElement | null>(null);
-    const dispatch = useDispatch();
 
     useEffect(() => {
         if (!footerStyle) {
-            dispatch(layoutConstants.actions.setFooterBtnHeight(btnBoxRef.current!.getBoundingClientRect().height));
+            store.setFooterBtnHeight(btnBoxRef.current!.getBoundingClientRect().height);
         }
     }, []);
 

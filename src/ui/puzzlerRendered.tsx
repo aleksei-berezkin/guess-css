@@ -1,20 +1,23 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
-import { useDispatch, useSelector } from 'react-redux';
-import { mapCurrentView, ofCurrentView, ofCurrentViewOrUndefined } from '../store/store';
+import {
+    mapCurrentView,
+    ofCurrentView,
+    ofCurrentViewOrUndefined,
+    PuzzlerView,
+    store,
+    useSelector
+} from '../store/store';
 import useTheme from '@material-ui/core/styles/useTheme';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import { Theme } from '@material-ui/core';
 import { resolveColor } from './resolveColor';
 import { getContrastColorValue } from './contrastColorValue';
-import { Dispatch } from 'redux';
 import IconButton from '@material-ui/core/IconButton';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import { genNewPuzzler } from '../store/thunks';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import React from 'react';
-import { PuzzlerView } from '../store/slices/puzzlerViews';
-import { current } from '../store/slices/current';
 import { globalEscapedRe } from './escapeRe';
 
 const useStyles = makeStyles(theme => ({
@@ -79,11 +82,10 @@ function insertColors(src: string, vars: PuzzlerView['vars'] | undefined, theme:
 
 function PrevButton() {
     const hasPrev = useSelector(state => state.current > 0);
-    const dispatch: Dispatch = useDispatch();
 
     function handlePrev() {
         if (hasPrev) {
-            dispatch(current.actions.prev());
+            store.displayPrevPuzzler();
         } else {
             throw new Error('Cannot navPrev')
         }
@@ -97,13 +99,12 @@ function PrevButton() {
 function NextButton() {
     const hasNext = useSelector(state => state.current < state.puzzlerViews.length - 1);
     const isAnswered = useSelector(mapCurrentView(v => v.status.userChoice != null, false));
-    const dispatch = useDispatch();
 
     function handleNext() {
         if (hasNext) {
-            dispatch(current.actions.next());
+            store.displayNextPuzzler();
         } else if (isAnswered) {
-            dispatch(genNewPuzzler(false));
+            genNewPuzzler(false);
         } else {
             throw new Error('Cannot navNext');
         }

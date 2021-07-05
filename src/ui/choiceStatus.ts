@@ -4,7 +4,7 @@ import red from '@material-ui/core/colors/red';
 import { CSSProperties } from '@material-ui/styles/withStyles/withStyles';
 import { PaletteType } from '@material-ui/core';
 import { entryStream } from 'fluent-streams';
-import { PuzzlerView } from '../store/slices/puzzlerViews';
+import { PuzzlerView } from '../store/store';
 
 export type ChoiceStatus = 'userCorrect' | 'correct' | 'incorrect' | 'untouched' | 'notAnswered';
 

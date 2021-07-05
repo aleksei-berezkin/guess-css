@@ -1,5 +1,4 @@
-import { useSelector } from 'react-redux';
-import { ofCurrentView } from '../store/store';
+import { ofCurrentView, useSelector } from '../store/store';
 import { ScrollToTop } from './scrollToTop';
 import { Route, Routes } from 'react-router-dom';
 import { routes } from './routes';

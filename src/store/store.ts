@@ -1,17 +1,114 @@
-import { configureStore, combineReducers } from '@reduxjs/toolkit';
-import { correctAnswers } from './slices/correctAnswers';
-import { current } from './slices/current';
-import { PuzzlerView, puzzlerViews } from './slices/puzzlerViews';
-import { layoutConstants } from './slices/layoutConstants';
+import { Region } from '../model/region';
+import { AssignedColorVar } from './assignColorVar';
+import { useEffect, useState } from 'react';
 
-export const reducer = combineReducers({
-    puzzlerViews: puzzlerViews.reducer,
-    current: current.reducer,
-    correctAnswers: correctAnswers.reducer,
-    layoutConstants: layoutConstants.reducer,
-});
+export type PuzzlerView = {
+    source: string,
+    styleChoices: Region[][][],
+    commonStyleSummary: string[],
+    commonStyle: Region[][],
+    vars: {
+        contrastColor: string,
+        colors: AssignedColorVar[],
+    },
+    body: Region[][],
+    status: {
+        correctChoice: number,
+        userChoice: number | undefined,
+    },
+    currentTab: number,
+};
 
-export type State = ReturnType<typeof reducer>;
+export type State = {
+    puzzlerViews: PuzzlerView[],
+    current: number,
+    correctAnswers: number,
+    layoutConstants: {
+        footerBtnHeight: number | undefined,
+    },
+}
+
+export class Store implements State {
+    puzzlerViews: PuzzlerView[] = [];
+    current = -1;
+    correctAnswers = 0;
+    layoutConstants: State['layoutConstants'] = {
+        footerBtnHeight: undefined,
+    }
+
+    @action()
+    appendPuzzler(puzzlerView: PuzzlerView) {
+        return this.puzzlerViews.push(puzzlerView);
+    }
+
+    @action()
+    setCurrentTab(tab: number) {
+        this.puzzlerViews[this.current].currentTab = tab;
+    }
+
+    @action()
+    setUserChoice(userChoice: number) {
+        this.puzzlerViews[this.current].status = {
+            ...this.puzzlerViews[this.current].status,
+            userChoice,
+        }
+    }
+
+    @action()
+    displayNextPuzzler() {
+        this.current++;
+    }
+
+    @action()
+    displayPrevPuzzler() {
+        this.current--;
+    }
+
+    @action()
+    displayPuzzler(index: number) {
+        this.current = index;
+    }
+
+    @action()
+    incCorrectAnswers() {
+        this.correctAnswers++;
+    }
+
+    @action()
+    setFooterBtnHeight(footerBtnHeight: number) {
+        this.layoutConstants.footerBtnHeight = footerBtnHeight;
+    }
+}
+
+export const store = new Store();
+
+const listeners: Set<(st: State) => void> = new Set();
+
+function action(): MethodDecorator {
+    return function(targetProto, methodName, descriptor: TypedPropertyDescriptor<any>) {
+        const origMethod = descriptor.value;
+
+        descriptor.value = function(this: State, ...args: any[]) {
+            const returnValue = origMethod.apply(this, args);
+            listeners.forEach(l => l(this));
+            return returnValue;
+        }
+    }
+}
+
+export function useSelector<T>(
+    selector: (st: State) => T,
+): T {
+    const [state, setState] = useState(selector(store));
+
+    useEffect(() => {
+        const l = () => setState(selector(store));
+        listeners.add(l);
+        return () => void listeners.delete(l);
+    }, []);
+
+    return state;
+}
 
 export function ofCurrentView<K extends keyof PuzzlerView>(key: K, deflt: PuzzlerView[K]): (state: State) => PuzzlerView[K] {
     return mapCurrentView(v => v && v[key], deflt);
@@ -25,14 +122,4 @@ export function mapCurrentView<T>(map: (v: PuzzlerView) => T, deflt: T): (state:
         const currentView = state.puzzlerViews[state.current];
         return currentView && map(currentView) || deflt;
     };
-}
-
-declare module 'react-redux' {
-    // noinspection JSUnusedGlobalSymbols
-    interface DefaultRootState extends State {
-    }
-}
-
-export function createAppStore() {
-    return configureStore({reducer});
 }
