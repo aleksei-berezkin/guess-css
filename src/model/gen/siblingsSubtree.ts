@@ -1,5 +1,5 @@
 import { TagNode } from '../nodes';
-import { randomItem } from '../../util';
+import { stream } from 'fluent-streams';
 
 export class SiblingsSubtree {
     constructor(readonly root: TagNode, readonly depth: number = 1) {
@@ -46,7 +46,7 @@ export function getSiblingsSubtree(root: TagNode): SiblingsSubtree | null {
         .filter(s => s != null) as SiblingsSubtree[];
 
     if (childrenSubtrees.length) {
-        return randomItem(childrenSubtrees).createWithParent(root);
+        return stream(childrenSubtrees).randomItem().get().createWithParent(root);
     }
 
     if (root.tagChildren.length > 1) {

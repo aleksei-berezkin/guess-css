@@ -1,6 +1,5 @@
 import { Puzzler } from '../../puzzler';
 import { Node, TagNode, TextNode } from '../../nodes';
-import { randomItem } from '../../../util';
 import { genRulesChoices } from './genSelectorsCss';
 import { stream } from 'fluent-streams';
 
@@ -99,6 +98,6 @@ class Classes {
     }
 
     private randomClass(): string {
-        return randomItem(this.classes);
+        return stream(this.classes).randomItem().get();
     }
 }

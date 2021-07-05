@@ -1,11 +1,11 @@
 import { TagNode } from '../../nodes';
 import { ChildCombinator, ClassSelector, Declaration, Rule, Selector, TypeSelector } from '../../cssRules';
-import { getNShuffled, randomBounded, randomItemsInOrder } from '../../../util';
 import { getSiblingsSubtree } from '../siblingsSubtree';
 import { stream } from 'fluent-streams';
 import { RulesParam } from '../../puzzler';
 import { contrastColorVar, getColorVar } from '../vars';
 import { globalRule } from '../globalRule';
+import { getNShuffled, randomBounded, randomItemsInOrder } from '../randomItems';
 
 const displays = ['inline', 'block', 'inline-block'];
 

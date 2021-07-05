@@ -1,4 +1,3 @@
-import { randomItem } from '../util';
 import { stream } from 'fluent-streams';
 import { ColorVar } from '../model/gen/vars';
 
@@ -33,7 +32,7 @@ export function assignColorVars(vars: readonly ColorVar[]): AssignedColorVar[] {
     }
 
     if (vars.length === 1) {
-        return [doAssign(randomItem(allHues), vars[0])];
+        return [doAssign(stream(allHues).randomItem().get(), vars[0])];
     }
 
     if (vars.length === 2) {

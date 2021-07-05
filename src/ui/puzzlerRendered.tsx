@@ -5,7 +5,6 @@ import useTheme from '@material-ui/core/styles/useTheme';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import { Theme } from '@material-ui/core';
-import { globalRe } from '../util';
 import { resolveColor } from './resolveColor';
 import { getContrastColorValue } from './contrastColorValue';
 import { Dispatch } from 'redux';
@@ -16,6 +15,7 @@ import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import React from 'react';
 import { PuzzlerView } from '../store/slices/puzzlerViews';
 import { current } from '../store/slices/current';
+import { globalEscapedRe } from './escapeRe';
 
 const useStyles = makeStyles(theme => ({
     layoutSize: {
@@ -64,7 +64,7 @@ function insertColors(src: string, vars: PuzzlerView['vars'] | undefined, theme:
     const colorsInserted = vars.colors
         .reduceRight(
             (t, assignedCol) => t.replace(
-                globalRe(assignedCol.id),
+                globalEscapedRe(assignedCol.id),
                 resolveColor(assignedCol, theme.palette.type),
             ),
             src
@@ -72,7 +72,7 @@ function insertColors(src: string, vars: PuzzlerView['vars'] | undefined, theme:
 
     const contrastColorValue = getContrastColorValue(theme);
     return colorsInserted.replace(
-        globalRe(vars.contrastColor),
+        globalEscapedRe(vars.contrastColor),
         contrastColorValue,
     );
 }

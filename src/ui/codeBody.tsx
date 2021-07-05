@@ -7,12 +7,13 @@ import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import { useSelector } from 'react-redux';
 import { ofCurrentViewOrUndefined } from '../store/store';
 import useTheme from '@material-ui/core/styles/useTheme';
-import { escapeRe, globalRe, ld, monospaceFonts } from '../util';
+import { monospaceFonts } from '../monospaceFonts';
 import { getContrastColorValue } from './contrastColorValue';
 import { resolveColor } from './resolveColor';
 import { Theme } from '@material-ui/core';
 import { hasVars } from '../model/gen/vars';
 import { spacing } from './theme';
+import { escapeRe, globalEscapedRe } from './escapeRe';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -92,6 +93,11 @@ const regionStylesObj: (theme: Theme) => {
     },
 });
 
+function ld(light: string, dark: string, theme: Theme) {
+    return theme.palette.type === 'light' ? light : dark;
+}
+
+
 const useRegionStyles = makeStyles(regionStylesObj);
 
 function RegionCode(p: {region: Region}): ReactElement {
@@ -112,7 +118,7 @@ function RegionCode(p: {region: Region}): ReactElement {
 
     const { contrastColor, colors } = vars;
     const { palette: { type, getContrastText }} = theme;
-    const text = p.region.text.replace(globalRe(contrastColor), getContrastColorValue(theme));
+    const text = p.region.text.replace(globalEscapedRe(contrastColor), getContrastColorValue(theme));
 
     return <>{
         [...function* toSpans(text: string, key: string): IterableIterator<ReactElement> {

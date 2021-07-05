@@ -2,9 +2,9 @@ import { Node, TagNode } from './nodes';
 import { Rule } from './cssRules';
 import { Region } from './region';
 import { Indent } from './indent';
-import { randomBounded } from '../util';
 import { Stream, stream, streamOf } from 'fluent-streams';
 import { ColorVar } from './gen/vars';
+import { randomBounded } from './gen/randomItems';
 
 export type RulesParam = ConstructorParameters<typeof Puzzler>[1];
 

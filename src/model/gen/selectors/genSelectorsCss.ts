@@ -1,4 +1,4 @@
-import { twoElementVariationsInOrder, xprod } from '../../../util';
+
 import { TagNode } from '../../nodes';
 import {
     ChildCombinator,
@@ -15,6 +15,7 @@ import { optional, Optional, range, stream } from 'fluent-streams';
 import { RulesParam } from '../../puzzler';
 import { contrastColorVar, getColorVar } from '../vars';
 import { globalRule } from '../globalRule';
+import { twoElementVariationsInOrder, xprod } from '../combineItems';
 
 const constantRule = new Rule(
     new TypeSelector('div'),

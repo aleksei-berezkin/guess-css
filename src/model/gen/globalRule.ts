@@ -1,6 +1,6 @@
 import { Rule, TypeSelector } from '../cssRules';
 import { contrastColorVar } from './vars';
-import { monospaceFontsLines } from '../../util';
+import { monospaceFontsLines } from '../../monospaceFonts';
 
 // TODO RuleCtx to capture vars and enrich rules
 export const globalRule = new Rule(new TypeSelector('body'), [

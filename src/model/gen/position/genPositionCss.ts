@@ -1,11 +1,11 @@
 import { TagNode } from '../../nodes';
 import { ChildCombinator, ClassSelector, Rule, Selector, TypeSelector } from '../../cssRules';
 import { getDeepestSingleChildSubtree } from '../singleChildSubtree';
-import { transpose } from '../../../util';
 import { stream } from 'fluent-streams';
 import { RulesParam } from '../../puzzler';
 import { contrastColorVar, getColorVar } from '../vars';
 import { globalRule } from '../globalRule';
+import { transpose } from '../transpose';
 
 export function genPositionCss(body: TagNode): RulesParam {
     const [outer, inner] = getDeepestSingleChildSubtree(body).unfoldToStream().takeLast(2);

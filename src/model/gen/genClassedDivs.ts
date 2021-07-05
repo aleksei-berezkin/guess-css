@@ -1,6 +1,6 @@
-import { randomBounded } from '../../util';
 import { TagNode, TextNode } from '../nodes';
 import { abc, stream } from 'fluent-streams';
+import { randomBounded } from './randomItems';
 
 export function genClassedDivs(min: number, max: number): TagNode[] {
     if (min < 1 || max < min) {
