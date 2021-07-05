@@ -7,13 +7,14 @@ import ReactGA from 'react-ga';
 import { puzzlerViews as puzzlerViewsSlice} from './slices/puzzlerViews';
 import { current } from './slices/current';
 import { correctAnswers } from './slices/correctAnswers';
+import { topics } from '../model/gen/topic';
 
 type VoidThunk = ThunkAction<void, State, never, Action<string>>;
 
 export function genNewPuzzler(diffHint: boolean): VoidThunk {
     return function(dispatch, getState) {
         const state = getState();
-        const topic = state.topics[state.puzzlerViews.length % state.topics.length]
+        const topic = topics[state.puzzlerViews.length % topics.length]
 
         const puzzler = genPuzzler(topic);
         dispatch(puzzlerViewsSlice.actions.append({

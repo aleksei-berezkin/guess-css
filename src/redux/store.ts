@@ -1,12 +1,10 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import { correctAnswers } from './slices/correctAnswers';
 import { current } from './slices/current';
-import { topics } from './slices/topics';
 import { PuzzlerView, puzzlerViews } from './slices/puzzlerViews';
 import { layoutConstants } from './slices/layoutConstants';
 
 export const reducer = combineReducers({
-    topics: topics.reducer,
     puzzlerViews: puzzlerViews.reducer,
     current: current.reducer,
     correctAnswers: correctAnswers.reducer,

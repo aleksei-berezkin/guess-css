@@ -4,7 +4,6 @@ import { genDisplayPuzzler } from './display/genDisplayPuzzler';
 import { genPositionPuzzler } from './position/genPositionPuzzler';
 import { genFlexboxPuzzler } from './flexbox/genFlexboxPuzzler';
 import { Topic } from './topic';
-import { continually, entryStream } from 'fluent-streams';
 
 const generators: {[k in Topic]: () => Puzzler} = {
     display: genDisplayPuzzler,
@@ -15,11 +14,4 @@ const generators: {[k in Topic]: () => Puzzler} = {
 
 export function genPuzzler(topic: Topic): Puzzler {
     return generators[topic]();
-}
-
-export function getRandomizedTopics(): Topic[] {
-    return continually(() => entryStream(generators).map(([k, _]) => k).shuffle())
-        .take(5)
-        .flatMap(v => v)
-        .toArray();
 }
