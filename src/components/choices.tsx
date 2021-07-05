@@ -1,7 +1,7 @@
 import React, { ReactElement, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { ofCurrentView, ofCurrentViewOrUndefined, State } from '../redux/store';
-import { checkChoice } from '../redux/thunks';
+import { ofCurrentView, ofCurrentViewOrUndefined, State } from '../store/store';
+import { checkChoice } from '../store/thunks';
 import Grid from '@material-ui/core/Grid';
 import { abc, range } from 'fluent-streams';
 import { CodePaper } from './codePaper';
@@ -19,8 +19,8 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import { Dispatch } from 'redux';
 import { spacing } from './theme';
-import { PuzzlerView, puzzlerViews } from '../redux/slices/puzzlerViews';
-import { layoutConstants } from '../redux/slices/layoutConstants';
+import { PuzzlerView, puzzlerViews } from '../store/slices/puzzlerViews';
+import { layoutConstants } from '../store/slices/layoutConstants';
 
 
 export function Choices(): ReactElement {

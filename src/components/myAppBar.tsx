@@ -11,7 +11,7 @@ import Help from '@material-ui/icons/Help';
 import Brightness2Icon from '@material-ui/icons/Brightness2';
 import BrightnessHigh from '@material-ui/icons/BrightnessHigh';
 import { useSelector } from 'react-redux';
-import { State } from '../redux/store';
+import { State } from '../store/store';
 import { stream } from 'fluent-streams';
 import React from 'react';
 import CheckIcon from '@material-ui/icons/Check';

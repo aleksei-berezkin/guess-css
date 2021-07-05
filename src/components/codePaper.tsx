@@ -8,7 +8,7 @@ import Collapse from '@material-ui/core/Collapse';
 import IconButton from '@material-ui/core/IconButton';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import { useSelector } from 'react-redux';
-import { ofCurrentView } from '../redux/store';
+import { ofCurrentView } from '../store/store';
 import { CodeBody } from './codeBody';
 import { spacing } from './theme';
 import SwipeableViews from 'react-swipeable-views';

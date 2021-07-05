@@ -1,21 +1,21 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { useDispatch, useSelector } from 'react-redux';
-import { mapCurrentView, ofCurrentView, ofCurrentViewOrUndefined } from '../redux/store';
+import { mapCurrentView, ofCurrentView, ofCurrentViewOrUndefined } from '../store/store';
 import useTheme from '@material-ui/core/styles/useTheme';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import { Theme } from '@material-ui/core';
 import { globalRe } from '../util';
-import { resolveColor } from '../redux/resolveColor';
+import { resolveColor } from '../store/resolveColor';
 import { getContrastColorValue } from './contrastColorValue';
 import { Dispatch } from 'redux';
 import IconButton from '@material-ui/core/IconButton';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
-import { genNewPuzzler } from '../redux/thunks';
+import { genNewPuzzler } from '../store/thunks';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import React from 'react';
-import { PuzzlerView } from '../redux/slices/puzzlerViews';
-import { current } from '../redux/slices/current';
+import { PuzzlerView } from '../store/slices/puzzlerViews';
+import { current } from '../store/slices/current';
 
 const useStyles = makeStyles(theme => ({
     layoutSize: {

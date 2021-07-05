@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { PuzzlerApp } from './components/puzzlerApp';
 import { Provider } from 'react-redux';
-import { createAppStore } from './redux/store';
+import { createAppStore } from './store/store';
 
 
 ReactDOM.render(

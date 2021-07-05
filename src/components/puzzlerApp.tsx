@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { gaInit, genNewPuzzler } from '../redux/thunks';
+import { gaInit, genNewPuzzler } from '../store/thunks';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { PaletteType } from '@material-ui/core';
 import { ThemeProvider } from '@material-ui/styles';
