@@ -3,6 +3,7 @@ export type Topic =
     | 'flexbox'
     | 'position'
     | 'selectors'
+    | 'grid'
     ;
 
-export const topics: Topic[] = ['selectors', 'flexbox', 'position', 'display'];
+export const topics: Topic[] = ['grid', 'selectors', 'flexbox', 'position', 'display'];

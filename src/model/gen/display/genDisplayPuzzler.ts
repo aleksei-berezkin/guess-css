@@ -1,6 +1,6 @@
 import { Puzzler } from '../../puzzler';
 import { TagNode } from '../../nodes';
-import { genClassedDivs } from '../genClassedDivs';
+import { genDivs } from '../genDivs';
 import { genDisplayCss } from './genDisplayCss';
 
 export function genDisplayPuzzler(): Puzzler {
@@ -8,7 +8,7 @@ export function genDisplayPuzzler(): Puzzler {
         [
             new TagNode(
                 'div', ['root'],
-                genClassedDivs(2, 3)
+                genDivs(2, 3, true)
             )
         ]
     );

@@ -2,14 +2,14 @@ import { TagNode } from '../../nodes';
 import { ChildCombinator, ClassSelector, Declaration, Rule, Selector, TypeSelector } from '../../cssRules';
 import { getSiblingsSubtree } from '../siblingsSubtree';
 import { stream } from 'fluent-streams';
-import { RulesParam } from '../../puzzler';
+import { CssRules } from '../../puzzler';
 import { contrastColorVar, getColorVar } from '../vars';
-import { globalRule } from '../globalRule';
+import { fontRule } from '../commonRules';
 import { getNShuffled, randomBounded, randomItemsInOrder } from '../randomItems';
 
 const displays = ['inline', 'block', 'inline-block'];
 
-export function genDisplayCss(body: TagNode): RulesParam {
+export function genDisplayCss(body: TagNode): CssRules {
     const {path, siblings} = getSiblingsSubtree(body)!.unfold();
     const [displays1, displays2, displays3] = getNShuffled(displays, 3);
     const bgColorVar = getColorVar('background', 0);
@@ -41,7 +41,7 @@ export function genDisplayCss(body: TagNode): RulesParam {
                     {property: 'padding', value: '.25em'},
                 ]
             ),
-            globalRule,
+            fontRule,
         ],
         vars: {
             contrastColor: contrastColorVar,

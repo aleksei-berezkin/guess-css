@@ -1,4 +1,3 @@
-
 import { TagNode } from '../../nodes';
 import {
     ChildCombinator,
@@ -12,9 +11,9 @@ import {
 import { getSiblingsSubtree, SiblingsSubtree } from '../siblingsSubtree';
 import { getDeepestSingleChildSubtree, SingleChildSubtree } from '../singleChildSubtree';
 import { optional, Optional, range, stream } from 'fluent-streams';
-import { RulesParam } from '../../puzzler';
+import { CssRules } from '../../puzzler';
 import { contrastColorVar, getColorVar } from '../vars';
-import { globalRule } from '../globalRule';
+import { fontRule } from '../commonRules';
 import { twoElementVariationsInOrder, xprod } from '../combineItems';
 
 const constantRule = new Rule(
@@ -25,9 +24,10 @@ const constantRule = new Rule(
         {property: 'border', value: `1px solid ${ contrastColorVar }`},
     ]
 );
+// TODO shared in the whole project
 const RULES_CHOICES = 3;
 
-export function genRulesChoices(body: TagNode): RulesParam | null {
+export function genRulesChoices(body: TagNode): CssRules | null {
     const colorVars = range(0, 2).map(i => getColorVar('background', i)).toArray();
     const [deepStyle, siblingsStyle] = stream(colorVars)
         .map((colorVar): Declaration[] => [{property: 'background-color', value: colorVar.id}])
@@ -58,7 +58,7 @@ export function genRulesChoices(body: TagNode): RulesParam | null {
             .toArray(),
         common: [
             constantRule,
-            globalRule,
+            fontRule,
         ],
         vars: {
             contrastColor: contrastColorVar,

@@ -6,21 +6,21 @@ import { Stream, stream, streamOf } from 'fluent-streams';
 import { ColorVar } from './gen/vars';
 import { randomBounded } from './gen/randomItems';
 
-export type RulesParam = ConstructorParameters<typeof Puzzler>[1];
+export type CssRules = {
+    choices: Rule[][],
+    common: Rule[],
+    vars: {
+        contrastColor: string,
+        colors: readonly ColorVar[],
+    },
+};
 
 export class Puzzler {
     readonly correctChoice: number;
 
     constructor(
             private readonly body: TagNode,
-            readonly rules: {
-                choices: Rule[][],
-                common: Rule[],
-                vars: {
-                    contrastColor: string,
-                    colors: readonly ColorVar[],
-                }
-            },
+            readonly rules: CssRules,
             private readonly showBodyTag = false,
     ) {
         this.correctChoice = randomBounded(rules.choices.length);

@@ -2,12 +2,12 @@ import { TagNode } from '../../nodes';
 import { ChildCombinator, ClassSelector, Rule, Selector, TypeSelector } from '../../cssRules';
 import { getDeepestSingleChildSubtree } from '../singleChildSubtree';
 import { stream } from 'fluent-streams';
-import { RulesParam } from '../../puzzler';
+import { CssRules } from '../../puzzler';
 import { contrastColorVar, getColorVar } from '../vars';
-import { globalRule } from '../globalRule';
+import { fontRule } from '../commonRules';
 import { transpose } from '../transpose';
 
-export function genPositionCss(body: TagNode): RulesParam {
+export function genPositionCss(body: TagNode): CssRules {
     const [outer, inner] = getDeepestSingleChildSubtree(body).unfoldToStream().takeLast(2);
     const outerBorderColor = getColorVar('border', 0);
     const innerBgColor = getColorVar('background', 0);
@@ -34,7 +34,7 @@ export function genPositionCss(body: TagNode): RulesParam {
                 new ChildCombinator(getClassSelector(outer), new TypeSelector('*')),
                 [{property: 'padding', value: '.5em'}]
             ),
-            globalRule,
+            fontRule,
         ],
         vars: {
             contrastColor: contrastColorVar,

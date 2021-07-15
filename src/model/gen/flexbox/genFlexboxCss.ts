@@ -2,12 +2,12 @@ import { TagNode } from '../../nodes';
 import { Declaration, Rule, TypeSelector } from '../../cssRules';
 import { getSiblingsSubtree } from '../siblingsSubtree';
 import { stream, streamOf } from 'fluent-streams';
-import { RulesParam } from '../../puzzler';
+import { CssRules } from '../../puzzler';
 import { contrastColorVar } from '../vars';
-import { globalRule } from '../globalRule';
+import { body100percentNoMarginRule, fontRule } from '../commonRules';
 import { transpose } from '../transpose';
 
-export function genFlexboxCss(body: TagNode): RulesParam {
+export function genFlexboxCss(body: TagNode): CssRules {
     const direction = streamOf('row', 'column', 'row-reverse', 'column-reverse').randomItem().get();
     const wrap = getSiblingsSubtree(body)!.unfold().siblings.length > 2 && Math.random() < .7;
     const alignName = wrap && Math.random() < .5 ? 'align-content' : 'align-items';
@@ -41,13 +41,7 @@ export function genFlexboxCss(body: TagNode): RulesParam {
                 ]
             ),
         common: [
-            new Rule(
-                [new TypeSelector('html'), new TypeSelector('body')],
-                [
-                    {property: 'height', value: '100%'},
-                    {property: 'margin', value: '0'},
-                ],
-            ),
+            body100percentNoMarginRule,
             new Rule(
                 new TypeSelector('div'),
                 [
@@ -55,7 +49,7 @@ export function genFlexboxCss(body: TagNode): RulesParam {
                     {property: 'padding', value: '.5em'},
                 ]
             ),
-            globalRule,
+            fontRule,
         ],
         vars: {
             contrastColor: contrastColorVar,
