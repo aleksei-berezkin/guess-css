@@ -1,6 +1,6 @@
 import { TagNode } from '../../nodes';
 import { CssRules } from '../../puzzler';
-import { continually, streamOf } from 'fluent-streams';
+import { continually, stream, streamOf } from 'fluent-streams';
 import { Rule, TypeSelector } from '../../cssRules';
 import { body100percentNoMarginRule, fontRule } from '../commonRules';
 import { contrastColorVar } from '../vars';
@@ -58,6 +58,20 @@ function createChoices(body: TagNode, rowNum: number, colNum: number): Rule[][] 
 }
 
 function genTemplate(tracksNum: number) {
+    if (tracksNum === 4) {
+        const trackListItems = streamOf(
+            ['2fr', '50%', 'repeat(2, 1fr)'],
+            ['1fr', '50%', 'repeat(2, 2fr)'],
+            ['2fr', '1fr', 'repeat(2, 25%)'],
+            ['1fr', 'repeat(3, 20%)'],
+            ['50%', 'repeat(3, 10%)'],
+        ).randomItem().get();
+
+        return stream(trackListItems)
+            .shuffle()
+            .join(' ');
+    }
+
     return streamOf('50%', '1fr', '2fr', '3fr')
         .takeRandom(tracksNum)
         .join(' ');
