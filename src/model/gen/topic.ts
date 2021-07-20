@@ -6,4 +6,4 @@ export type Topic =
     | 'grid'
     ;
 
-export const topics: Topic[] = ['grid'];//, 'selectors', 'flexbox', 'position', 'display'];
+export const topics: Topic[] = ['grid', 'selectors', 'flexbox', 'position', 'display'];
