@@ -1,14 +1,12 @@
 import { genPuzzler } from '../model/gen/genPuzzler';
 import { assignColorVars } from './assignColorVar';
 import ReactGA from 'react-ga';
-import { topics } from '../model/gen/topic';
 import { store } from './store';
 
 export function genNewPuzzler(diffHint: boolean) {
-    const topic = topics[store.puzzlerViews.length % topics.length]
+    const topic = store.topics[store.puzzlerViews.length % store.topics.length]
     const puzzler = genPuzzler(topic);
-
-    const puzzlersCount = store.appendPuzzler({
+    store.appendAndDisplayPuzzler({
         source: puzzler.html,
         styleChoices: puzzler.getStyleCodes(diffHint),
         commonStyleSummary: puzzler.commonStyleSummary,
@@ -24,7 +22,6 @@ export function genNewPuzzler(diffHint: boolean) {
         },
         currentTab: 0,
     });
-    store.displayPuzzler(puzzlersCount - 1);
 
     gaNewPuzzler();
 }

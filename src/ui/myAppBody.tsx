@@ -10,6 +10,7 @@ import { Footer } from './footer';
 import { Credits } from './credits';
 import { About } from './about';
 import React from 'react';
+import { SelectPuzzlers } from './selectPuzzlers';
 
 export function MyAppBody(p: { basename: string | undefined }) {
     const htmlCode = useSelector(ofCurrentView('body', []));
@@ -36,6 +37,9 @@ export function MyAppBody(p: { basename: string | undefined }) {
             </Route>
             <Route path={ routes.about }>
                 <About/>
+            </Route>
+            <Route path={ routes.select }>
+                <SelectPuzzlers/>
             </Route>
         </Routes>
     </>

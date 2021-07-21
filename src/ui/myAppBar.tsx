@@ -4,59 +4,122 @@ import { routes } from './routes';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Container from '@material-ui/core/Container';
-import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
-import Help from '@material-ui/icons/Help';
-import Brightness2Icon from '@material-ui/icons/Brightness2';
-import BrightnessHigh from '@material-ui/icons/BrightnessHigh';
+import MenuIcon from '@material-ui/icons/Menu';
 import { State, useSelector } from '../store/store';
 import { stream } from 'fluent-streams';
-import React from 'react';
+import React, { useState } from 'react';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
 import { useInlineSvg } from './inlineSvg';
+import makeStyles from '@material-ui/core/styles/makeStyles';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
+import Switch from '@material-ui/core/Switch';
+
+const useStyles = makeStyles({
+    appName: {
+        whiteSpace: 'nowrap',
+        '@media (max-width: 350px)': {
+            fontSize: '1.1rem',
+        },
+    },
+
+    containerGrid: {
+        display: 'grid',
+        gridTemplateColumns: '1fr max-content 1fr',
+        alignItems: 'center',
+    },
+
+    appMenuBtn: {
+        float: 'right',
+        color: 'currentColor',
+    },
+});
 
 export function MyAppBar(p: {paletteType: PaletteType, setPaletteType: (paletteType: PaletteType) => void}) {
-    const togglePaletteType = () => {
-        if (p.paletteType === 'light') {
-            p.setPaletteType('dark');
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
+
+    function handleAppMenuButtonClick(e: React.MouseEvent) {
+        setMenuOpen(!menuOpen);
+        if (menuOpen) {
+            setAnchorEl(null);
         } else {
-            p.setPaletteType('light');
+            setAnchorEl(e.currentTarget);
         }
-    };
+    }
 
     const navigate = useNavigate();
-    const navigateToAbout = () => navigate(routes.about);
+
+    function handleSelectPuzzlers() {
+        closeMenu();
+        navigate(routes.select);
+    }
+
+    function handleAbout() {
+        closeMenu();
+        navigate(routes.about);
+    }
+
+    const [darkTheme, setDarkTheme] = useState(p.paletteType === 'dark');
+
+    function handleThemeChanged() {
+        setDarkTheme(!darkTheme);
+        setTimeout(() => {
+            if (darkTheme) {
+                p.setPaletteType('light');
+            } else {
+                p.setPaletteType('dark');
+            }
+        });
+    }
+
+    function closeMenu() {
+        setMenuOpen(false);
+        setAnchorEl(null);
+    }
+
+    const styles = useStyles();
 
     return <>
         <AppBar color={ p.paletteType === 'light' ? 'primary' : 'default' } position='sticky'>
             <Toolbar variant='dense'>
                 <Container maxWidth='sm' disableGutters>
-                    <Grid container alignItems='center'>
-                        <Grid item style={{ flexGrow: 1 }}>
-                            <Typography variant="h6">
+                    <div className={ styles.containerGrid }>
+                        <div>
+                            <Typography variant='h6' className={ styles.appName }>
                                 Guess CSS!
                             </Typography>
-                        </Grid>
-                        <Grid item>
+                        </div>
+
+                        <div>
                             <Score/>
                             <DonePuzzler/>
-                        </Grid>
-                        <Grid item style={{ flexGrow: 1.03 }}>
+                        </div>
 
-                            <IconButton onClick={ navigateToAbout } style={{ float: 'right', color: 'currentColor' }}>
-                                <Help color='inherit'/>
+                        <div>
+                            <IconButton onClick={ handleAppMenuButtonClick } className={ styles.appMenuBtn }>
+                                <MenuIcon titleAccess='App menu'/>
                             </IconButton>
-                            <IconButton onClick={ togglePaletteType } style={{ float: 'right', color: 'currentColor' }}>
-                                {
-                                    p.paletteType === 'light' &&
-                                    <Brightness2Icon titleAccess='dark theme'/> ||
-                                    <BrightnessHigh titleAccess='lightTheme'/>
-                                }
-                            </IconButton>
-                        </Grid>
-                    </Grid>
+
+                            <Menu open={ menuOpen }
+                                  anchorEl={ anchorEl } getContentAnchorEl={ null }
+                                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                                  transformOrigin={{ vertical: 'top', horizontal: 'right'}}
+                                  onClose={ closeMenu }
+                            >
+                                <MenuItem onClick={ handleThemeChanged }>Dark theme <Switch
+                                    checked={ darkTheme }
+                                    onChange={ handleThemeChanged }
+                                    color='secondary'
+                                /></MenuItem>
+                                <MenuItem onClick={ handleSelectPuzzlers }>Select puzzlers...</MenuItem>
+                                <MenuItem onClick={ handleAbout }>About...</MenuItem>
+                            </Menu>
+                        </div>
+                    </div>
                 </Container>
             </Toolbar>
         </AppBar>
@@ -95,4 +158,3 @@ function getDonePuzzlersNum(state: State) {
     }
     return state.puzzlerViews.length - 1;
 }
-

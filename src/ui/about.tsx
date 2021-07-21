@@ -3,14 +3,12 @@ import Typography from '@material-ui/core/Typography';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import { ContentPage } from './contentPage';
-import Brightness2Icon from '@material-ui/icons/Brightness2';
-import BrightnessHigh from '@material-ui/icons/BrightnessHigh';
 import CodeIcon from '@material-ui/icons/Code';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { Contacts } from './contacts';
 import { Link as RouterLink } from 'react-router-dom';
 import Link from '@material-ui/core/Link';
-import { useInlineSvg } from './inlineSvg';
+import { allTopics } from '../model/gen/topic';
 
 const useStyles = makeStyles(theme => ({
     bm: {
@@ -24,7 +22,6 @@ const useStyles = makeStyles(theme => ({
 
 export function About() {
     const styles = useStyles();
-    const inlineSvg = useInlineSvg();
 
     return <ContentPage>
         <Typography variant='h4'>Guess CSS!</Typography>
@@ -41,8 +38,14 @@ export function About() {
             After you made your guess the app shows which one was correct, and updates your score displayed
             at the top.</Typography>
         <Typography className={ styles.bm }>Navigate between current and done tasks with arrows to the left and right of the frame.</Typography>
-        <Typography>Use <Brightness2Icon fontSize='small' className={ inlineSvg.small }/> and <BrightnessHigh fontSize='small' className={ inlineSvg.small }/> to
-            switch between dark and light themes.</Typography>
+
+        <Typography className={ styles.bm }>The game has the following puzzlers:</Typography>
+        <List dense>
+        {
+            allTopics.map(t => <ListItem><Marker/><Typography>{ t }</Typography></ListItem>)
+        }
+        </List>
+        <Typography className={ styles.bm }>If you don’t like them all, use app menu to select only a subset.</Typography>
 
         <Typography variant='h4'>Have something to say?</Typography>
         <Typography className={ styles.bm }>You are welcome! Use any of links below:</Typography>

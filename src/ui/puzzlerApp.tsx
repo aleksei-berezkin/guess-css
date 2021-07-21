@@ -7,12 +7,15 @@ import { createTheme } from './theme';
 import { BrowserRouter } from 'react-router-dom';
 import { MyAppBar } from './myAppBar';
 import { MyAppBody } from './myAppBody';
+import { store } from '../store/store';
+import { allTopics } from '../model/gen/topic';
 
 export function PuzzlerApp(p: {basename: string | undefined}): ReactElement {
     const [paletteType, setPaletteType] = useState<PaletteType>('light');
 
     useEffect(() => {
         gaInit();
+        store.reset(allTopics);
         genNewPuzzler(true);
         document.getElementById('loading-screen-style')!.remove();
     }, []);

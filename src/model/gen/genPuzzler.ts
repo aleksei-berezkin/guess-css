@@ -7,11 +7,11 @@ import { Topic } from './topic';
 import { genGridPuzzler } from './grid/genGridPuzzler';
 
 const generators: {[k in Topic]: () => Puzzler} = {
-    display: genDisplayPuzzler,
-    flexbox: genFlexboxPuzzler,
-    position: genPositionPuzzler,
-    selectors: genSelectorsPuzzler,
-    grid: genGridPuzzler,
+    Display: genDisplayPuzzler,
+    Flexbox: genFlexboxPuzzler,
+    Position: genPositionPuzzler,
+    Selectors: genSelectorsPuzzler,
+    'Grid templates': genGridPuzzler,
 }
 
 export function genPuzzler(topic: Topic): Puzzler {

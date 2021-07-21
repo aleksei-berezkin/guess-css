@@ -1,6 +1,7 @@
 import { Region } from '../model/region';
 import { AssignedColorVar } from './assignColorVar';
 import { useEffect, useState } from 'react';
+import { Topic } from '../model/gen/topic';
 
 export type PuzzlerView = {
     source: string,
@@ -20,6 +21,7 @@ export type PuzzlerView = {
 };
 
 export type State = {
+    topics: Topic[],
     puzzlerViews: PuzzlerView[],
     current: number,
     correctAnswers: number,
@@ -29,6 +31,7 @@ export type State = {
 }
 
 export class Store implements State {
+    topics: Topic[] = undefined as never;
     puzzlerViews: PuzzlerView[] = [];
     current = -1;
     correctAnswers = 0;
@@ -37,8 +40,16 @@ export class Store implements State {
     }
 
     @action()
-    appendPuzzler(puzzlerView: PuzzlerView) {
-        return this.puzzlerViews.push(puzzlerView);
+    reset(topics: Topic[]) {
+        this.topics = topics;
+        this.puzzlerViews = [];
+        this.correctAnswers = 0;
+    }
+
+    @action()
+    appendAndDisplayPuzzler(puzzlerView: PuzzlerView) {
+        const newCount = this.puzzlerViews.push(puzzlerView);
+        this.current = newCount - 1;
     }
 
     @action()
