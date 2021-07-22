@@ -9,6 +9,7 @@ import { Contacts } from './contacts';
 import { Link as RouterLink } from 'react-router-dom';
 import Link from '@material-ui/core/Link';
 import { allTopics } from '../model/gen/topic';
+import { routes } from './routes';
 
 const useStyles = makeStyles(theme => ({
     bm: {
@@ -53,7 +54,7 @@ export function About() {
 
         <Typography variant='h4'>Credits</Typography>
         <Typography>Like any modern software, “Guess CSS!” is built with the usage of many awesome tools, libs
-            and assets. <Link to='credits' component={ RouterLink }>Here</Link> is the full list.</Typography>
+            and assets. <Link to={ routes.credits } component={ RouterLink }>Here</Link> is the full list.</Typography>
 
         <Typography variant='h4' style={{textAlign: 'center'}}>Have a nice play!</Typography>
     </ContentPage>;
