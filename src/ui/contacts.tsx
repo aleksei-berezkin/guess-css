@@ -1,7 +1,6 @@
 import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
 import FacebookIcon from '@material-ui/icons/Facebook';
-import RedditIcon from '@material-ui/icons/Reddit';
 import TwitterIcon from '@material-ui/icons/Twitter';
 import GitHubIcon from '@material-ui/icons/GitHub';
 import React from 'react';
@@ -40,9 +39,6 @@ export function Contacts(p: {large?: boolean}) {
     return <Typography variant='body2' color='textSecondary' className={ classes.root }>
         <Link target='_blank' color='inherit' href='https://www.facebook.com/people/Alexey-Berezkin/100005955309004'>
             <FacebookIcon fontSize={ fontSize } titleAccess='Facebook profile'/>
-        </Link>
-        <Link target='_blank' color='inherit' href='https://www.reddit.com/user/basic-coder'>
-            <RedditIcon fontSize={ fontSize } titleAccess='Reddit profile'/>
         </Link>
         <Link target='_blank' color='inherit' href='https://twitter.com/a_v_berezkin'>
             <TwitterIcon fontSize={ fontSize } titleAccess='Twitter profile'/>
