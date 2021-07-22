@@ -9,7 +9,7 @@ export function genGridPuzzler(): Puzzler {
     const colNum = randomBounded(3, 5);
     const cellNum = rowNum * colNum;
 
-    const body = new TagNode('body', [], genDivs(cellNum, cellNum, true));
+    const body = new TagNode('body', [], genDivs(cellNum, cellNum, false));
     return new Puzzler(body, genGridCss(body, rowNum, colNum), true);
 
 }
