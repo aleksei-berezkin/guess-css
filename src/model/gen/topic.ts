@@ -4,6 +4,7 @@ export type Topic =
     | 'Position'
     | 'Selectors'
     | 'Grid templates'
+    | 'Grid items'
     ;
 
-export const allTopics: Topic[] = ['Grid templates', 'Selectors', 'Flexbox', 'Position', 'Display'];
+export const allTopics: Topic[] = ['Grid templates', 'Grid items', 'Selectors', 'Flexbox', 'Position', 'Display'];

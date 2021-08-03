@@ -15,3 +15,11 @@ export const body100percentNoMarginRule = new Rule(
         {property: 'margin', value: '0'},
     ],
 );
+
+export const borderAndTextUpCenterRule = new Rule(
+    new TypeSelector('div'),
+    [
+        {property: 'border', value: `1px solid ${ contrastColorVar }`},
+        {property: 'text-align', value: 'center'},
+    ]
+);

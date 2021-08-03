@@ -2,22 +2,16 @@ import { TagNode } from '../../nodes';
 import { CssRules } from '../../puzzler';
 import { continually, stream, streamOf } from 'fluent-streams';
 import { Rule, TypeSelector } from '../../cssRules';
-import { body100percentNoMarginRule, fontRule } from '../commonRules';
+import { body100percentNoMarginRule, borderAndTextUpCenterRule, fontRule } from '../commonRules';
 import { contrastColorVar } from '../vars';
 
-export function genGridCss(body: TagNode, rowNum: number, colNum: number): CssRules {
+export function genGridTemplatesCss(body: TagNode, rowNum: number, colNum: number): CssRules {
     return {
         choices: createChoices(body, rowNum, colNum),
         common: [
-            fontRule,
+            borderAndTextUpCenterRule,
             body100percentNoMarginRule,
-            new Rule(
-                new TypeSelector('div'),
-                [
-                    {property: 'border', value: `1px solid ${ contrastColorVar }`},
-                    {property: 'text-align', value: 'center'},
-                ]
-            ),
+            fontRule,
         ],
         vars: {
             contrastColor: contrastColorVar,

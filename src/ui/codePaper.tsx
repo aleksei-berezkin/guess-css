@@ -106,6 +106,9 @@ const makeCollapsedStyles = makeStyles(theme => ({
     },
 }));
 
+const summarySep = ', ';
+const summaryEllipsis = '...';
+
 function SimpleCollapsed(p: { summary: string[], children: ReactElement }) {
     const [collapsedOpen, setCollapsedOpen] = useState(false);
     const classes = makeCollapsedStyles();
@@ -132,10 +135,21 @@ function SimpleCollapsed(p: { summary: string[], children: ReactElement }) {
             </IconButton>
             {
                 stream(p.summary)
-                    .zipWithIndex()
-                    .map(([s, i]) => i < 4 ? s : '...')
-                    .take(5)
-                    .joinBy((_, r) => r === '...' ? '' : ', ')
+                    .reduceLeft('', (acc, s) => {
+                        if (acc.endsWith(summaryEllipsis)) {
+                            return acc;
+                        }
+
+                        if (acc.length + summarySep.length + s.length + summaryEllipsis.length> 40) {
+                            return acc + summaryEllipsis;
+                        }
+
+                        if (acc) {
+                            return acc + summarySep + s;
+                        }
+
+                        return s;
+                    })
             }
         </Typography>
 

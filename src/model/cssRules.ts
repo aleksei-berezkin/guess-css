@@ -6,6 +6,7 @@ export type Declaration = {
     property: string,
     value: string | string[],
     differing?: boolean,
+    propDiffering?: boolean,
 };
 
 export class Rule {
@@ -77,7 +78,7 @@ export class Rule {
                 if (i === 0) {
                     line.push(
                         indent.toRegion(),
-                        {kind: 'declName', text: decl.property},
+                        {kind: 'declName', text: decl.property, differing: decl.propDiffering},
                         {kind: 'default', text: ': '},
                     );
                 } else {

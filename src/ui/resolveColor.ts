@@ -2,7 +2,7 @@ import { PaletteType } from '@material-ui/core';
 import red from '@material-ui/core/colors/red';
 import blue from '@material-ui/core/colors/blue';
 import blueGrey from '@material-ui/core/colors/blueGrey';
-import yellow from '@material-ui/core/colors/yellow';
+import amber from '@material-ui/core/colors/amber';
 import orange from '@material-ui/core/colors/orange';
 import brown from '@material-ui/core/colors/brown';
 import { AssignedColorVar, Hue } from '../store/assignColorVar';
@@ -47,12 +47,12 @@ const colors: {
     },
     yellow: {
         light: {
-            background: yellow[400],
-            border: yellow[900], 
+            background: amber[200],
+            border: amber[900], 
         },
         dark: {
             background: orange[900],
-            border: yellow[500],
+            border: amber[400],
         },
     },
     brown: {
