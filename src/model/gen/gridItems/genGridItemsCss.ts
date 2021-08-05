@@ -13,7 +13,8 @@ export function genGridItemsCss(body: TagNode, rowNum: number, colNum: number): 
         common: [
             new Rule(new TypeSelector('body'), [
                 {property: 'display', value: 'grid'},
-                {property: 'grid-template-columns', value: `repeat(${colNum}, 1fr)`},
+                {property: 'grid-template-columns', value: ['', `repeat(${colNum}, 1fr)`]},
+                {property: 'grid-template-rows', value: ['', `repeat(${rowNum}, 1fr)`]},
             ]),
             borderAndTextUpCenterRule,
             body100percentNoMarginRule,
@@ -27,15 +28,22 @@ export function genGridItemsCss(body: TagNode, rowNum: number, colNum: number): 
 }
 
 type ItemProperty = 'grid-row' | 'grid-column';
-const itemProperties: ItemProperty[] = ['grid-row', 'grid-column'];
+const itemProperties: ItemProperty[] = ['grid-row', 'grid-column', 'grid-row', 'grid-column'];
+
+type ValSubtype = 'From' | 'FromTo' | 'FromNegTo' | 'FromSpan';
+const valSubtypes: ValSubtype[] = ['From', 'FromTo', 'FromNegTo', 'FromSpan'];
+
 
 function createChoices(body: TagNode, colorVar: string, rowNum: number, colNum: number): Rule[][] {
     const pickedItem = pickItem(body, rowNum, colNum);
-    return range(0, 999)
-        .map(i => i < 2 ? itemProperties[i] : itemProperties[Math.round(Math.random())])
-        .map(property => genChoice(pickedItem, colorVar, property, rowNum, colNum))
-        .distinctBy(rs => rs.map(r => r.toUnformattedCode()).join(''))
-        .filter(rs => !rs.map(r => r.toUnformattedCode()).some(c => c.includes('/ span 1')))
+
+    // TODO allocate distinct spans to avoid collisions
+    return stream(itemProperties).shuffle()
+        .zip(stream(valSubtypes).shuffle())
+        .map(([property, valSubtype]) => {
+            const tracksNum = property === 'grid-row' ? rowNum : colNum;
+            return genChoice(pickedItem, colorVar, property, valSubtype, tracksNum);
+        })
         .take(3)
         .toArray();
 }
@@ -58,18 +66,13 @@ function pickItem(body: TagNode, rowNum: number, colNum: number): PickedItem {
     };
 }
 
-const valSubtypes = ['From', 'FromTo', 'FromNegTo', 'FromSpan'] as const;
-
-function genChoice(pickedItem: PickedItem, colorVar: string, property: ItemProperty, rowNum: number, colNum: number): Rule[] {
-    const valueSubtype = stream(valSubtypes).randomItem().get();
-
+function genChoice(pickedItem: PickedItem, colorVar: string, property: ItemProperty, valSubtype: ValSubtype, tracksNum: number): Rule[] {
     const pickedItemLine = (property === 'grid-row' ? pickedItem.row : pickedItem.col) + 1;
-    const tracksNum = property === 'grid-row' ? rowNum : colNum;
 
-    const value = valueSubtype === 'From' ? genFrom(pickedItemLine, tracksNum)
-        : valueSubtype === 'FromTo' ? genFromTo(pickedItemLine, tracksNum)
-        : valueSubtype === 'FromNegTo' ? genFromNegTo(pickedItemLine, tracksNum)
-        : valueSubtype === 'FromSpan' ? genFromSpan(pickedItemLine, tracksNum)
+    const value = valSubtype === 'From' ? genFrom(pickedItemLine, tracksNum)
+        : valSubtype === 'FromTo' ? genFromTo(pickedItemLine, tracksNum)
+        : valSubtype === 'FromNegTo' ? genFromNegTo(pickedItemLine, tracksNum)
+        : valSubtype === 'FromSpan' ? genFromSpan(pickedItemLine, tracksNum)
         : undefined as never;
 
     return [
