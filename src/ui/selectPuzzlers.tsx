@@ -68,7 +68,7 @@ export function SelectPuzzlers() {
                 }
             </FormGroup>
             <div className={ styles.buttonsGroup }>
-                <Button variant='contained' color='primary' onClick={ handleApply }>
+                <Button variant='contained' color='primary' onClick={ handleApply } disabled={ !selectedTopics.length }>
                     Apply and restart
                 </Button>
                 <Button variant='contained' onClick={ handleBack }>
