@@ -1,7 +1,7 @@
 import { Region } from '../model/region';
 import { AssignedColorVar } from './assignColorVar';
 import { useEffect, useState } from 'react';
-import { Topic } from '../model/gen/topic';
+import {allTopics, Topic} from '../model/gen/topic';
 
 export type PuzzlerView = {
     source: string,
@@ -31,7 +31,7 @@ export type State = {
 }
 
 export class Store implements State {
-    topics: Topic[] = undefined as never;
+    topics: Topic[] = [];
     puzzlerViews: PuzzlerView[] = [];
     current = -1;
     correctAnswers = 0;

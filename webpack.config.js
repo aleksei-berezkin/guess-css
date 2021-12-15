@@ -16,7 +16,7 @@ module.exports = {
         }),
     ],
     output: {
-        publicPath: '',
+        publicPath: '/',
     },
     module: {
         rules: [
@@ -55,4 +55,7 @@ module.exports = {
             },
         },
     },
+    devServer: {
+        historyApiFallback: true,
+    }
 };
