@@ -43,7 +43,7 @@ function which(name: string): Promise<string> {
     ).then(executables =>
         stream(executables)
             .filterWithAssertion((ex): ex is string => !!ex)
-            .single()
+            .head()
             .get()
     )
 }

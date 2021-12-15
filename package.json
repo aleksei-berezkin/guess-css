@@ -6,11 +6,12 @@
   "scripts": {
     "clean": "rm -rf ./dist",
     "clean-generated": "rm -rf ./generated",
-    "generate": "ts-node --project tsconfig.generate.json ./scripts/generate.ts",
+    "generate": "ts-node --project tsconfig.build.json ./scripts/generate.ts",
     "start": "NODE_ENV=development webpack serve --port 3000",
     "webpack": "NODE_ENV=production webpack",
     "copy-logo": "cp css-logo.png dist/",
-    "build": "npm-run-all clean clean-generated generate webpack copy-logo",
+    "copy-index-to-paths": "ts-node --project tsconfig.build.json ./scripts/copyIndexToPaths.ts",
+    "build": "npm-run-all clean clean-generated generate webpack copy-logo copy-index-to-paths",
     "analyze": "NODE_ENV=production webpack --config webpack.analyze.js"
   },
   "author": "Aleksei Berezkin",
