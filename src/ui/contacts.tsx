@@ -1,6 +1,7 @@
 import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
 import FacebookIcon from '@material-ui/icons/Facebook';
+import LinkedInIcon from '@material-ui/icons/LinkedIn';
 import TwitterIcon from '@material-ui/icons/Twitter';
 import GitHubIcon from '@material-ui/icons/GitHub';
 import React from 'react';
@@ -37,6 +38,9 @@ export function Contacts(p: {large?: boolean}) {
     const fontSize = p.large ? 'large' : 'default';
 
     return <Typography variant='body2' color='textSecondary' className={ classes.root }>
+        <Link target='_blank' color='inherit' href='https://www.linkedin.com/in/a-v-berezkin'>
+            <LinkedInIcon fontSize={ fontSize } titleAccess='LinkedIn profile'/>
+        </Link>
         <Link target='_blank' color='inherit' href='https://www.facebook.com/people/Alexey-Berezkin/100005955309004'>
             <FacebookIcon fontSize={ fontSize } titleAccess='Facebook profile'/>
         </Link>
