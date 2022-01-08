@@ -12,6 +12,8 @@ import ListItem from '@material-ui/core/ListItem';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import { ContentPage } from './contentPage';
+import ReactGA from 'react-ga';
+import { routes } from './routes';
 
 const useStyles = makeStyles(theme => ({
     accDetails: {
@@ -37,6 +39,8 @@ type Awaited<T> = T extends PromiseLike<infer U> ? Awaited<U> : T;
 export function Credits() {
     const classes = useStyles();
     const [visible, setVisible] = useState<{[k: string]: boolean}>({});
+
+    useEffect(() => ReactGA.pageview(routes.credits), []);
 
     const depsPromise = import('../../generated/deps.json').then(res => res.default);
     const [deps, setDeps] = useState<Awaited<typeof depsPromise> | undefined>();

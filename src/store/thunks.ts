@@ -2,10 +2,13 @@ import { genPuzzler } from '../model/gen/genPuzzler';
 import { assignColorVars } from './assignColorVar';
 import ReactGA from 'react-ga';
 import { store } from './store';
+import { routes } from '../ui/routes';
 
-export function genNewPuzzler(diffHint: boolean) {
-    const topic = store.topics[store.puzzlerViews.length % store.topics.length]
-    const puzzler = genPuzzler(topic);
+export function genAndDisplayNewPuzzler() {
+    const topic = store.topics[store.puzzlerViews.length % store.topics.length];
+    const round = Math.floor(store.puzzlerViews.length / store.topics.length);
+    const puzzler = genPuzzler(topic, round);
+    const diffHint = store.puzzlerViews.length === 0;
     store.appendAndDisplayPuzzler({
         source: puzzler.html,
         styleChoices: puzzler.getStyleCodes(diffHint),
@@ -37,12 +40,12 @@ export function checkChoice(userChoice: number) {
 
 export function gaInit() {
     ReactGA.initialize('UA-171636839-1');
-    ReactGA.pageview('/');
+    ReactGA.pageview(routes.root);
 }
 
 export function gaNewPuzzler() {
     ReactGA.event({
         category: 'NewPuzzler',
-        action: String(store.current),
+        action: `NewPuzzler_${store.current}`,
     });
 }

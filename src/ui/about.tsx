@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import Typography from '@material-ui/core/Typography';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -8,8 +8,9 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import { Contacts } from './contacts';
 import { Link as RouterLink } from 'react-router-dom';
 import Link from '@material-ui/core/Link';
-import { allTopics } from '../model/gen/topic';
+import { allTopics } from '../model/topic';
 import { routes } from './routes';
+import ReactGA from 'react-ga';
 
 const useStyles = makeStyles(theme => ({
     bm: {
@@ -23,6 +24,8 @@ const useStyles = makeStyles(theme => ({
 
 export function About() {
     const styles = useStyles();
+
+    useEffect(() => ReactGA.pageview(routes.about), []);
 
     return <ContentPage>
         <Typography variant='h4'>Guess CSS!</Typography>

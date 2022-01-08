@@ -1,7 +1,7 @@
 import { Region } from '../model/region';
 import { AssignedColorVar } from './assignColorVar';
 import { useEffect, useState } from 'react';
-import {allTopics, Topic} from '../model/gen/topic';
+import {allTopics, Topic} from '../model/topic';
 
 export type PuzzlerView = {
     source: string,
@@ -24,6 +24,7 @@ export type State = {
     topics: Topic[],
     puzzlerViews: PuzzlerView[],
     current: number,
+    showProgressDialog: boolean,
     correctAnswers: number,
     layoutConstants: {
         footerBtnHeight: number | undefined,
@@ -34,6 +35,7 @@ export class Store implements State {
     topics: Topic[] = [];
     puzzlerViews: PuzzlerView[] = [];
     current = -1;
+    showProgressDialog = false;
     correctAnswers = 0;
     layoutConstants: State['layoutConstants'] = {
         footerBtnHeight: undefined,
@@ -78,6 +80,11 @@ export class Store implements State {
     @action()
     displayPuzzler(index: number) {
         this.current = index;
+    }
+
+    @action()
+    displayProgressDialog(display: boolean) {
+        this.showProgressDialog = display;
     }
 
     @action()

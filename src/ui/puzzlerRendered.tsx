@@ -15,10 +15,11 @@ import { resolveColor } from './resolveColor';
 import { getContrastColorValue } from './contrastColorValue';
 import IconButton from '@material-ui/core/IconButton';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
-import { genNewPuzzler } from '../store/thunks';
+import { genAndDisplayNewPuzzler } from '../store/thunks';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import React from 'react';
 import { globalEscapedRe } from './escapeRe';
+import { allTopics } from '../model/topic';
 
 const useStyles = makeStyles(theme => ({
     layoutSize: {
@@ -104,7 +105,12 @@ function NextButton() {
         if (hasNext) {
             store.displayNextPuzzler();
         } else if (isAnswered) {
-            genNewPuzzler(false);
+            if (store.topics.length === allTopics.length
+                && (store.current + 1) % store.topics.length === 0) {
+                store.displayProgressDialog(true);
+            } else {
+                genAndDisplayNewPuzzler();
+            }
         } else {
             throw new Error('Cannot navNext');
         }

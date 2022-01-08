@@ -8,7 +8,8 @@ import React from 'react';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 
 const useStyles = makeStyles(theme => ({
-    root: (p: {large?: boolean}) => ({
+    root: (p: {large?: boolean, paragraph?: boolean}) => ({
+        height: p.paragraph && !p.large ? 24 : undefined,
         textAlign: 'center',
         '& a:not(:last-child)': {
            marginRight: theme.spacing(p.large ? 1.5 : .5),
@@ -33,11 +34,11 @@ const useStyles = makeStyles(theme => ({
 }));
 
 
-export function Contacts(p: {large?: boolean}) {
+export function Contacts(p: {large?: boolean, paragraph?: boolean}) {
     const classes = useStyles(p);
     const fontSize = p.large ? 'large' : 'default';
 
-    return <Typography variant='body2' color='textSecondary' className={ classes.root }>
+    return <Typography color='textSecondary' className={ classes.root } paragraph={ p.paragraph }>
         <Link target='_blank' color='inherit' href='https://www.linkedin.com/in/a-v-berezkin'>
             <LinkedInIcon fontSize={ fontSize } titleAccess='LinkedIn profile'/>
         </Link>

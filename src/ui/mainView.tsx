@@ -7,6 +7,7 @@ import React from 'react';
 import { ofCurrentView, useSelector } from '../store/store';
 import { CircularProgress } from '@material-ui/core';
 import makeStyles from '@material-ui/core/styles/makeStyles';
+import { ProgressDialog } from './progressDialog';
 
 
 const useStyles = makeStyles({
@@ -23,10 +24,16 @@ export function MainView() {
     const htmlCode = useSelector(ofCurrentView('body', []));
     const styles = useStyles();
 
+    const showProgressDialog = useSelector(state => state.showProgressDialog);
+
     if (!htmlCode.length) {
         return <div className={ styles.spinnerRoot }>
             <CircularProgress/>
         </div>
+    }
+
+    if (showProgressDialog) {
+        return <ProgressDialog/>
     }
 
     return <>
