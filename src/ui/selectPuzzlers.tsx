@@ -51,6 +51,7 @@ export function SelectPuzzlers() {
 
     function handleApply() {
         const filteredTopics = allTopics.filter(t => selectedTopics.includes(t));
+        store.displayProgressDialog(false);
         store.reset(filteredTopics);
         ReactGA.event({
             category: 'SelectPuzzlers',
