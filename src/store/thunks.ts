@@ -46,6 +46,19 @@ export function gaInit() {
 export function gaNewPuzzler() {
     ReactGA.event({
         category: 'NewPuzzler',
-        action: `NewPuzzler_${store.current}`,
+        action: `NewPuzzler_${leadingZeros(store.current)}`,
     });
+}
+
+function leadingZeros(a: number) {
+    if (a < 0 || !Number.isInteger(a)) {
+        return String(a);
+    }
+    if (a <= 9) {
+        return `00${a}`;
+    }
+    if (a <= 99) {
+        return `0${a}`;
+    }
+    return String(a);
 }
