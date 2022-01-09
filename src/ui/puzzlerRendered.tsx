@@ -10,7 +10,7 @@ import {
 import useTheme from '@material-ui/core/styles/useTheme';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
-import { Theme } from '@material-ui/core';
+import { Badge, Theme } from '@material-ui/core';
 import { resolveColor } from './resolveColor';
 import { getContrastColorValue } from './contrastColorValue';
 import IconButton from '@material-ui/core/IconButton';
@@ -100,6 +100,7 @@ function PrevButton() {
 function NextButton() {
     const hasNext = useSelector(state => state.current < state.puzzlerViews.length - 1);
     const isAnswered = useSelector(mapCurrentView(v => v.status.userChoice != null, false));
+    const isVeryFirst = useSelector(state => state.current === 0 && state.puzzlerViews.length === 1);
 
     function handleNext() {
         if (hasNext) {
@@ -116,9 +117,11 @@ function NextButton() {
         }
     }
 
-    return <IconButton onClick={ handleNext }
-                       disabled={ !hasNext && !isAnswered }
-                       color={ isAnswered && !hasNext ? 'primary' : 'default' }>
-        <KeyboardArrowRight titleAccess='next puzzler'/>
-    </IconButton>;
+    return <Badge color='secondary' badgeContent={ isVeryFirst && isAnswered ? 'next' : undefined } overlap='circle'>
+        <IconButton onClick={ handleNext }
+                           disabled={ !hasNext && !isAnswered }
+                           color={ isAnswered && !hasNext ? 'primary' : 'default' }>
+            <KeyboardArrowRight titleAccess='next puzzler'/>
+        </IconButton>
+    </Badge>;
 }
