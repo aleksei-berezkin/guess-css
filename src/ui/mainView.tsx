@@ -8,6 +8,7 @@ import { ofCurrentView, useSelector } from '../store/store';
 import { CircularProgress } from '@material-ui/core';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { ProgressDialog } from './progressDialog';
+import { IntroToast } from './introToast';
 
 
 const useStyles = makeStyles({
@@ -37,6 +38,7 @@ export function MainView() {
     }
 
     return <>
+        <IntroToast/>
         <PuzzlerRendered/>
         <Choices/>
         <Grid item>
