@@ -97,10 +97,18 @@ function PrevButton() {
     </IconButton>;
 }
 
+const useNextButtonStyles = makeStyles({
+    badge: {
+        transform: 'scale(1) translate(70%, -50%)',
+    },
+});
+
 function NextButton() {
     const hasNext = useSelector(state => state.current < state.puzzlerViews.length - 1);
     const isAnswered = useSelector(mapCurrentView(v => v.status.userChoice != null, false));
     const isVeryFirst = useSelector(state => state.current === 0 && state.puzzlerViews.length === 1);
+
+    const styles = useNextButtonStyles();
 
     function handleNext() {
         if (hasNext) {
@@ -117,11 +125,16 @@ function NextButton() {
         }
     }
 
-    return <Badge color='secondary' badgeContent={ isVeryFirst && isAnswered ? 'next' : undefined } overlap='circle'>
-        <IconButton onClick={ handleNext }
-                           disabled={ !hasNext && !isAnswered }
-                           color={ isAnswered && !hasNext ? 'primary' : 'default' }>
+    return <IconButton onClick={ handleNext }
+                       disabled={ !hasNext && !isAnswered }
+                       color={ isAnswered && !hasNext ? 'primary' : 'default' }>
+        <Badge badgeContent={ isVeryFirst && isAnswered ? 'next' : undefined }
+               classes={{
+                   badge: styles.badge,
+               }}
+               color='secondary'
+               overlap='rectangle'>
             <KeyboardArrowRight titleAccess='next puzzler'/>
-        </IconButton>
-    </Badge>;
+        </Badge>
+    </IconButton>
 }

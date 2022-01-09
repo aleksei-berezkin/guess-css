@@ -4,7 +4,7 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 
 const useStyles = makeStyles(theme => ({
     snackbar: {
-        opacity: .75,
+        opacity: .80,
         transition: 'opacity 300ms',
         top: 96,
     },
