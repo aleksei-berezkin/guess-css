@@ -46,7 +46,7 @@ export function About() {
         <Typography className={ styles.bm }>The game has the following puzzlers:</Typography>
         <List dense>
         {
-            allTopics.map(t => <ListItem><Marker/><Typography>{ t }</Typography></ListItem>)
+            allTopics.map(t => <ListItem key={ t }><Marker/><Typography>{ t }</Typography></ListItem>)
         }
         </List>
         <Typography className={ styles.bm }>If you don’t like them all, use app menu to select only a subset.</Typography>
