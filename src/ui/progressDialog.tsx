@@ -13,6 +13,7 @@ import makeStyles from "@material-ui/core/styles/makeStyles";
 import { range, same } from 'fluent-streams';
 import { genAndDisplayNewPuzzler } from '../store/thunks';
 import { Contacts } from './contacts';
+import { leadingZeros3 } from '../util/leadingZeros3';
 
 const great = [
     'Great!',
@@ -38,6 +39,12 @@ const allCorrect = [
     'Amazing! Not a single wrong answer! I\'d subscribe to you on Twitter!',
 ];
 
+const  moreCorrect = [
+    'Nice! Most answers are correct!',
+    'Good! You answered mostly correctly!',
+    'Well done! Your answers are mainly correct!',
+];
+
 const useStyles = makeStyles(theme => ({
     tableCont: {
         marginBottom: theme.spacing(2),
@@ -50,19 +57,25 @@ const useStyles = makeStyles(theme => ({
 export function ProgressDialog() {
     useEffect(() => ReactGA.event({
         category: 'ProgressDialog',
-        action: `ProgressDialog_${store.current + 1}`,
+        action: `ProgressDialog_${leadingZeros3(store.current + 1)}`,
     }), []);
 
     const round = Math.floor(store.current / store.topics.length);
     const [scorePerTopic] = useState(countScorePerTopic);
 
     const allAnswersAreCorrect = useSelector(state => state.correctAnswers === state.puzzlerViews.length);
+    const moreCorrectAnswers = useSelector(state => state.correctAnswers > state.puzzlerViews.length / 2);
 
     useEffect(() => {
         if (allAnswersAreCorrect) {
             ReactGA.event({
                 category: 'AllAnswersAreCorrect',
-                action: `AllAnswersAreCorrect_${store.current + 1}`,
+                action: `AllAnswersAreCorrect_${leadingZeros3(store.current + 1)}`,
+            });
+        } else if (moreCorrectAnswers) {
+            ReactGA.event({
+                category: 'MoreCorrectAnswers',
+                action: `MoreCorrectAnswers_${leadingZeros3(store.current + 1)}`,
             });
         }
     }, []);
@@ -115,6 +128,12 @@ export function ProgressDialog() {
             allAnswersAreCorrect &&
             <Alert severity='success' className={ styles.alert }>
                 <Typography variant='body1'>{ allCorrect[round % allCorrect.length] }</Typography>
+            </Alert>
+        }
+        {
+            !allAnswersAreCorrect && moreCorrectAnswers &&
+            <Alert severity='success' className={ styles.alert }>
+                <Typography variant='body1'>{ moreCorrect[round % moreCorrect.length] }</Typography>
             </Alert>
         }
 

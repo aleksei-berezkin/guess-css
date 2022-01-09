@@ -1,8 +1,9 @@
-import { genPuzzler } from '../model/gen/genPuzzler';
-import { assignColorVars } from './assignColorVar';
+import {genPuzzler} from '../model/gen/genPuzzler';
+import {assignColorVars} from './assignColorVar';
 import ReactGA from 'react-ga';
-import { store } from './store';
-import { routes } from '../ui/routes';
+import {store} from './store';
+import {routes} from '../ui/routes';
+import {leadingZeros3} from "../util/leadingZeros3";
 
 export function genAndDisplayNewPuzzler() {
     const topic = store.topics[store.puzzlerViews.length % store.topics.length];
@@ -46,19 +47,6 @@ export function gaInit() {
 export function gaNewPuzzler() {
     ReactGA.event({
         category: 'NewPuzzler',
-        action: `NewPuzzler_${leadingZeros(store.current)}`,
+        action: `NewPuzzler_${leadingZeros3(store.current)}`,
     });
-}
-
-function leadingZeros(a: number) {
-    if (a < 0 || !Number.isInteger(a)) {
-        return String(a);
-    }
-    if (a <= 9) {
-        return `00${a}`;
-    }
-    if (a <= 99) {
-        return `0${a}`;
-    }
-    return String(a);
 }
