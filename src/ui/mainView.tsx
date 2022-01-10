@@ -8,13 +8,14 @@ import { ofCurrentView, useSelector } from '../store/store';
 import { CircularProgress } from '@material-ui/core';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { ProgressDialog } from './progressDialog';
-import Typography from "@material-ui/core/Typography";
-import {FeedbackToast} from "./feedbackToast";
+import Typography from '@material-ui/core/Typography';
+import { FeedbackToast } from './feedbackToast';
 
 
 const useStyles = makeStyles(theme => ({
     question: {
-        margin: theme.spacing(.25),
+        marginTop: theme.spacing(.5),
+        marginBottom: theme.spacing(.5),
     },
     spinnerRoot: {
         alignItems: 'center',
