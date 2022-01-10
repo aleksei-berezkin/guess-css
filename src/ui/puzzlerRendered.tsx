@@ -32,9 +32,6 @@ const useStyles = makeStyles(theme => ({
     iframe: {
         border: 'none',
     },
-    iframePaper: {
-        marginTop: theme.spacing(1),
-    },
 }));
 
 export function PuzzlerRendered() {
@@ -48,7 +45,7 @@ export function PuzzlerRendered() {
             <PrevButton/>
         </Grid>
         <Grid item>
-            <Paper className={ `${classes.layoutSize} ${classes.iframePaper}` }>
+            <Paper className={classes.layoutSize}>
                 <iframe className={ `${classes.layoutSize} ${classes.iframe}` } srcDoc={
                     insertColors(source, vars, theme)
                 }/>

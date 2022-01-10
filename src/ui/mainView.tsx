@@ -8,10 +8,13 @@ import { ofCurrentView, useSelector } from '../store/store';
 import { CircularProgress } from '@material-ui/core';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { ProgressDialog } from './progressDialog';
-import { IntroToast } from './introToast';
+import Typography from "@material-ui/core/Typography";
 
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
+    question: {
+        margin: theme.spacing(.25),
+    },
     spinnerRoot: {
         alignItems: 'center',
         display: 'flex',
@@ -19,7 +22,7 @@ const useStyles = makeStyles({
         position: 'absolute',
         top: 0,
     },
-});
+}));
 
 export function MainView() {
     const htmlCode = useSelector(ofCurrentView('body', []));
@@ -38,7 +41,7 @@ export function MainView() {
     }
 
     return <>
-        <IntroToast/>
+        <Typography variant='subtitle1' className={ styles.question }>Guess which CSS renders this:</Typography>
         <PuzzlerRendered/>
         <Choices/>
         <Grid item>

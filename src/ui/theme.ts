@@ -29,7 +29,12 @@ export const createTheme = (paletteType: PaletteType) => createMuiTheme({
                 paper: '#1e1e1e',
                 default: '#000000',
             },
-        } : {}),
+        } : {
+            background: {
+                paper: '#ffffff',
+                default: '#f6f6f6',
+            },
+        }),
     },
     props: {
         MuiPaper: {
