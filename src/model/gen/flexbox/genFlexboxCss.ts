@@ -7,9 +7,9 @@ import { contrastColorVar } from '../vars';
 import { body100percentNoMarginRule, fontRule } from '../commonRules';
 import { transpose } from '../transpose';
 
-export function genFlexboxCss(body: TagNode): CssRules {
+export function genFlexboxCss(body: TagNode, canWrap: boolean): CssRules {
     const direction = streamOf('row', 'column', 'row-reverse', 'column-reverse').randomItem().get();
-    const wrap = getSiblingsSubtree(body)!.unfold().siblings.length > 2 && Math.random() < .7;
+    const wrap = canWrap && getSiblingsSubtree(body)!.unfold().siblings.length > 2 && Math.random() < .7;
     const alignName = wrap && Math.random() < .5 ? 'align-content' : 'align-items';
 
     return {

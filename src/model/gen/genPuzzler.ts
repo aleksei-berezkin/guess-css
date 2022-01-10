@@ -12,7 +12,7 @@ export function genPuzzler(topic: Topic, round: number): Puzzler {
         return genDisplayPuzzler();
     }
     if (topic === 'Flexbox') {
-        return genFlexboxPuzzler();
+        return genFlexboxPuzzler(round > 0);
     }
     if (topic === 'Position') {
         return genPositionPuzzler();
