@@ -56,7 +56,6 @@ export function MainView() {
     }
 
     return <>
-        <Typography variant='subtitle1' className={ styles.question }>Guess which CSS renders this:</Typography>
         <PuzzlerRendered/>
         <Choices/>
         <Grid item>

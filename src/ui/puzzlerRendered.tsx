@@ -22,6 +22,9 @@ import { globalEscapedRe } from './escapeRe';
 import { allTopics } from '../model/topic';
 
 const useStyles = makeStyles(theme => ({
+    puzzleContainer: {
+        paddingTop: theme.spacing(1),
+    },
     layoutSize: {
         height: 130,
         width: 190,
@@ -40,7 +43,7 @@ export function PuzzlerRendered() {
     const theme = useTheme();
     const classes = useStyles();
 
-    return <Grid container justify='center' alignItems='center'>
+    return <Grid container justify='center' alignItems='center' className={ classes.puzzleContainer }>
         <Grid item>
             <PrevButton/>
         </Grid>
