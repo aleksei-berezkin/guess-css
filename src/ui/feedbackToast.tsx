@@ -2,7 +2,7 @@ import { Slide, Snackbar } from '@material-ui/core';
 import React, { useState } from 'react';
 import Alert from '@material-ui/lab/Alert';
 import AlertTitle from '@material-ui/lab/AlertTitle';
-import {stream} from "fluent-streams";
+import { randomItem } from '../util/randomItem';
 
 const correct = [
     {
@@ -36,7 +36,7 @@ const wrong = [
 
 export function FeedbackToast(p: {correct: boolean}) {
     const [open, setOpen] = useState(true);
-    const [texts] = useState(stream(p.correct ? correct : wrong).randomItem().get());
+    const [texts] = useState(randomItem(p.correct ? correct : wrong));
 
     function hide() {
         setOpen(false);

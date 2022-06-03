@@ -1,7 +1,9 @@
 import { Puzzler } from '../../puzzler';
 import { Node, TagNode, TextNode } from '../../nodes';
 import { genRulesChoices } from './genSelectorsCss';
-import { stream } from 'fluent-streams';
+import { takeRandom } from '../../../util/takeRandom';
+import { lastOrUndefined } from '../../../util/lastOrUndefined';
+import { randomItem } from '../../../util/randomItem';
 
 export function genSelectorsPuzzler(): Puzzler {
     const body = new TagNode(
@@ -17,7 +19,7 @@ export function genSelectorsPuzzler(): Puzzler {
     return new Puzzler(body, rulesChoices);
 }
 
-function *genSiblings(ctx: Context, level: number, i = 0): IterableIterator<Node> {
+function* genSiblings(ctx: Context, level: number, i = 0): IterableIterator<Node> {
     if (ctx.hasQuotaLeft() && i < prob.siblings[level].length && Math.random() < prob.siblings[level][i]) {
         const classes = ctx.classes.genClasses();
         const text = classes.join(' ');
@@ -78,26 +80,25 @@ class Classes {
 
         const p = Math.random();
         if (p < .05) {
-            return stream(this.classes)
-                .takeRandom(2)
-                .toArray();
+            return takeRandom(this.classes, 2);
         }
 
         return [this.randomClass()];
     }
 
     private addOneClass() {
-        if (stream(this.classes).last().is('z')) {
+        const lastClass = lastOrUndefined(this.classes);
+        if (lastClass == null || lastClass === 'z') {
             return;
         }
 
         this.classes = [
             ...this.classes,
-            stream(this.classes).last().map(c => String.fromCharCode(c.charCodeAt(0) + 1)).get(),
+            String.fromCharCode(lastClass.charCodeAt(0) + 1),
         ]; 
     }
 
     private randomClass(): string {
-        return stream(this.classes).randomItem().get();
+        return randomItem(this.classes);
     }
 }

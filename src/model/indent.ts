@@ -1,5 +1,4 @@
 import { Region } from './region';
-import { same } from 'fluent-streams';
 
 const indentSize = 2;
 
@@ -7,7 +6,7 @@ export class Indent {
     readonly text: string;
 
     constructor(indent: number = 0) {
-        this.text = same(' ').take(indent).join('');
+        this.text = Array.from({length: indent}).map(() => ' ').join('');
     }
 
     indent(): Indent {

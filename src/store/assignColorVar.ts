@@ -1,5 +1,6 @@
-import { stream } from 'fluent-streams';
 import { ColorVar } from '../model/gen/vars';
+import { randomItem } from '../util/randomItem';
+import { shuffle } from '../util/shuffle';
 
 export type Hue = 'red' | 'blue' | 'gray' | 'yellow' | 'brown';
 
@@ -14,10 +15,7 @@ const compatibleHues: [Hue, Hue][] = [
     ['blue', 'brown'],
 ];
 
-const allHues = stream(compatibleHues)
-    .flatMap(h => h)
-    .distinctBy(h => h)
-    .toArray();
+const allHues = [...new Set(compatibleHues.flatMap(h => h))];
 
 export function assignColorVars(vars: readonly ColorVar[]): AssignedColorVar[] {
     if (!vars.length) {
@@ -32,18 +30,13 @@ export function assignColorVars(vars: readonly ColorVar[]): AssignedColorVar[] {
     }
 
     if (vars.length === 1) {
-        return [doAssign(stream(allHues).randomItem().get(), vars[0])];
+        return [doAssign(randomItem(allHues), vars[0])];
     }
 
     if (vars.length === 2) {
-        return stream(compatibleHues)
-            .randomItem()
-            .flatMapToStream(h => h)
-            .shuffle()
-            .zipStrict(vars)
-            .map(([h, v]) => doAssign(h, v))
-            .toArray();
+        const hues = shuffle(randomItem(compatibleHues));
+        return hues.map((h, ix) => doAssign(h, vars[ix]))
     }
 
-    throw new Error('Bad length: ' + vars.length);
+    throw new Error(`Bad length: ${vars}`);
 }

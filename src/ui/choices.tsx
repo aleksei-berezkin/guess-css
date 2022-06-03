@@ -2,7 +2,6 @@ import React, { ReactElement, useEffect, useRef } from 'react';
 import { ofCurrentView, ofCurrentViewOrUndefined, PuzzlerView, State, store, useSelector } from '../store/store';
 import { checkChoice } from '../store/thunks';
 import Grid from '@material-ui/core/Grid';
-import { abc, range } from 'fluent-streams';
 import { CodePaper } from './codePaper';
 import { CodeHeader } from './codeHeader';
 import Button from '@material-ui/core/Button';
@@ -17,6 +16,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import { spacing } from './theme';
+import { abc } from '../util/abc';
 
 
 export function Choices(): ReactElement {
@@ -47,8 +47,8 @@ function WideChoices() {
     const classes = makeChoiceStyles();
 
     return <Grid container justify='center'>{
-        abc().zipWithIndex().take(choices.length)
-            .map(([letter, i]) =>
+        abc(choices.length)
+            .map((letter, i) =>
                 <Grid item key={ current + letter }>
                     <CodePaper
                         header={
@@ -63,7 +63,6 @@ function WideChoices() {
                     />
                 </Grid>
             )
-            .toArray()
     }</Grid>    
 }
 
@@ -89,25 +88,23 @@ function NarrowChoices() {
                     textColor='primary'
                     variant='fullWidth'
                 >{
-                    abc().zipWithIndex().take(choices.length)
-                        .map(([letter, i]) =>
+                    abc(choices.length)
+                        .map((letter, i) =>
                             <Tab label={ `CSS ${ letter.toUpperCase() }` }
                                  key={ currentPuzzler + letter }
                                  className={ classes[getChoiceStatus(i, status)]}
                             />
                         )
-                        .toArray()
                 }</Tabs>
             </AppBar>
         }
         body={{
-            tabs: range(0, choices.length)
-                .map(i => ({
+            tabs: Array.from({length: choices.length})
+                .map((_, i) => ({
                     code: choices[i] || [],
                     collapsedCode: common,
                     footer: <FooterButton status={ getChoiceStatus(i, status) } checkChoice={ handleCheckChoice(i, status) }/>
-                }))
-                .toArray(),
+                })),
             currentIndex: currentTab,
             handleChangeIndex
         }}

@@ -1,8 +1,8 @@
-import { entryStream, stream, Stream } from 'fluent-streams';
 import * as localPackageJson from '../package.json';
 import path from 'path';
 import fs from 'fs';
 import { DepFullData } from './depFullData';
+import { groupBy } from './groupBy';
 
 type PackageJsonFile = {
     type: 'package.json',
@@ -29,60 +29,62 @@ type LicenseData = LicenseFile & {
     text: string,
 }
 
-type DepName = keyof typeof localPackageJson.dependencies | keyof typeof localPackageJson.devDependencies;
-
-export const readModules: Promise<Stream<DepFullData>> = entryStream<{[k in DepName]?: string}>(localPackageJson.dependencies)
-    .appendAll(entryStream(localPackageJson.devDependencies))
-    .map(([name, _]) => [name, path.resolve(__dirname, '..', 'node_modules', name)])
-    .flatMap<PackageJsonFile | LicenseFile>(([name, dir]) => [
-        {
-            type: 'package.json',
-            name,
-            path: path.resolve(dir, 'package.json'),
-        },
-        ...['LICENSE', 'LICENSE.md', 'LICENSE.txt', 'license.md']
-            .map(filename => ({
-                type: 'LICENSE' as const,
+export const readModules: Promise<DepFullData[]> = Promise.all(
+    [
+        ...Object.entries(localPackageJson.dependencies),
+        ...Object.entries(localPackageJson.devDependencies)
+    ]
+        .map(([name, _]) => [name, path.resolve(__dirname, '..', 'node_modules', name)])
+        .flatMap<PackageJsonFile | LicenseFile>(([name, dir]) => [
+            {
+                type: 'package.json',
                 name,
-                path: path.resolve(dir, filename)
-            }))
-    ])
-    .map(file =>
-        new Promise<PackageJsonData | LicenseData | null>(async resolve => {
-            if (file.type === 'package.json') {
-                const buf = await fs.promises.readFile(file.path);
-                const json = JSON.parse(String(buf));
-                resolve({
-                    ...file,
-                    description: json.description,
-                    license: json.license,
-                    homepage: json.homepage,
-                    repository: json.repository,
-                });
-                return;
-            }
-
-            try {
-                const realPath = await fs.promises.realpath(file.path);
-                // Workaround register-insensitive systems
-                if (path.basename(realPath) === path.basename(file.path)) {
-                    const buf = await fs.promises.readFile(realPath);
+                path: path.resolve(dir, 'package.json'),
+            },
+            ...['LICENSE', 'LICENSE.md', 'LICENSE.txt', 'license.md']
+                .map(filename => ({
+                    type: 'LICENSE' as const,
+                    name,
+                    path: path.resolve(dir, filename)
+                }))
+        ])
+        .map(file =>
+            new Promise<PackageJsonData | LicenseData | null>(async resolve => {
+                if (file.type === 'package.json') {
+                    const buf = await fs.promises.readFile(file.path);
+                    const json = JSON.parse(String(buf));
                     resolve({
                         ...file,
-                        text: String(buf),
-                    })
-                } else {
+                        description: json.description,
+                        license: json.license,
+                        homepage: json.homepage,
+                        repository: json.repository,
+                    });
+                    return;
+                }
+    
+                try {
+                    const realPath = await fs.promises.realpath(file.path);
+                    // Workaround register-insensitive systems
+                    if (path.basename(realPath) === path.basename(file.path)) {
+                        const buf = await fs.promises.readFile(realPath);
+                        resolve({
+                            ...file,
+                            text: String(buf),
+                        })
+                    } else {
+                        resolve(null);
+                    }
+                } catch (_) {
                     resolve(null);
                 }
-            } catch (_) {
-                resolve(null);
-            }
-        })
-    ).awaitAll().then(datas =>
-        stream(datas)
-            .filterWithAssertion((data): data is PackageJsonData | LicenseData => !!data)
-            .groupBy(data => data.name)
-            .map(([_, data]): readonly [PackageJsonData, {licenseText: string}] => {
+            })
+        )
+    ).then(datas => {
+        const packageJsonOrLicenseData = datas.filter(data => !!data) as (PackageJsonData | LicenseData)[];
+
+        return groupBy(packageJsonOrLicenseData, data => data.name)
+            .map(([_, data]): readonly [PackageJsonData, { licenseText: string }] => {
                 if (data.length === 1 && data[0].type === 'package.json' && data[0].name === 'npm-run-parallel') {
                     // Lacks homepage and license file
                     return [
@@ -111,7 +113,8 @@ export const readModules: Promise<Stream<DepFullData>> = entryStream<{[k in DepN
                 link: getLink(p),
                 license: getNotNull(p, 'license'),
                 licenseText: getNotNull(l, 'licenseText'),
-            }))
+            }));
+        }
     );
 
 function getNotNull<T, K extends keyof T>(o: T, k: K): Exclude<T[K], null | undefined> {

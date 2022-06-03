@@ -1,6 +1,5 @@
 import React, { ReactElement, useState } from 'react';
 import { Region } from '../model/region';
-import { stream, streamOf } from 'fluent-streams';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
@@ -56,12 +55,10 @@ export function CodePaper(
         {
             isTabs(body) &&
             <SwipeableViews index={ body.currentIndex } onChangeIndex={ body.handleChangeIndex }>{
-                stream(body.tabs)
-                    .zipWithIndex()
-                    .map(([tab, index]) =>
+                body.tabs
+                    .map((tab, index) =>
                         <Body key={ index } code={ tab.code } collapsedCode={ tab.collapsedCode } footer={ tab.footer }/>
                     )
-                    .toArray()
             }</SwipeableViews>
         }
         {
@@ -127,20 +124,20 @@ function SimpleCollapsed(p: { summary: string[], children: ReactElement }) {
             component='label'
         >
             <IconButton size='small' onClick={ toggleCollapsed } color='inherit'>
-                <ChevronRightIcon fontSize='small' className={
-                    streamOf(classes.expandIcon)
-                        .appendAll(collapsedOpen ? [classes.expandIconOpen] : [])
-                        .join(' ')
-                } titleAccess={ collapsedOpen ? 'collapse' : 'expand'}/>
+                <ChevronRightIcon
+                    fontSize='small'
+                    className={ `${classes.expandIcon} ${collapsedOpen ? classes.expandIconOpen : ''}` }
+                    titleAccess={ collapsedOpen ? 'collapse' : 'expand'}
+                />
             </IconButton>
             {
-                stream(p.summary)
-                    .reduceLeft('', (acc, s) => {
+                p.summary
+                    .reduce((acc, s) => {
                         if (acc.endsWith(summaryEllipsis)) {
                             return acc;
                         }
 
-                        if (acc.length + summarySep.length + s.length + summaryEllipsis.length> 40) {
+                        if (acc.length + summarySep.length + s.length + summaryEllipsis.length > 40) {
                             return acc + summaryEllipsis;
                         }
 
@@ -149,7 +146,7 @@ function SimpleCollapsed(p: { summary: string[], children: ReactElement }) {
                         }
 
                         return s;
-                    })
+                    }, '')
             }
         </Typography>
 

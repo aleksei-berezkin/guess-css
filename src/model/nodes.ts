@@ -1,6 +1,5 @@
 import { Region } from './region';
 import { Indent } from './indent';
-import { stream, streamOf } from 'fluent-streams';
 
 export interface Node {
     readonly children: Node[];
@@ -41,10 +40,11 @@ export class TagNode implements Node {
             ];
         }
 
-        return streamOf([indent.toRegion(), ...this.openTagToRegions()])
-            .appendAll(this.childrenToRegions(indent.indent()))
-            .append([indent.toRegion(), ...this.closeTagToRegions()])
-            .toArray();
+        return [
+            [indent.toRegion(), ...this.openTagToRegions()],
+            ...this.childrenToRegions(indent.indent()),
+            [indent.toRegion(), ...this.closeTagToRegions()],
+        ];
     }
 
     private openTagToRegions(): Region[] {
@@ -88,9 +88,8 @@ export class TagNode implements Node {
     }
 
     private childrenToRegions(indent: Indent): Region[][] {
-        return stream(this.children)
-            .flatMap(node => node.toRegions(indent))
-            .toArray();
+        return this.children
+            .flatMap(node => node.toRegions(indent));
     }
 
     toUnformattedCode(): string {

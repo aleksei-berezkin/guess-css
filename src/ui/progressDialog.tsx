@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {store, useSelector} from '../store/store';
+import { store, useSelector } from '../store/store';
 import ReactGA from 'react-ga';
 import { ContentPage } from './contentPage';
 import Alert from '@material-ui/lab/Alert';
@@ -10,10 +10,10 @@ import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
 import Button from "@material-ui/core/Button";
 import makeStyles from "@material-ui/core/styles/makeStyles";
-import { range, same } from 'fluent-streams';
 import { genAndDisplayNewPuzzler } from '../store/thunks';
 import { Contacts } from './contacts';
 import { leadingZeros3 } from '../util/leadingZeros3';
+import { countScorePerTopic } from './scorePerTopic';
 
 const great = [
     'Great!',
@@ -111,10 +111,10 @@ export function ProgressDialog() {
                                 <TableCell><Typography variant='body1'>{ t }</Typography></TableCell>
                                 <TableCell>
                                     {
-                                        range(0, sc.correct).map(i => <CheckIcon key={ i } fontSize='small'/>).toArray()
+                                        Array.from({length: sc.correct}).map((_, i) => <CheckIcon key={ i } fontSize='small'/>)
                                     }
                                     {
-                                        range(0, sc.wrong).map(i => <CloseIcon key={ i } fontSize='small'/>).toArray()
+                                        Array.from({length: sc.wrong}).map((_, i) => <CloseIcon key={ i } fontSize='small'/>)
                                     }
                                 </TableCell>
                             </TableRow>
@@ -170,24 +170,3 @@ export function ProgressDialog() {
     </ContentPage>;
 }
 
-function countScorePerTopic() {
-    return same(store.topics)
-        .flatMap(topics => topics)
-        .zip(store.puzzlerViews)
-        .groupBy(([t]) => t)
-        .map(([t, tAndVs]) => [
-            t,
-            tAndVs
-                .map(([_, {status}]) => status.userChoice === status.correctChoice)
-                .reduce((acc, isCorrect) => {
-                    if (isCorrect) {
-                        acc.correct++;
-                    } else {
-                        acc.wrong++;
-                    }
-                    return acc;
-                }, {correct: 0 as number, wrong: 0 as number}),
-        ] as const)
-        .sortBy(([_, score]) => score.wrong)
-        .toArray();
-}

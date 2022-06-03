@@ -38,7 +38,6 @@
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.11.3-deprecations.1",
     "@material-ui/styles": "^4.11.4",
-    "fluent-streams": "^0.4.7",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-ga": "^3.3.0",

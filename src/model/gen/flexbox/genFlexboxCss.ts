@@ -1,14 +1,15 @@
 import { TagNode } from '../../nodes';
-import { Declaration, Rule, TypeSelector } from '../../cssRules';
+import { Rule, TypeSelector } from '../../cssRules';
 import { getSiblingsSubtree } from '../siblingsSubtree';
-import { stream, streamOf } from 'fluent-streams';
 import { CssRules } from '../../puzzler';
 import { contrastColorVar } from '../vars';
 import { body100percentNoMarginRule, fontRule } from '../commonRules';
 import { transpose } from '../transpose';
+import { takeRandom } from '../../../util/takeRandom';
+import { randomItem } from '../../../util/randomItem';
 
 export function genFlexboxCss(body: TagNode, canWrap: boolean): CssRules {
-    const direction = streamOf('row', 'column', 'row-reverse', 'column-reverse').randomItem().get();
+    const direction = randomItem(['row', 'column', 'row-reverse', 'column-reverse']);
     const wrap = canWrap && getSiblingsSubtree(body)!.unfold().siblings.length > 2 && Math.random() < .7;
     const alignName = wrap && Math.random() < .5 ? 'align-content' : 'align-items';
 
@@ -18,20 +19,15 @@ export function genFlexboxCss(body: TagNode, canWrap: boolean): CssRules {
                 [
                     new Rule(
                         new TypeSelector('body'),
-                        stream<Declaration>([{property: 'display', value: 'flex'}])
-                            .appendAll(
-                                direction !== 'row'
-                                    ? [{property: 'flex-direction', value: direction}]
-                                    : []
-                            )
-                            .appendAll(
-                                wrap ? [{property: 'flex-wrap', value: 'wrap'}] : []
-                            )
-                            .appendAll([
-                                {property: 'justify-content', value: justifyContent, differing: true},
-                                {property: alignName, value: alignItems, differing: true},
-                            ])
-                            .toArray(),
+                        [
+                            {property: 'display', value: 'flex'},
+                            ...direction !== 'row'
+                                ? [{property: 'flex-direction', value: direction}]
+                                : [],
+                            ...wrap ? [{property: 'flex-wrap', value: 'wrap'}] : [],
+                            {property: 'justify-content', value: justifyContent, differing: true},
+                            {property: alignName, value: alignItems, differing: true},
+                        ],
                     ),
                     ...(
                         wrap
@@ -59,11 +55,9 @@ export function genFlexboxCss(body: TagNode, canWrap: boolean): CssRules {
 }
 
 function getJustifyContents() {
-    return streamOf('flex-start', 'flex-end', 'center', 'space-between', 'space-around')
-        .takeRandom(3).toArray();
+    return takeRandom(['flex-start', 'flex-end', 'center', 'space-between', 'space-around'], 3);
 }
 
 function getAlignItems() {
-    return streamOf('flex-start', 'flex-end', 'center', 'stretch')
-        .takeRandom(3).toArray();
+    return takeRandom(['flex-start', 'flex-end', 'center', 'stretch'], 3);
 }

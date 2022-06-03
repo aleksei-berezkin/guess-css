@@ -10,11 +10,13 @@ import {
 } from '../../cssRules';
 import { getSiblingsSubtree, SiblingsSubtree } from '../siblingsSubtree';
 import { getDeepestSingleChildSubtree, SingleChildSubtree } from '../singleChildSubtree';
-import { optional, Optional, range, stream } from 'fluent-streams';
 import { CssRules } from '../../puzzler';
 import { contrastColorVar, getColorVar } from '../vars';
 import { fontRule } from '../commonRules';
 import { twoElementVariationsInOrder, xprod } from '../combineItems';
+import { takeRandom } from '../../../util/takeRandom';
+import { distinctBy } from '../../../util/distinctBy';
+import { distinct } from '../../../util/distinct';
 
 const constantRule = new Rule(
     new TypeSelector('div'),
@@ -28,13 +30,18 @@ const constantRule = new Rule(
 const RULES_CHOICES = 3;
 
 export function genRulesChoices(body: TagNode): CssRules | null {
-    const colorVars = range(0, 2).map(i => getColorVar('background', i)).toArray();
-    const [deepStyle, siblingsStyle] = stream(colorVars)
-        .map((colorVar): Declaration[] => [{property: 'background-color', value: colorVar.id}])
-        .takeRandom(2);
+    const colorVars = Array.from({length: 2}).map((_, i) => getColorVar('background', i));
+    const [deepStyle, siblingsStyle] = takeRandom(
+        colorVars
+            .map((colorVar): Declaration[] => [{property: 'background-color', value: colorVar.id}]),
+        2,
+    );
 
     const deepest: SingleChildSubtree = getDeepestSingleChildSubtree(body);
-    const deepChildRules = genDeepChildRules(deepest, deepStyle);
+    const deepChildRules = takeRandom(
+        genDeepChildRules(deepest, deepStyle),
+        RULES_CHOICES,
+    );
     if (deepChildRules.length < RULES_CHOICES) {
         return null;
     }
@@ -44,18 +51,20 @@ export function genRulesChoices(body: TagNode): CssRules | null {
         return null;
     }
 
-    const siblingsRules = stream(genSiblingsRules(siblingsSubtree, siblingsStyle))
-        .distinctBy(r => r.selectorsString)
-        .toArray();
+    const siblingsRules = takeRandom(
+        distinctBy(
+            [...genSiblingsRules(siblingsSubtree, siblingsStyle)],
+            r => r.selectorsString,
+        ),
+        RULES_CHOICES,
+    );
     if (siblingsRules.length < RULES_CHOICES) {
         return null;
     }
 
     return {
-        choices: stream(deepChildRules).takeRandom(RULES_CHOICES)
-            .zip(stream(siblingsRules).takeRandom(RULES_CHOICES))
-            .map(([deepRule, siblingRule]) => [deepRule, siblingRule])
-            .toArray(),
+        choices: deepChildRules
+            .map((deepRule, i) => [deepRule, siblingsRules[i]]),
         common: [
             constantRule,
             fontRule,
@@ -75,26 +84,23 @@ function genDeepChildRules(deepest: SingleChildSubtree, style: Declaration[]): R
     }
 
     if (path.length === 1) {
-        return stream(path)
-            .head()
-            .flatMap(genAllPossibleSelectors)
-            .map(s => new Rule(s, style))
-            .toArray();
+        return genAllPossibleSelectors(path[0])
+            .map(s => new Rule(s, style));
     }
 
-    return twoElementVariationsInOrder(path)
+    const variations = twoElementVariationsInOrder(path)
         .flatMap(([ancestor, descendant]) =>
             xprod(genAllPossibleSelectors(ancestor), genAllPossibleSelectors(descendant))
         )
         .flatMap(([ancestorSelector, descendantSelector]) => [
             new Rule(new DescendantCombinator(ancestorSelector, descendantSelector), style, true),
             new Rule(new ChildCombinator(ancestorSelector, descendantSelector), style, true)
-        ])
-        .distinctBy(r => r.selectorsString)
-        .toArray();
+        ]);
+
+    return distinctBy(variations, v => v.selectorsString);
 }
 
-function *genSiblingsRules(siblingsSubtree: SiblingsSubtree, style: Declaration[]): IterableIterator<Rule> {
+function* genSiblingsRules(siblingsSubtree: SiblingsSubtree, style: Declaration[]): IterableIterator<Rule> {
     const pathAndSiblings = siblingsSubtree.unfold();
     const path = pathAndSiblings.path.filter(n => n.name !== 'body');
     const siblings = pathAndSiblings.siblings;
@@ -102,13 +108,13 @@ function *genSiblingsRules(siblingsSubtree: SiblingsSubtree, style: Declaration[
         return;
     }
 
-    const sameName = allSameName(siblings).orElseUndefined();
+    const sameName = allSameNameOrUndefined(siblings);
     if (sameName) {
         const innerSelectors = genAllPossiblePseudoClassSelectors(sameName);
 
-        yield *innerSelectors.map(s => new Rule(s, style, true));
+        yield* innerSelectors.map(s => new Rule(s, style, true));
 
-        yield *stream(path)
+        yield* path
             .flatMap(genAllPossibleSelectors)
             .flatMap(ancestorSelector =>
                 innerSelectors.map(innerSelector =>
@@ -117,13 +123,11 @@ function *genSiblingsRules(siblingsSubtree: SiblingsSubtree, style: Declaration[
             );
     }
 
-    yield *genAllPossibleSelectors(stream(path).last().get())
+    yield* genAllPossibleSelectors(path[path.length - 1])
         .map(selector => new Rule(new ChildCombinator(selector, new TypeSelector('*')), style, true));
 
-    yield *stream(siblings)
-        .flatMap(n => n.classes)
-        .distinctBy(_ => _)
-        .map(clazz => new Rule(new ClassSelector(clazz), style, true))
+    yield* distinct(siblings.flatMap(tn => tn.classes))
+        .map(clazz => new Rule(new ClassSelector(clazz), style, true));
 }
 
 function genAllPossibleSelectors(node: TagNode): Selector[] {
@@ -143,9 +147,9 @@ function genAllPossiblePseudoClassSelectors(name: string): Selector[] {
     ];
 }
 
-function allSameName(nodes: TagNode[]): Optional<string> {
-    const firstName = stream(nodes).head().get().name;
-    return stream(nodes).all(n => n.name === firstName)
-        ? optional([firstName])
-        : optional([]);
+function allSameNameOrUndefined(nodes: TagNode[]): string | undefined {
+    const firstName = nodes[0].name;
+    return nodes.every(n => n.name === firstName)
+        ? firstName
+        : undefined;
 }

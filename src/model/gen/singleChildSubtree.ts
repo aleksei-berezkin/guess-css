@@ -1,5 +1,6 @@
 import { TagNode } from '../nodes';
-import { Stream, stream } from 'fluent-streams';
+import { randomItem } from '../../util/randomItem';
+import { getItemsWithMax } from '../../util/getItemsWithMax';
 
 export class SingleChildSubtree {
     constructor(readonly root: TagNode, readonly depth: number = 1) {
@@ -16,11 +17,11 @@ export class SingleChildSubtree {
     }
 
     unfold(): TagNode[] {
-        return this.unfoldToStream().toArray();
+        return [...this.unfoldToItr()];
     }
 
-    unfoldToStream(): Stream<TagNode> {
-        return stream(function* _unfold(n: TagNode): IterableIterator<TagNode> {
+    *unfoldToItr(): IterableIterator<TagNode> {
+        yield* (function* _unfold(n: TagNode): IterableIterator<TagNode> {
             yield n;
             if (n.tagChildren.length === 1) {
                 yield *_unfold(n.tagChildren[0]);
@@ -31,12 +32,16 @@ export class SingleChildSubtree {
 }
 
 export function getDeepestSingleChildSubtree(root: TagNode): SingleChildSubtree {
-    return stream(root.tagChildren)
-        .map(getDeepestSingleChildSubtree)
-        .groupBy(subtree => subtree.depth)
-        .reduce(([d1, s1], [d2, s2]) => d1 > d2 ? [d1, s1] : [d2, s2])
-        .flatMapToStream(([_, s]) => s)
-        .randomItem()
-        .map(s => s.createWithParent(root))
-        .orElseGet(() => new SingleChildSubtree(root));
+    if (!root.tagChildren.length) {
+        return new SingleChildSubtree(root);
+    }
+
+    const deepestSingleChildSubtrees = root.tagChildren
+        .map(getDeepestSingleChildSubtree);
+
+    const deepestSingleChildSubtree = randomItem(
+        getItemsWithMax(deepestSingleChildSubtrees, st => st.depth),
+    );
+
+    return deepestSingleChildSubtree.createWithParent(root);
 }

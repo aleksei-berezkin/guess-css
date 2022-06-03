@@ -2,7 +2,6 @@ import { Node, TagNode } from './nodes';
 import { Rule } from './cssRules';
 import { Region } from './region';
 import { Indent } from './indent';
-import { Stream, stream, streamOf } from 'fluent-streams';
 import { ColorVar } from './gen/vars';
 import { randomBounded } from './gen/randomItems';
 
@@ -45,19 +44,17 @@ export class Puzzler {
     }
 
     get commonStyleSummary(): string[] {
-        return stream(this.rules.common)
+        return this.rules.common
             .flatMap(r => r.declarations)
-            .map(({property}) => property)
-            .toArray();
+            .map(({property}) => property);
     }
 
     get bodyCode(): Region[][] {
         if (this.showBodyTag) {
             return this.body.toRegions(new Indent());
         }
-        return stream(this.body.children)
-            .flatMap(n => n.toRegions(new Indent()))
-            .toArray();
+        return this.body.children
+            .flatMap(n => n.toRegions(new Indent()));
     }
 }
 
@@ -73,31 +70,32 @@ class StylesNode implements Node {
 
     toRegions(indent: Indent): Region[][] {
         if (this.isDiffHint) {
-            return streamOf<Region[]>([
-                indent.toRegion(),
-                {
-                    kind: 'comment',
-                    text: '/* Only text in ',
-                },
-                {
-                    kind: 'comment',
-                    text: 'bold',
-                    differing: true,
-                },
-                {
-                    kind: 'comment',
-                    text: ' differs */',
-                },
-            ])
-                .appendAll(this.doToRegions(indent))
-                .toArray();
+            return [
+                [
+                    indent.toRegion(),
+                    {
+                        kind: 'comment',
+                        text: '/* Only text in ',
+                    },
+                    {
+                        kind: 'comment',
+                        text: 'bold',
+                        differing: true,
+                    },
+                    {
+                        kind: 'comment',
+                        text: ' differs */',
+                    },
+                ],
+                ...this.doToRegions(indent)
+            ];
         }
 
-        return this.doToRegions(indent).toArray();
+        return this.doToRegions(indent);
     }
 
-    private doToRegions(indent: Indent): Stream<Region[]> {
-        return stream(this.rules)
+    private doToRegions(indent: Indent): Region[][] {
+        return this.rules
             .flatMap(rule => rule.toRegions(indent));
     }
 

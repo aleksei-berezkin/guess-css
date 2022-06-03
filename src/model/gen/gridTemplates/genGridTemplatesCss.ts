@@ -1,9 +1,11 @@
 import { TagNode } from '../../nodes';
 import { CssRules } from '../../puzzler';
-import { continually, stream, streamOf } from 'fluent-streams';
 import { Rule, TypeSelector } from '../../cssRules';
 import { body100percentNoMarginRule, borderAndTextUpCenterRule, fontRule } from '../commonRules';
 import { contrastColorVar } from '../vars';
+import { shuffle } from '../../../util/shuffle';
+import { randomItem } from '../../../util/randomItem';
+import { takeRandom } from '../../../util/takeRandom';
 
 export function genGridTemplatesCss(body: TagNode, rowNum: number, colNum: number): CssRules {
     return {
@@ -31,9 +33,7 @@ function createChoices(body: TagNode, rowNum: number, colNum: number): Rule[][] 
             ? [{property: 'grid-template-columns', value: ['', genSimpleTemplate(colNum)]}]
             : [];
 
-    return continually(() => genTemplate(trackNum))
-        .distinctBy(t => t)
-        .take(3)
+    return gen3DistinctTemplates(trackNum)
         .map(template => [
             new Rule(
                 new TypeSelector('body'),
@@ -47,27 +47,31 @@ function createChoices(body: TagNode, rowNum: number, colNum: number): Rule[][] 
                     },
                 ],
             ),
-        ])
-        .toArray();
+        ]);
+}
+
+function gen3DistinctTemplates(trackNum: number) {
+    const set = new Set<string>();
+    while (set.size < 3) {
+        set.add(genTemplate(trackNum));
+    }
+    return [...set];
 }
 
 function genTemplate(tracksNum: number) {
     if (tracksNum === 4) {
-        const trackListItems = streamOf(
+        const trackListItems = randomItem([
             ['2fr', '50%', 'repeat(2, 1fr)'],
             ['1fr', '50%', 'repeat(2, 2fr)'],
             ['2fr', '1fr', 'repeat(2, 25%)'],
             ['1fr', 'repeat(3, 20%)'],
             ['50%', 'repeat(3, 10%)'],
-        ).randomItem().get();
+        ]);
 
-        return stream(trackListItems)
-            .shuffle()
-            .join(' ');
+        return shuffle(trackListItems).join(' ');
     }
 
-    return streamOf('50%', '1fr', '2fr', '3fr')
-        .takeRandom(tracksNum)
+    return takeRandom(['50%', '1fr', '2fr', '3fr'], tracksNum)
         .join(' ');
 }
 

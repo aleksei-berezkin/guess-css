@@ -3,8 +3,10 @@ import { TagNode } from '../../nodes';
 import { CssRules } from '../../puzzler';
 import { body100percentNoMarginRule, borderAndTextUpCenterRule, fontRule } from '../commonRules';
 import { contrastColorVar, getColorVar } from '../vars';
-import { range, stream } from 'fluent-streams';
 import { randomBounded } from '../randomItems';
+import { range } from '../../../util/range';
+import { shuffle } from '../../../util/shuffle';
+import { single } from '../../../util/single';
 
 export function genGridItemsCss(body: TagNode, rowNum: number, colNum: number): CssRules {
     const colorVar = getColorVar('background', 0);
@@ -31,9 +33,8 @@ function createChoices(body: TagNode, rowNum: number, colNum: number, colorVar: 
     const pickedItem = pickItem(body, rowNum, colNum);
     const spans = gen3Spans(pickedItem, rowNum, colNum);
 
-    return stream(spans).shuffle()
-        .map(span => genChoice(pickedItem.className, span, rowNum, colNum, colorVar))
-        .toArray();
+    return shuffle(spans)
+        .map(span => genChoice(pickedItem.className, span, rowNum, colNum, colorVar));
 }
 
 type PickedItem = {
@@ -48,7 +49,7 @@ function pickItem(body: TagNode, rowNum: number, colNum: number): PickedItem {
     const node = body.children[row * colNum + col];
 
     return {
-        className: stream((node as TagNode).classes).single().get(),
+        className: single((node as TagNode).classes),
         row,
         col,
     };
@@ -68,23 +69,27 @@ class Span {
     }
 }
 
-function gen3Spans(pickedItem: PickedItem, rowNum: number, colNum: number) {
-    for ( ; ; ) {
-        const spans = stream(genSpans(pickedItem, rowNum, colNum))
-            .take(10)
-            .filterWithAssertion((s): s is Span => !!s)
-            .take(3)
-            .toArray();
-        if (spans.length === 3) {
-            return spans;
+function gen3Spans(pickedItem: PickedItem, rowNum: number, colNum: number): Span[] {
+    const spans: Span[] = [];
+    let counter = 0;
+    for (const span of genSpans(pickedItem, rowNum, colNum)) {
+        if (span) {
+            spans.push(span);
+            if (spans.length >= 3) {
+                return spans;
+            }
+        }
+        if (counter++ > 10) {
+            break;
         }
     }
+
+    return gen3Spans(pickedItem, rowNum, colNum);
 }
 
 function* genSpans(pickedItem: PickedItem, rowNum: number, colNum: number) {
-    const grid = range(0, rowNum)
-        .map(() => range(0, colNum).map(() => false as boolean).toArray())
-        .toArray();
+    const grid = range(rowNum)
+        .map(() => range(colNum).map(() => false as boolean));
 
     grid[pickedItem.row][pickedItem.col] = true;
 
@@ -102,17 +107,17 @@ function* genSpans(pickedItem: PickedItem, rowNum: number, colNum: number) {
                 row[c] = true;
                 break;
             }
-            grid.push(range(0, colNum).map(() => false as boolean).toArray());
+            grid.push(range(colNum).map(() => false as boolean));
         }
     }
     function addToGridIfNotAlready(span: Span) {
-        const cells = range(0, span.size)
+        const cells = range(span.size)
             .map(i => span.horizontal
                 ? [span.from.row, span.from.col + i]
                 : [span.from.row + i, span.from.col]
             );
 
-        if (cells.any(isOccupied)) {
+        if (cells.some(isOccupied)) {
             return false;
         }
 

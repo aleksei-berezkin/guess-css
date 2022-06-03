@@ -1,7 +1,6 @@
 import path from 'path';
 import fs from 'fs';
 import { DepFullData } from './depFullData';
-import { stream } from 'fluent-streams';
 
 export const readNode = readLicense('node', 'JavaScript runtime built on Chrome\'s V8 JavaScript engine', process.argv0, 'https://nodejs.org/', '');
 export const readNpm = which('npm')
@@ -32,7 +31,7 @@ function readLicense(name: string, description: string, executable: string, link
 
 function which(name: string): Promise<string> {
     return Promise.all(
-        stream(process.env.PATH!.split(path.delimiter))
+        process.env.PATH!.split(path.delimiter)
             .map(dir =>
                 fs.promises.realpath(path.resolve(dir, name))
                     .then(
@@ -41,9 +40,6 @@ function which(name: string): Promise<string> {
                     )
             )
     ).then(executables =>
-        stream(executables)
-            .filterWithAssertion((ex): ex is string => !!ex)
-            .head()
-            .get()
+        executables.filter(ex => ex)[0]!
     )
 }

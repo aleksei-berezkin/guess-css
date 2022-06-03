@@ -3,7 +3,6 @@ import green from '@material-ui/core/colors/green';
 import red from '@material-ui/core/colors/red';
 import { CSSProperties } from '@material-ui/styles/withStyles/withStyles';
 import { PaletteType } from '@material-ui/core';
-import { entryStream } from 'fluent-streams';
 import { PuzzlerView } from '../store/store';
 
 export type ChoiceStatus = 'userCorrect' | 'correct' | 'incorrect' | 'untouched' | 'notAnswered';
@@ -58,8 +57,9 @@ const choiceStylesObj: {
 }
 
 export const makeChoiceStyles = makeStyles(
-    (theme): {[status in ChoiceStatus]: CSSProperties} =>
-        entryStream(choiceStylesObj)
-            .map(([k, v]) => [k, v[theme.palette.type]] as const)
-            .toObject()
+    theme =>
+        Object.fromEntries(
+            Object.entries(choiceStylesObj)
+                .map(([k, v]) => [k, v[theme.palette.type]] as const)
+        )
 );

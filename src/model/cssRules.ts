@@ -1,6 +1,5 @@
 import { Region } from './region';
 import { Indent } from './indent';
-import { stream, streamOf } from 'fluent-streams';
 
 export type Declaration = {
     property: string,
@@ -50,30 +49,29 @@ export class Rule {
     }
 
     toRegions(indent: Indent): Region[][] {
-        return streamOf<Region[]>([
+        return [
+            [
                 indent.toRegion(),
                 {kind: 'selector', text: this.selectorsString, differing: this.selectorsDiffering},
-                {kind: 'default', text: ' {'},
-            ])
-            .appendAll(this.declarationsToRegions(indent.indent()))
-            .append([
+                {kind: 'default', text: ' {'}
+            ],
+            ...this.declarationsToRegions(indent.indent()),
+            [
                 indent.toRegion(),
                 {kind: 'default', text: '}'},
-            ])
-            .toArray();
+            ],
+        ];
     }
 
 
     private declarationsToRegions(indent: Indent): Region[][] {
-        return stream(this.declarations)
+        return this.declarations
             .flatMap(decl => this.declarationToLines(decl, indent))
-            .toArray();
     }
 
     private declarationToLines(decl: Declaration, indent: Indent): Region[][] {
-        return (typeof decl.value === 'string' ? streamOf(decl.value) : stream(decl.value))
-            .zipWithIndexAndLen()
-            .map(([v, i, len]) => {
+        return (typeof decl.value === 'string' ? [decl.value] : decl.value)
+            .map((v, i, arr) => {
                 const line: Region[] = [];
                 if (i === 0) {
                     line.push(
@@ -87,12 +85,11 @@ export class Rule {
                     );
                 }
                 line.push({kind: 'declValue', text: v, differing: decl.differing});
-                if (i === len - 1) {
+                if (i === arr.length - 1) {
                     line.push({kind: 'default', text: ';'});
                 }
                 return line;
-            })
-            .toArray();
+            });
     }
 }
 

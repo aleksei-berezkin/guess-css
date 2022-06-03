@@ -8,7 +8,6 @@ import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import { State, useSelector } from '../store/store';
-import { stream } from 'fluent-streams';
 import React, { useState } from 'react';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
@@ -17,6 +16,7 @@ import makeStyles from '@material-ui/core/styles/makeStyles';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Switch from '@material-ui/core/Switch';
+import { lastOrUndefined } from '../util/lastOrUndefined';
 
 const useStyles = makeStyles({
     appName: {
@@ -153,7 +153,7 @@ function getDonePuzzlersNum(state: State) {
     if (!state.puzzlerViews.length) {
         return 0;
     }
-    if (stream(state.puzzlerViews).last().orElseUndefined()?.status.userChoice != null) {
+    if (lastOrUndefined(state.puzzlerViews)?.status.userChoice != null) {
         return state.puzzlerViews.length;
     }
     return state.puzzlerViews.length - 1;

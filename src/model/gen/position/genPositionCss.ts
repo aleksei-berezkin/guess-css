@@ -1,14 +1,15 @@
 import { TagNode } from '../../nodes';
 import { ChildCombinator, ClassSelector, Rule, Selector, TypeSelector } from '../../cssRules';
 import { getDeepestSingleChildSubtree } from '../singleChildSubtree';
-import { stream } from 'fluent-streams';
 import { CssRules } from '../../puzzler';
 import { contrastColorVar, getColorVar } from '../vars';
 import { fontRule } from '../commonRules';
 import { transpose } from '../transpose';
+import { takeRandom } from '../../../util/takeRandom';
+import { single } from '../../../util/single';
 
 export function genPositionCss(body: TagNode): CssRules {
-    const [outer, inner] = getDeepestSingleChildSubtree(body).unfoldToStream().takeLast(2);
+    const [outer, inner] = get2Last(getDeepestSingleChildSubtree(body).unfoldToItr());
     const outerBorderColor = getColorVar('border', 0);
     const innerBgColor = getColorVar('background', 0);
 
@@ -43,8 +44,18 @@ export function genPositionCss(body: TagNode): CssRules {
     };
 }
 
+function get2Last<T>(gen: IterableIterator<T>): T[] {
+    const last = [];
+    for (const it of gen) {
+        if (last.push(it) === 3) {
+            last.shift();
+        }
+    }
+    return last;
+}
+
 function getClassSelector(node: TagNode): Selector {
-    return new ClassSelector(stream(node.classes).single().get());
+    return new ClassSelector(single(node.classes));
 }
 
 
@@ -54,11 +65,13 @@ const outerPositions: Position[] = ['static', 'relative', 'absolute'];
 const innerPositions: Position[] = ['static', 'relative', 'absolute', 'fixed'];
 
 function innerOuterPositionsShuffled(): Position[][] {
-    const outerShuffled = stream(outerPositions).takeRandom(3).toArray();
-    const innerShuffled = stream(innerPositions).takeRandom(3).toArray();
-    const zipped = stream(outerShuffled).zip(innerShuffled);
-    if (zipped.all(([o, i]) => o === i) || zipped.any(([o, i]) => o === 'static' && i === 'static')) {
+    const outerShuffled = takeRandom(outerPositions, 3);
+    const innerShuffled = takeRandom(innerPositions, 3);
+    if (innerShuffled.every((pos, ix) => pos === outerShuffled[ix])
+        || innerShuffled.some((pos, ix) => pos === 'static' && outerShuffled[ix] === 'static')
+    ) {
         return innerOuterPositionsShuffled();
     }
+
     return [outerShuffled, innerShuffled];
 }

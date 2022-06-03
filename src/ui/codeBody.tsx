@@ -1,7 +1,6 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { Region, RegionKind } from '../model/region';
 import Box from '@material-ui/core/Box';
-import { stream } from 'fluent-streams';
 import React, { ReactElement } from 'react';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import { ofCurrentViewOrUndefined, useSelector } from '../store/store';
@@ -33,8 +32,8 @@ export function CodeBody(p: { lines: Region[][], noBottomPadding?: boolean }) {
 
     return <Box className={ classes.root } style={ inlineStyle }>{
         p.lines &&
-        stream(p.lines).zipWithIndex().map(
-            ([regions, i]) => <Line key={ i } regions={ regions }/>
+        p.lines.map(
+            (regions, i) => <Line key={ i } regions={ regions }/>
         )
     }</Box>;
 }
