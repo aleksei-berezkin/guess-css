@@ -7,7 +7,7 @@ import Container from '@material-ui/core/Container';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import { State, useSelector } from '../store/store';
+import { useSelector } from '../store/store';
 import React, { useState } from 'react';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
@@ -17,6 +17,7 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import Switch from '@material-ui/core/Switch';
 import { lastOrUndefined } from '../util/lastOrUndefined';
+import { State } from '../store/State';
 
 const useStyles = makeStyles({
     appName: {
@@ -127,9 +128,9 @@ export function MyAppBar(p: {paletteType: PaletteType, setPaletteType: (paletteT
 }
 
 function Score() {
-    const isLast = useSelector(state => state.current === state.puzzlerViews.length - 1);
-    const correctAnswers = useSelector(state => state.correctAnswers);
-    const incorrectAnswers = useSelector(state => getDonePuzzlersNum(state) - state.correctAnswers);
+    const isLast = useSelector(state => state.current === state.persistent.puzzlerViews.length - 1);
+    const correctAnswers = useSelector(state => state.persistent.correctAnswers);
+    const incorrectAnswers = useSelector(state => getDonePuzzlersNum(state) - state.persistent.correctAnswers);
     const inlineSvg = useInlineSvg();
 
     return <>{
@@ -139,7 +140,7 @@ function Score() {
 }
 
 function DonePuzzler() {
-    const isHistory = useSelector(state => state.current < state.puzzlerViews.length - 1);
+    const isHistory = useSelector(state => state.current < state.persistent.puzzlerViews.length - 1);
     const historyPuzzlerPos = useSelector(state => state.current + 1);
     const donePuzzlersNum = useSelector(getDonePuzzlersNum);
 
@@ -150,11 +151,11 @@ function DonePuzzler() {
 }
 
 function getDonePuzzlersNum(state: State) {
-    if (!state.puzzlerViews.length) {
+    if (!state.persistent.puzzlerViews.length) {
         return 0;
     }
-    if (lastOrUndefined(state.puzzlerViews)?.status.userChoice != null) {
-        return state.puzzlerViews.length;
+    if (lastOrUndefined(state.persistent.puzzlerViews)?.status.userChoice != null) {
+        return state.persistent.puzzlerViews.length;
     }
-    return state.puzzlerViews.length - 1;
+    return state.persistent.puzzlerViews.length - 1;
 }

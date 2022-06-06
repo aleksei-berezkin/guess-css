@@ -60,11 +60,11 @@ export function ProgressDialog() {
         action: `ProgressDialog_${leadingZeros3(store.current + 1)}`,
     }), []);
 
-    const round = Math.floor(store.current / store.topics.length);
+    const round = Math.floor(store.current / store.persistent.topics.length);
     const [scorePerTopic] = useState(countScorePerTopic);
 
-    const allAnswersAreCorrect = useSelector(state => state.correctAnswers === state.puzzlerViews.length);
-    const moreCorrectAnswers = useSelector(state => state.correctAnswers > state.puzzlerViews.length / 2);
+    const allAnswersAreCorrect = useSelector(state => state.persistent.correctAnswers === state.persistent.puzzlerViews.length);
+    const moreCorrectAnswers = useSelector(state => state.persistent.correctAnswers > state.persistent.puzzlerViews.length / 2);
 
     useEffect(() => {
         if (allAnswersAreCorrect) {
@@ -154,7 +154,7 @@ export function ProgressDialog() {
                     If you were looking for the game to end it's a good moment perhaps. Thanks for your interest! And, once again, please feel free to share any feedback.
                 </Typography>
                 <Typography variant='body1' paragraph>
-                    You may also continue playing if you wish; the game is technically endless. We'll continue to make pauses after each {store.topics.length} puzzlers to track your results.
+                    You may also continue playing if you wish; the game is technically endless. We'll continue to make pauses after each {store.persistent.topics.length} puzzlers to track your results.
                 </Typography>
             </>
         }
@@ -162,7 +162,7 @@ export function ProgressDialog() {
         {
             round !== 2 &&
             <Typography variant='body1' paragraph>
-                We'll meet again after next {store.topics.length} puzzlers to check your results. See you later!
+                We'll meet again after next {store.persistent.topics.length} puzzlers to check your results. See you later!
             </Typography>
         }
 

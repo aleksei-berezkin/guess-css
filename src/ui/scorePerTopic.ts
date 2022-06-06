@@ -5,12 +5,12 @@ export type ScorePerTopic = {correct: number, wrong: number};
 
 export function countScorePerTopic(): [Topic, ScorePerTopic][] {
     const scoreByTopic: Map<Topic, ScorePerTopic> = new Map(
-        store.topics.map(topic => [topic, {correct: 0, wrong: 0}]),
+        store.persistent.topics.map(topic => [topic, {correct: 0, wrong: 0}]),
     );
 
-    const topicAndAnswerIsCorrect: [Topic, boolean][] = store.puzzlerViews
+    const topicAndAnswerIsCorrect: [Topic, boolean][] = store.persistent.puzzlerViews
         .map((puzzler, i) => [
-            store.topics[i % store.topics.length],
+            store.persistent.topics[i % store.persistent.topics.length],
             puzzler.status.correctChoice === puzzler.status.userChoice,
         ]);
 

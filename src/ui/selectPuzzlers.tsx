@@ -33,7 +33,7 @@ const useStyles = makeStyles(theme => ({
 
 export function SelectPuzzlers() {
     const styles = useStyles();
-    const initialTopics = useSelector(state => state.topics);
+    const initialTopics = useSelector(state => state.persistent.topics);
     const [selectedTopics, setSelectedTopics] = useState(initialTopics);
     useEffect(() => ReactGA.pageview(routes.select), []);
 

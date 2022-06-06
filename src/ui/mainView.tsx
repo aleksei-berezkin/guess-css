@@ -8,7 +8,6 @@ import { ofCurrentView, useSelector } from '../store/store';
 import { CircularProgress } from '@material-ui/core';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { ProgressDialog } from './progressDialog';
-import Typography from '@material-ui/core/Typography';
 import { FeedbackToast } from './feedbackToast';
 
 
@@ -33,12 +32,12 @@ export function MainView() {
     const showProgressDialog = useSelector(state => state.showProgressDialog);
 
     const firstStatus = useSelector(state => {
-        const currentStatus = state.puzzlerViews[state.current]?.status;
-        if (currentStatus?.userChoice != null && state.current === state.puzzlerViews.length - 1) {
-            if (currentStatus.userChoice === currentStatus.correctChoice && state.correctAnswers === 1) {
+        const currentStatus = state.persistent.puzzlerViews[state.current]?.status;
+        if (currentStatus?.userChoice != null && state.current === state.persistent.puzzlerViews.length - 1) {
+            if (currentStatus.userChoice === currentStatus.correctChoice && state.persistent.correctAnswers === 1) {
                 return 'firstCorrect';
             }
-            if (currentStatus.userChoice !== currentStatus.correctChoice && state.correctAnswers === state.puzzlerViews.length - 1) {
+            if (currentStatus.userChoice !== currentStatus.correctChoice && state.persistent.correctAnswers === state.persistent.puzzlerViews.length - 1) {
                 return 'firstIncorrect';
             }
         }

@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect, useRef } from 'react';
-import { ofCurrentView, ofCurrentViewOrUndefined, PuzzlerView, State, store, useSelector } from '../store/store';
-import { checkChoice } from '../store/thunks';
+import { ofCurrentView, ofCurrentViewOrUndefined, store, useSelector } from '../store/store';
+import { setUserChoice } from '../store/thunks';
 import Grid from '@material-ui/core/Grid';
 import { CodePaper } from './codePaper';
 import { CodeHeader } from './codeHeader';
@@ -17,6 +17,7 @@ import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import { spacing } from './theme';
 import { abc } from '../util/abc';
+import { PuzzlerView, State } from '../store/State';
 
 
 export function Choices(): ReactElement {
@@ -34,7 +35,7 @@ const statusSelector = ofCurrentViewOrUndefined('status');
 function handleCheckChoice(choice: number, status: PuzzlerView['status'] | undefined) {
     return () => {
         if (status?.userChoice == null) {
-            checkChoice(choice);
+            setUserChoice(choice);
         }
     }
 }

@@ -3,7 +3,7 @@ import green from '@material-ui/core/colors/green';
 import red from '@material-ui/core/colors/red';
 import { CSSProperties } from '@material-ui/styles/withStyles/withStyles';
 import { PaletteType } from '@material-ui/core';
-import { PuzzlerView } from '../store/store';
+import { PuzzlerView } from '../store/State';
 
 export type ChoiceStatus = 'userCorrect' | 'correct' | 'incorrect' | 'untouched' | 'notAnswered';
 

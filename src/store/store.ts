@@ -1,68 +1,51 @@
-import { Region } from '../model/region';
-import { AssignedColorVar } from './assignColorVar';
 import { useEffect, useState } from 'react';
-import {allTopics, Topic} from '../model/topic';
-
-export type PuzzlerView = {
-    source: string,
-    styleChoices: Region[][][],
-    commonStyleSummary: string[],
-    commonStyle: Region[][],
-    vars: {
-        contrastColor: string,
-        colors: AssignedColorVar[],
-    },
-    body: Region[][],
-    status: {
-        correctChoice: number,
-        userChoice: number | undefined,
-    },
-    currentTab: number,
-};
-
-export type State = {
-    topics: Topic[],
-    puzzlerViews: PuzzlerView[],
-    current: number,
-    showProgressDialog: boolean,
-    correctAnswers: number,
-    layoutConstants: {
-        footerBtnHeight: number | undefined,
-    },
-}
+import { Topic } from '../model/topic';
+import { PersistentState, PuzzlerView, State } from './State';
 
 export class Store implements State {
-    topics: Topic[] = [];
-    puzzlerViews: PuzzlerView[] = [];
+    persistent: PersistentState = {
+        topics: [],
+        puzzlerViews: [],
+        correctAnswers: 0,
+        _version: 0,
+    };
     current = -1;
     showProgressDialog = false;
-    correctAnswers = 0;
     layoutConstants: State['layoutConstants'] = {
         footerBtnHeight: undefined,
     }
 
     @action()
     reset(topics: Topic[]) {
-        this.topics = topics;
-        this.puzzlerViews = [];
-        this.correctAnswers = 0;
+        this.persistent = {
+            topics,
+            puzzlerViews: [],
+            correctAnswers: 0,
+            _version: this.persistent._version,
+        }
+    }
+
+    @action()
+    restore(persistent: PersistentState) {
+        this.persistent = persistent;
+        this.current = persistent.puzzlerViews.length - 1;
     }
 
     @action()
     appendAndDisplayPuzzler(puzzlerView: PuzzlerView) {
-        const newCount = this.puzzlerViews.push(puzzlerView);
+        const newCount = this.persistent.puzzlerViews.push(puzzlerView);
         this.current = newCount - 1;
     }
 
     @action()
     setCurrentTab(tab: number) {
-        this.puzzlerViews[this.current].currentTab = tab;
+        this.persistent.puzzlerViews[this.current].currentTab = tab;
     }
 
     @action()
     setUserChoice(userChoice: number) {
-        this.puzzlerViews[this.current].status = {
-            ...this.puzzlerViews[this.current].status,
+        this.persistent.puzzlerViews[this.current].status = {
+            ...this.persistent.puzzlerViews[this.current].status,
             userChoice,
         }
     }
@@ -89,7 +72,7 @@ export class Store implements State {
 
     @action()
     incCorrectAnswers() {
-        this.correctAnswers++;
+        this.persistent.correctAnswers++;
     }
 
     @action()
@@ -101,6 +84,7 @@ export class Store implements State {
 export const store = new Store();
 
 const listeners: Set<(st: State) => void> = new Set();
+let updateQueued = false;
 
 function action(): MethodDecorator {
     return function(targetProto, methodName, descriptor: TypedPropertyDescriptor<any>) {
@@ -108,7 +92,13 @@ function action(): MethodDecorator {
 
         descriptor.value = function(this: State, ...args: any[]) {
             const returnValue = origMethod.apply(this, args);
-            listeners.forEach(l => l(this));
+            if (!updateQueued) {
+                queueMicrotask(() => {
+                    updateQueued = false;
+                    listeners.forEach(l => l(this));
+                });
+                updateQueued = true;
+            }
             return returnValue;
         }
     }
@@ -137,7 +127,7 @@ export function ofCurrentViewOrUndefined<K extends keyof PuzzlerView>(key: K): (
 
 export function mapCurrentView<T>(map: (v: PuzzlerView) => T, deflt: T): (state: State) => T {
     return state => {
-        const currentView = state.puzzlerViews[state.current];
+        const currentView = state.persistent.puzzlerViews[state.current];
         return currentView && map(currentView) || deflt;
     };
 }

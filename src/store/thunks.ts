@@ -1,15 +1,16 @@
-import {genPuzzler} from '../model/gen/genPuzzler';
-import {assignColorVars} from './assignColorVar';
+import { genPuzzler } from '../model/gen/genPuzzler';
+import { assignColorVars } from './assignColorVar';
 import ReactGA from 'react-ga';
-import {store} from './store';
-import {routes} from '../ui/routes';
-import {leadingZeros3} from "../util/leadingZeros3";
+import { store } from './store';
+import { routes } from '../ui/routes';
+import { leadingZeros3 } from '../util/leadingZeros3';
+import { writeToLocalStorage } from './myLocalStorage';
 
 export function genAndDisplayNewPuzzler() {
-    const topic = store.topics[store.puzzlerViews.length % store.topics.length];
-    const round = Math.floor(store.puzzlerViews.length / store.topics.length);
+    const topic = store.persistent.topics[store.persistent.puzzlerViews.length % store.persistent.topics.length];
+    const round = Math.floor(store.persistent.puzzlerViews.length / store.persistent.topics.length);
     const puzzler = genPuzzler(topic, round);
-    const diffHint = store.puzzlerViews.length === 0;
+    const diffHint = store.persistent.puzzlerViews.length === 0;
     store.appendAndDisplayPuzzler({
         source: puzzler.html,
         styleChoices: puzzler.getStyleCodes(diffHint),
@@ -27,16 +28,26 @@ export function genAndDisplayNewPuzzler() {
         currentTab: 0,
     });
 
+    writeToLocalStoragePostponed();
+
     gaNewPuzzler();
 }
 
-export function checkChoice(userChoice: number) {
-    const {puzzlerViews, current} = store;
+export function setUserChoice(userChoice: number) {
+    const { current } = store;
+    const { puzzlerViews } = store.persistent;
     const isCorrect = puzzlerViews[current].status.correctChoice === userChoice;
     store.setUserChoice(userChoice)
     if (isCorrect) {
         store.incCorrectAnswers();
     }
+    writeToLocalStoragePostponed();
+}
+
+function writeToLocalStoragePostponed() {
+    setTimeout(() => {
+        writeToLocalStorage(store.persistent);
+    }, 500);
 }
 
 export function gaInit() {

@@ -3,7 +3,6 @@ import {
     mapCurrentView,
     ofCurrentView,
     ofCurrentViewOrUndefined,
-    PuzzlerView,
     store,
     useSelector
 } from '../store/store';
@@ -20,6 +19,7 @@ import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
 import React from 'react';
 import { globalEscapedRe } from './escapeRe';
 import { allTopics } from '../model/topic';
+import { PuzzlerView } from '../store/State';
 
 const useStyles = makeStyles(theme => ({
     puzzleContainer: {
@@ -104,9 +104,9 @@ const useNextButtonStyles = makeStyles({
 });
 
 function NextButton() {
-    const hasNext = useSelector(state => state.current < state.puzzlerViews.length - 1);
+    const hasNext = useSelector(state => state.current < state.persistent.puzzlerViews.length - 1);
     const isAnswered = useSelector(mapCurrentView(v => v.status.userChoice != null, false));
-    const isVeryFirst = useSelector(state => state.current === 0 && state.puzzlerViews.length === 1);
+    const isVeryFirst = useSelector(state => state.current === 0 && state.persistent.puzzlerViews.length === 1);
 
     const styles = useNextButtonStyles();
 
@@ -114,8 +114,8 @@ function NextButton() {
         if (hasNext) {
             store.displayNextPuzzler();
         } else if (isAnswered) {
-            if (store.topics.length === allTopics.length
-                && (store.current + 1) % store.topics.length === 0) {
+            if (store.persistent.topics.length === allTopics.length
+                && (store.current + 1) % store.persistent.topics.length === 0) {
                 store.displayProgressDialog(true);
             } else {
                 genAndDisplayNewPuzzler();
