@@ -1,5 +1,5 @@
 import makeStyles from '@material-ui/core/styles/makeStyles';
-import { Region, RegionKind } from '../model/region';
+import { Region, regionKind, RegionKindLabel } from '../model/region';
 import Box from '@material-ui/core/Box';
 import React, { ReactElement } from 'react';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
@@ -49,40 +49,40 @@ function Line(p: {regions: Region[]}) {
 }
 
 const regionStylesObj: (theme: Theme) => {
-    [k in RegionKind | 'differing']: CSSProperties
+    [k in RegionKindLabel | 'differing']: CSSProperties
 } = theme => ({
-    default: {
+    [regionKind.default]: {
         color: ld('#505050', '#c8c8c8', theme),
     },
-    text: {
+    [regionKind.text]: {
         color: ld('black', 'white', theme),
         backgroundColor: ld('#ececec', '#676767', theme),
     },
-    tag: {
+    [regionKind.tag]: {
         color: ld('#4b69c6', '#559cd6', theme),
     },
-    tagBracket: {
+    [regionKind.tagBracket]: {
         color: ld('#91b3e0', '#808080', theme),
     },
-    attrName: {
+    [regionKind.attrName]: {
         color: ld('#9b5d27', '#9cdcff', theme),
     },
-    attrValue: {
+    [regionKind.attrValue]: {
         color: ld('#438b27', '#ce9178', theme),
     },
-    operator: {
+    [regionKind.operator]: {
         color: ld('#777777', '#d4d4d4', theme),
     },
-    selector: {
+    [regionKind.selector]: {
         color: ld('#793e9d', '#d7bb7d', theme),
     },
-    declName: {
+    [regionKind.declarationName]: {
         color: ld('#9b5d27', '#9cdcff', theme),
     },
-    declValue: {
+    [regionKind.declarationValue]: {
         color: ld('black', 'white', theme),
     },
-    comment: {
+    [regionKind.comment]: {
         color: ld('#438b27', '#6a9954', theme),
         fontStyle: 'italic',
     },
@@ -99,6 +99,7 @@ function ld(light: string, dark: string, theme: Theme) {
 const useRegionStyles = makeStyles(regionStylesObj);
 
 function RegionCode(p: {region: Region}): ReactElement {
+    const [regionText, regionKind, differing] = p.region;
     const vars = useSelector(ofCurrentViewOrUndefined('vars'));
     const regionClasses = useRegionStyles();
     const theme = useTheme();
@@ -107,16 +108,16 @@ function RegionCode(p: {region: Region}): ReactElement {
         return <></>;
     }
 
-    const differingClass = p.region.differing && regionClasses.differing || '';
-    if (!hasVars(p.region.text)) {
+    const differingClass = differing && regionClasses.differing || '';
+    if (!hasVars(regionText)) {
         return <span className={
-            `${ regionClasses[p.region.kind] } ${ differingClass }`
-        }>{ p.region.text }</span>;
+            `${ regionClasses[regionKind] } ${ differingClass }`
+        }>{ regionText }</span>;
     }
 
     const { contrastColor, colors } = vars;
     const { palette: { type, getContrastText }} = theme;
-    const text = p.region.text.replace(globalEscapedRe(contrastColor), getContrastColorValue(theme));
+    const text = regionText.replace(globalEscapedRe(contrastColor), getContrastColorValue(theme));
 
     return <>{
         [...function* toSpans(text: string, key: string): IterableIterator<ReactElement> {
@@ -146,7 +147,7 @@ function RegionCode(p: {region: Region}): ReactElement {
             }
 
             yield <span key={ key } className={
-                `${ regionClasses[p.region.kind] } ${ differingClass }`
+                `${ regionClasses[regionKind] } ${ differingClass }`
             }>{ text }</span>;
         }(text, '')]
     }</>;

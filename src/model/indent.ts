@@ -1,4 +1,4 @@
-import { Region } from './region';
+import { Region, regionKind } from './region';
 
 const indentSize = 2;
 
@@ -14,9 +14,6 @@ export class Indent {
     }
 
     toRegion(): Region {
-        return {
-            kind: 'default',
-            text: this.text,
-        }
+        return [this.text, regionKind.default];
     }
 }

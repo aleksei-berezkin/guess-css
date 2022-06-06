@@ -4,10 +4,10 @@ import { PersistentState, PuzzlerView, State } from './State';
 
 export class Store implements State {
     persistent: PersistentState = {
+        _version: 1,
         topics: [],
         puzzlerViews: [],
         correctAnswers: 0,
-        _version: 0,
     };
     current = -1;
     showProgressDialog = false;

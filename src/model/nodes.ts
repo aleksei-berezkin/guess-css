@@ -1,4 +1,4 @@
-import { Region } from './region';
+import { Region, regionKind as kind } from './region';
 import { Indent } from './indent';
 
 export interface Node {
@@ -48,20 +48,11 @@ export class TagNode implements Node {
     }
 
     private openTagToRegions(): Region[] {
-        const classesRegions = this.classesToRegions();
-        if (!classesRegions.length) {
-            return [
-                { kind: 'tagBracket', text: '<' },
-                { kind: 'tag', text: this.name },
-                { kind: 'tag', text: '>' },
-            ];
-        }
-
         return [
-            { kind: 'tagBracket', text: '<' },
-            { kind: 'tag', text: this.name },
-            ...classesRegions,
-            { kind: 'tagBracket', text: '>' },
+            ['<', kind.tagBracket],
+            [this.name, kind.tag],
+            ...this.classesToRegions(),
+            ['>', kind.tagBracket],
         ];
     }
 
@@ -71,19 +62,19 @@ export class TagNode implements Node {
         }
 
         return [
-            { kind: 'default', text: ' ' },
-            { kind: 'attrName', text: 'class' },
-            { kind: 'operator', text: '="' },
-            { kind: 'attrValue', text: this.classes.join(' ') },
-            { kind: 'operator', text: '"' },
+            [' ', kind.default],
+            ['class', kind.attrName],
+            ['="', kind.operator],
+            [this.classes.join(' '), kind.attrValue],
+            ['"', kind.operator],
         ];
     }
 
     private closeTagToRegions(): Region[] {
         return [
-            { kind: 'tagBracket', text: '</' },
-            { kind: 'tag', text: this.name },
-            { kind: 'tagBracket', text: '>' },
+            ['</', kind.tagBracket],
+            [this.name, kind.tag],
+            ['>', kind.tagBracket],
         ];
     }
 
@@ -132,6 +123,6 @@ export class TextNode implements Node {
     }
 
     toTextRegion(): Region {
-        return {kind: 'text', text: this.text};
+        return [this.text, kind.text];
     }
 }

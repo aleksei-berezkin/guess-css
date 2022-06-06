@@ -1,6 +1,6 @@
 import { Node, TagNode } from './nodes';
 import { Rule } from './cssRules';
-import { Region } from './region';
+import { Region, regionKind as kind } from './region';
 import { Indent } from './indent';
 import { ColorVar } from './gen/vars';
 import { randomBounded } from './gen/randomItems';
@@ -73,19 +73,9 @@ class StylesNode implements Node {
             return [
                 [
                     indent.toRegion(),
-                    {
-                        kind: 'comment',
-                        text: '/* Only text in ',
-                    },
-                    {
-                        kind: 'comment',
-                        text: 'bold',
-                        differing: true,
-                    },
-                    {
-                        kind: 'comment',
-                        text: ' differs */',
-                    },
+                    ['/* Only text in ', kind.comment],
+                    ['bold', kind.comment, true],
+                    [' difers */', kind.comment],
                 ],
                 ...this.doToRegions(indent)
             ];

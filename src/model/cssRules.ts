@@ -1,4 +1,4 @@
-import { Region } from './region';
+import { Region, regionKind as kind } from './region';
 import { Indent } from './indent';
 
 export type Declaration = {
@@ -52,13 +52,15 @@ export class Rule {
         return [
             [
                 indent.toRegion(),
-                {kind: 'selector', text: this.selectorsString, differing: this.selectorsDiffering},
-                {kind: 'default', text: ' {'}
+                this.selectorsDiffering
+                    ? [this.selectorsString, kind.selector, true]
+                    : [this.selectorsString, kind.selector],
+                [' {', kind.default],
             ],
             ...this.declarationsToRegions(indent.indent()),
             [
                 indent.toRegion(),
-                {kind: 'default', text: '}'},
+                ['} ', kind.default],
             ],
         ];
     }
@@ -76,17 +78,23 @@ export class Rule {
                 if (i === 0) {
                     line.push(
                         indent.toRegion(),
-                        {kind: 'declName', text: decl.property, differing: decl.propDiffering},
-                        {kind: 'default', text: ': '},
+                        decl.propDiffering
+                            ? [decl.property, kind.declarationName, true]
+                            : [decl.property, kind.declarationName],
+                        [': ', kind.default],
                     );
                 } else {
                     line.push(
                         indent.indent().toRegion(),
                     );
                 }
-                line.push({kind: 'declValue', text: v, differing: decl.differing});
+                line.push(
+                    decl.differing
+                        ? [v, kind.declarationValue, true]
+                        : [v, kind.declarationValue]
+                );
                 if (i === arr.length - 1) {
-                    line.push({kind: 'default', text: ';'});
+                    line.push([';', kind.default]);
                 }
                 return line;
             });
