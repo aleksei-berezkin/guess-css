@@ -19,9 +19,9 @@ export type PersistentState = {
 }
 
 export type PuzzlerView = {
-    source: string,
+    source: string,                 // TODO computed
     styleChoices: Region[][][],
-    commonStyleSummary: string[],
+    commonStyleSummary: string[],   // TODO computed
     commonStyle: Region[][],
     vars: {
         contrastColor: string,

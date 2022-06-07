@@ -10,7 +10,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import Link from '@material-ui/core/Link';
 import { allTopics } from '../model/topic';
 import { routes } from './routes';
-import ReactGA from 'react-ga';
+import { gaPageview } from './ga';
 
 const useStyles = makeStyles(theme => ({
     bm: {
@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
 export function About() {
     const styles = useStyles();
 
-    useEffect(() => ReactGA.pageview(routes.about), []);
+    useEffect(() => gaPageview(routes.about), []);
 
     return <ContentPage>
         <Typography variant='h4'>Guess CSS!</Typography>

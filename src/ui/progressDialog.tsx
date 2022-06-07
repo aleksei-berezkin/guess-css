@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { store, useSelector } from '../store/store';
-import ReactGA from 'react-ga';
 import { ContentPage } from './contentPage';
 import Alert from '@material-ui/lab/Alert';
 import Typography from '@material-ui/core/Typography';
@@ -14,6 +13,7 @@ import { genAndDisplayNewPuzzler } from '../store/thunks';
 import { Contacts } from './contacts';
 import { leadingZeros3 } from '../util/leadingZeros3';
 import { countScorePerTopic } from './scorePerTopic';
+import { gaEvent } from './ga';
 
 const great = [
     'Great!',
@@ -55,10 +55,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export function ProgressDialog() {
-    useEffect(() => ReactGA.event({
-        category: 'ProgressDialog',
-        action: `ProgressDialog_${leadingZeros3(store.current + 1)}`,
-    }), []);
+    useEffect(() => gaEvent('ProgressDialog', leadingZeros3(store.current + 1)), []);
 
     const round = Math.floor(store.current / store.persistent.topics.length);
     const [scorePerTopic] = useState(countScorePerTopic);
@@ -68,20 +65,13 @@ export function ProgressDialog() {
 
     useEffect(() => {
         if (allAnswersAreCorrect) {
-            ReactGA.event({
-                category: 'AllAnswersAreCorrect',
-                action: `AllAnswersAreCorrect_${leadingZeros3(store.current + 1)}`,
-            });
+            gaEvent('AllAnswersAreCorrect', leadingZeros3(store.current + 1));
         } else if (moreCorrectAnswers) {
-            ReactGA.event({
-                category: 'MoreCorrectAnswers',
-                action: `MoreCorrectAnswers_${leadingZeros3(store.current + 1)}`,
-            });
+            gaEvent('MoreCorrectAnswers', leadingZeros3(store.current + 1));
         }
     }, []);
 
     function handleContinue() {
-        store.displayProgressDialog(false);
         genAndDisplayNewPuzzler();
         window.scrollTo(0, 0);
     }

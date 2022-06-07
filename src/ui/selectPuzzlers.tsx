@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { genAndDisplayNewPuzzler } from '../store/thunks';
 import { routes } from './routes';
 import Typography from '@material-ui/core/Typography';
-import ReactGA from 'react-ga';
+import { gaEvent, gaPageview } from './ga';
 
 const useStyles = makeStyles(theme => ({
     selectPuzzlersRoot: {
@@ -35,7 +35,7 @@ export function SelectPuzzlers() {
     const styles = useStyles();
     const initialTopics = useSelector(state => state.persistent.topics);
     const [selectedTopics, setSelectedTopics] = useState(initialTopics);
-    useEffect(() => ReactGA.pageview(routes.select), []);
+    useEffect(() => gaPageview(routes.select), []);
 
     useEffect(() => void setSelectedTopics(initialTopics), [initialTopics]);
 
@@ -51,12 +51,8 @@ export function SelectPuzzlers() {
 
     function handleApply() {
         const filteredTopics = allTopics.filter(t => selectedTopics.includes(t));
-        store.displayProgressDialog(false);
         store.reset(filteredTopics);
-        ReactGA.event({
-            category: 'SelectPuzzlers',
-            action: `SelectPuzzlers_${store.current}`,
-        });
+        gaEvent('SelectPuzzlers', String(filteredTopics.length));
         genAndDisplayNewPuzzler();
         navigate(routes.root);
     }

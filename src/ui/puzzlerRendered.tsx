@@ -116,7 +116,7 @@ function NextButton() {
         } else if (isAnswered) {
             if (store.persistent.topics.length === allTopics.length
                 && (store.current + 1) % store.persistent.topics.length === 0) {
-                store.displayProgressDialog(true);
+                store.displayProgressDialog();
             } else {
                 genAndDisplayNewPuzzler();
             }

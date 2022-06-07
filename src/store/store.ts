@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Topic } from '../model/topic';
+import { allTopics, Topic } from '../model/topic';
 import { PersistentState, PuzzlerView, State } from './State';
 
 export class Store implements State {
     persistent: PersistentState = {
         _version: 1,
-        topics: [],
+        topics: allTopics,
         puzzlerViews: [],
         correctAnswers: 0,
     };
@@ -26,15 +26,17 @@ export class Store implements State {
     }
 
     @action()
-    restore(persistent: PersistentState) {
+    restoreAndDisplayLast(persistent: PersistentState) {
         this.persistent = persistent;
         this.current = persistent.puzzlerViews.length - 1;
+        this.showProgressDialog = false;
     }
 
     @action()
     appendAndDisplayPuzzler(puzzlerView: PuzzlerView) {
         const newCount = this.persistent.puzzlerViews.push(puzzlerView);
         this.current = newCount - 1;
+        this.showProgressDialog = false;
     }
 
     @action()
@@ -66,8 +68,8 @@ export class Store implements State {
     }
 
     @action()
-    displayProgressDialog(display: boolean) {
-        this.showProgressDialog = display;
+    displayProgressDialog() {
+        this.showProgressDialog = true;
     }
 
     @action()

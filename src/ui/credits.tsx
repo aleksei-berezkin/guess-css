@@ -12,8 +12,8 @@ import ListItem from '@material-ui/core/ListItem';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import { ContentPage } from './contentPage';
-import ReactGA from 'react-ga';
 import { routes } from './routes';
+import { gaPageview } from './ga';
 
 const useStyles = makeStyles(theme => ({
     accDetails: {
@@ -40,7 +40,7 @@ export function Credits() {
     const classes = useStyles();
     const [visible, setVisible] = useState<{[k: string]: boolean}>({});
 
-    useEffect(() => ReactGA.pageview(routes.credits), []);
+    useEffect(() => gaPageview(routes.credits), []);
 
     const depsPromise = import('../../generated/deps.json').then(res => res.default);
     const [deps, setDeps] = useState<Awaited<typeof depsPromise> | undefined>();

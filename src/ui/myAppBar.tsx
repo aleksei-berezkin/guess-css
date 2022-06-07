@@ -7,7 +7,7 @@ import Container from '@material-ui/core/Container';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import { useSelector } from '../store/store';
+import { store, useSelector } from '../store/store';
 import React, { useState } from 'react';
 import CheckIcon from '@material-ui/icons/Check';
 import CloseIcon from '@material-ui/icons/Close';
@@ -18,6 +18,10 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Switch from '@material-ui/core/Switch';
 import { lastOrUndefined } from '../util/lastOrUndefined';
 import { State } from '../store/State';
+import { allTopics } from '../model/topic';
+import { genAndDisplayNewPuzzler } from '../store/thunks';
+import { leadingZeros3 } from '../util/leadingZeros3';
+import { gaEvent } from './ga';
 
 const useStyles = makeStyles({
     appName: {
@@ -57,6 +61,19 @@ export function MyAppBar(p: {paletteType: PaletteType, setPaletteType: (paletteT
     function handleSelectPuzzlers() {
         closeMenu();
         navigate(routes.select);
+    }
+
+    function handleRestart() {
+        closeMenu();
+        setTimeout(() => {
+            const notAllTopicsSelected = store.persistent.topics.length !== allTopics.length;
+            const msg = `This will ${ notAllTopicsSelected ? 'reset topics selection and ' : '' }restart the game. Continue?`
+            if (window.confirm(msg)) {
+                store.reset(allTopics);
+                gaEvent('RestartGame', leadingZeros3(store.current));
+                genAndDisplayNewPuzzler();
+            }
+        }, 100);
     }
 
     function handleAbout() {
@@ -117,6 +134,7 @@ export function MyAppBar(p: {paletteType: PaletteType, setPaletteType: (paletteT
                                     color='secondary'
                                 /></MenuItem>
                                 <MenuItem onClick={ handleSelectPuzzlers }>Select puzzlers...</MenuItem>
+                                <MenuItem onClick={ handleRestart }>Restart...</MenuItem>
                                 <MenuItem onClick={ handleAbout }>About...</MenuItem>
                             </Menu>
                         </div>

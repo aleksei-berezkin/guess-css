@@ -1,10 +1,10 @@
 import { genPuzzler } from '../model/gen/genPuzzler';
 import { assignColorVars } from './assignColorVar';
-import ReactGA from 'react-ga';
 import { store } from './store';
-import { routes } from '../ui/routes';
 import { leadingZeros3 } from '../util/leadingZeros3';
 import { writeToLocalStorage } from './myLocalStorage';
+import { PersistentState } from './State';
+import { gaEvent } from '../ui/ga';
 
 export function genAndDisplayNewPuzzler() {
     const topic = store.persistent.topics[store.persistent.puzzlerViews.length % store.persistent.topics.length];
@@ -30,7 +30,12 @@ export function genAndDisplayNewPuzzler() {
 
     writeToLocalStoragePostponed();
 
-    gaNewPuzzler();
+    gaEvent('NewPuzzler', leadingZeros3(store.current));
+}
+
+export function restoreAndDisplay(persistent: PersistentState) {
+    store.restoreAndDisplayLast(persistent);
+    gaEvent('RestoreState', leadingZeros3(store.current));
 }
 
 export function setUserChoice(userChoice: number) {
@@ -48,16 +53,4 @@ function writeToLocalStoragePostponed() {
     setTimeout(() => {
         writeToLocalStorage(store.persistent);
     }, 500);
-}
-
-export function gaInit() {
-    ReactGA.initialize('UA-171636839-1');
-    ReactGA.pageview(routes.root);
-}
-
-export function gaNewPuzzler() {
-    ReactGA.event({
-        category: 'NewPuzzler',
-        action: `NewPuzzler_${leadingZeros3(store.current)}`,
-    });
 }
