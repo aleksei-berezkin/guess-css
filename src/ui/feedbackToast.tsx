@@ -55,6 +55,6 @@ export function FeedbackToast(p: {correct: boolean}) {
     </Snackbar>;
 }
 
-function SlideTransition(props: unknown) {
+function SlideTransition(props: object) {
     return <Slide {...props} direction='up'/>
 }
