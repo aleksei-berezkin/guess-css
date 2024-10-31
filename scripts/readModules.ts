@@ -109,19 +109,18 @@ export const readModules: Promise<DepFullData[]> = Promise.all(
             })
             .map(([p, l]) => ({
                 name: p.name,
-                description: getNotNull(p, 'description'),
+                description: assertNotNull(p.description),
                 link: getLink(p),
-                license: getNotNull(p, 'license'),
-                licenseText: getNotNull(l, 'licenseText'),
+                license: assertNotNull(p.license),
+                licenseText: assertNotNull(l.licenseText),
             }));
         }
     );
 
-function getNotNull<T, K extends keyof T>(o: T, k: K): Exclude<T[K], null | undefined> {
-    if (o[k] != null) {
-        return o[k]!;
-    }
-    throw new Error(`'${ k }' is null or undefined in ${ JSON.stringify(o) }`);
+function assertNotNull<T>(value: T | null | undefined): T {
+    if (value == null)
+        throw Error('value is null')
+    return value
 }
 
 function getLink(p: PackageJsonData): string {
