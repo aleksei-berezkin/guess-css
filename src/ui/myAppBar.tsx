@@ -1,27 +1,27 @@
-import { PaletteType } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
 import { routes } from './routes';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-import Container from '@material-ui/core/Container';
-import Typography from '@material-ui/core/Typography';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import MenuIcon from '@mui/icons-material/Menu';
 import { store, useSelector } from '../store/store';
 import React, { useState } from 'react';
-import CheckIcon from '@material-ui/icons/Check';
-import CloseIcon from '@material-ui/icons/Close';
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
 import { useInlineSvg } from './inlineSvg';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Menu from '@material-ui/core/Menu';
-import MenuItem from '@material-ui/core/MenuItem';
-import Switch from '@material-ui/core/Switch';
+import makeStyles from '@mui/styles/makeStyles';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Switch from '@mui/material/Switch';
 import { lastOrUndefined } from '../util/lastOrUndefined';
 import { State } from '../store/State';
 import { allTopics } from '../model/topic';
 import { genAndDisplayNewPuzzler } from '../store/thunks';
 import { leadingZeros3 } from '../util/leadingZeros3';
 import { gaEvent } from './ga';
+import { PaletteMode } from '@mui/material';
 
 const useStyles = makeStyles({
     appName: {
@@ -43,7 +43,7 @@ const useStyles = makeStyles({
     },
 });
 
-export function MyAppBar(p: {paletteType: PaletteType, setPaletteType: (paletteType: PaletteType) => void}) {
+export function MyAppBar(p: {paletteMode: PaletteMode, setPaletteMode: (paletteMode: PaletteMode) => void}) {
     const [menuOpen, setMenuOpen] = useState(false);
     const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
 
@@ -81,15 +81,15 @@ export function MyAppBar(p: {paletteType: PaletteType, setPaletteType: (paletteT
         navigate(routes.about);
     }
 
-    const [darkTheme, setDarkTheme] = useState(p.paletteType === 'dark');
+    const [darkTheme, setDarkTheme] = useState(p.paletteMode === 'dark');
 
     function handleThemeChanged() {
         setDarkTheme(!darkTheme);
         setTimeout(() => {
             if (darkTheme) {
-                p.setPaletteType('light');
+                p.setPaletteMode('light');
             } else {
-                p.setPaletteType('dark');
+                p.setPaletteMode('dark');
             }
         });
     }
@@ -102,7 +102,7 @@ export function MyAppBar(p: {paletteType: PaletteType, setPaletteType: (paletteT
     const styles = useStyles();
 
     return <>
-        <AppBar color={ p.paletteType === 'light' ? 'primary' : 'default' } position='sticky'>
+        <AppBar color={ p.paletteMode === 'light' ? 'primary' : 'default' } position='sticky'>
             <Toolbar variant='dense'>
                 <Container maxWidth='sm' disableGutters>
                     <div className={ styles.containerGrid }>
@@ -123,7 +123,7 @@ export function MyAppBar(p: {paletteType: PaletteType, setPaletteType: (paletteT
                             </IconButton>
 
                             <Menu open={ menuOpen }
-                                  anchorEl={ anchorEl } getContentAnchorEl={ null }
+                                  anchorEl={ anchorEl }
                                   anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                                   transformOrigin={{ vertical: 'top', horizontal: 'right'}}
                                   onClose={ closeMenu }

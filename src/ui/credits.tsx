@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import Typography from '@material-ui/core/Typography';
-import Link from '@material-ui/core/Link';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Accordion, { AccordionProps } from '@material-ui/core/Accordion';
-import AccordionDetails from '@material-ui/core/AccordionDetails';
-import AccordionSummary from '@material-ui/core/AccordionSummary';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import Typography from '@mui/material/Typography';
+import Link from '@mui/material/Link';
+import makeStyles from '@mui/styles/makeStyles';
+import Accordion, { AccordionProps } from '@mui/material/Accordion';
+import AccordionDetails from '@mui/material/AccordionDetails';
+import AccordionSummary from '@mui/material/AccordionSummary';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { monospaceFonts } from '../monospaceFonts';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import Grid from '@material-ui/core/Grid';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import CircularProgress from '@mui/material/CircularProgress';
+import Grid from '@mui/material/Grid';
 import { ContentPage } from './contentPage';
 import { routes } from './routes';
 import { gaPageview } from './ga';
@@ -114,7 +114,7 @@ function License(p: {name: string}) {
 
 
 function CenteredSpinner() {
-    return <Grid container justify='center'>
+    return <Grid container sx={{justify: 'center'}}>
         <Grid item>
             <CircularProgress color='inherit'/>
         </Grid>

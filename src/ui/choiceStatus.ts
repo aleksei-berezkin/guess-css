@@ -1,9 +1,7 @@
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import green from '@material-ui/core/colors/green';
-import red from '@material-ui/core/colors/red';
-import { CSSProperties } from '@material-ui/styles/withStyles/withStyles';
-import { PaletteType } from '@material-ui/core';
+import { green } from '@mui/material/colors';
+import { red } from '@mui/material/colors';
 import { PuzzlerView } from '../store/State';
+import makeStyles from '@mui/styles/makeStyles';
 
 export type ChoiceStatus = 'userCorrect' | 'correct' | 'incorrect' | 'untouched' | 'notAnswered';
 
@@ -23,11 +21,7 @@ export function getChoiceStatus(i: number, status: PuzzlerView['status'] | undef
     return 'untouched';
 }
 
-const choiceStylesObj: {
-    [status in ChoiceStatus]: {
-        [paletteType in PaletteType]: CSSProperties
-    }
-} = {
+const choiceStylesObj = {
     userCorrect: {
         light: {
             backgroundColor: green['A100'],
@@ -60,6 +54,6 @@ export const makeChoiceStyles = makeStyles(
     theme =>
         Object.fromEntries(
             Object.entries(choiceStylesObj)
-                .map(([k, v]) => [k, v[theme.palette.type]] as const)
+                .map(([k, v]) => [k, v[theme.palette.mode]] as const)
         )
 );

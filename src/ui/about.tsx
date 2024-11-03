@@ -1,31 +1,20 @@
 import React, {useEffect} from 'react';
-import Typography from '@material-ui/core/Typography';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
+import Typography from '@mui/material/Typography';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
 import { ContentPage } from './contentPage';
-import CodeIcon from '@material-ui/icons/Code';
-import makeStyles from '@material-ui/core/styles/makeStyles';
+import CodeIcon from '@mui/icons-material/Code';
 import { Contacts } from './contacts';
 import { Link as RouterLink } from 'react-router-dom';
-import Link from '@material-ui/core/Link';
+import Link from '@mui/material/Link';
 import { allTopics } from '../model/topic';
 import { routes } from './routes';
 import { gaPageview } from './ga';
 
-const useStyles = makeStyles(theme => ({
-    bm: {
-        marginBottom: theme.spacing(1),
-    },
-    marker: {
-        marginBottom: '.15em',
-        marginRight: theme.spacing(1.5),
-    },
-}));
-
 export function About() {
-    const styles = useStyles();
-
     useEffect(() => gaPageview(routes.about), []);
+
+    const mb = 1
 
     return <ContentPage>
         <Typography variant='h4'>Guess CSS!</Typography>
@@ -38,21 +27,21 @@ export function About() {
             <ListItem><Marker/><Typography>Three CSS snippets</Typography></ListItem>
             <ListItem><Marker/><Typography>HTML snippet</Typography></ListItem>
         </List>
-        <Typography className={ styles.bm }>Your task is to guess which of three CSS snippets was used to render the fragment!
+        <Typography sx={{ mb }}>Your task is to guess which of three CSS snippets was used to render the fragment!
             After you made your guess the app shows which one was correct, and updates your score displayed
             at the top.</Typography>
-        <Typography className={ styles.bm }>Navigate between current and done tasks with arrows to the left and right of the frame.</Typography>
+        <Typography sx={{ mb }}>Navigate between current and done tasks with arrows to the left and right of the frame.</Typography>
 
-        <Typography className={ styles.bm }>The game has the following puzzlers:</Typography>
+        <Typography sx={{ mb }}>The game has the following puzzlers:</Typography>
         <List dense>
         {
             allTopics.map(t => <ListItem key={ t }><Marker/><Typography>{ t }</Typography></ListItem>)
         }
         </List>
-        <Typography className={ styles.bm }>If you don’t like them all, use app menu to select only a subset.</Typography>
+        <Typography sx={{ mb }}>If you don’t like them all, use app menu to select only a subset.</Typography>
 
         <Typography variant='h4'>Have something to say?</Typography>
-        <Typography className={ styles.bm }>You are welcome! Use any of links below:</Typography>
+        <Typography sx={{ mb }}>You are welcome! Use any of links below:</Typography>
         <Contacts large/>
 
         <Typography variant='h4'>Credits</Typography>
@@ -64,7 +53,5 @@ export function About() {
 }
 
 function Marker() {
-    const styles = useStyles();
-
-    return <CodeIcon fontSize='small' className={ styles.marker }/>
+    return <CodeIcon fontSize='small' sx={{mb: '.15em', mr: 1.5}}/>
 }

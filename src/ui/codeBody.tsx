@@ -1,17 +1,16 @@
-import makeStyles from '@material-ui/core/styles/makeStyles';
+import makeStyles from '@mui/styles/makeStyles';
 import { Region, regionKind, RegionKindLabel } from '../model/region';
-import Box from '@material-ui/core/Box';
+import Box from '@mui/material/Box';
 import React, { ReactElement } from 'react';
-import { CSSProperties } from '@material-ui/core/styles/withStyles';
 import { ofCurrentViewOrUndefined, useSelector } from '../store/store';
-import useTheme from '@material-ui/core/styles/useTheme';
 import { monospaceFonts } from '../monospaceFonts';
 import { getContrastColorValue } from './contrastColorValue';
 import { resolveColor } from './resolveColor';
-import { Theme } from '@material-ui/core';
 import { hasVars } from '../model/gen/vars';
 import { spacing } from './theme';
 import { escapeRe, globalEscapedRe } from './escapeRe';
+import { Theme } from '@mui/material';
+import { DefaultTheme, useTheme } from '@mui/styles';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -48,9 +47,7 @@ function Line(p: {regions: Region[]}) {
     }</pre>
 }
 
-const regionStylesObj: (theme: Theme) => {
-    [k in RegionKindLabel | 'differing']: CSSProperties
-} = theme => ({
+const regionStylesObj = (theme: DefaultTheme) => ({
     [regionKind.default]: {
         color: ld('#505050', '#c8c8c8', theme),
     },
@@ -92,7 +89,7 @@ const regionStylesObj: (theme: Theme) => {
 });
 
 function ld(light: string, dark: string, theme: Theme) {
-    return theme.palette.type === 'light' ? light : dark;
+    return theme.palette.mode === 'light' ? light : dark;
 }
 
 
@@ -116,7 +113,7 @@ function RegionCode(p: {region: Region}): ReactElement {
     }
 
     const { contrastColor, colors } = vars;
-    const { palette: { type, getContrastText }} = theme;
+    const { palette: { mode, getContrastText }} = theme;
     const text = regionText.replace(globalEscapedRe(contrastColor), getContrastColorValue(theme));
 
     return <>{
@@ -128,7 +125,7 @@ function RegionCode(p: {region: Region}): ReactElement {
                         yield* toSpans(match[1], key + 'a');  
                     } 
 
-                    const resolvedCol = resolveColor(assignedCol, type);
+                    const resolvedCol = resolveColor(assignedCol, mode);
                     yield <span
                         key={ key + 'b'}
                         className={ `${ differingClass }` }

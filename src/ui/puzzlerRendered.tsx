@@ -1,4 +1,4 @@
-import makeStyles from '@material-ui/core/styles/makeStyles';
+import makeStyles from '@mui/styles/makeStyles';
 import {
     mapCurrentView,
     ofCurrentView,
@@ -6,20 +6,19 @@ import {
     store,
     useSelector
 } from '../store/store';
-import useTheme from '@material-ui/core/styles/useTheme';
-import Grid from '@material-ui/core/Grid';
-import Paper from '@material-ui/core/Paper';
-import { Badge, Theme } from '@material-ui/core';
+import Paper from '@mui/material/Paper';
+import { Badge, Grid2, Theme } from '@mui/material';
 import { resolveColor } from './resolveColor';
 import { getContrastColorValue } from './contrastColorValue';
-import IconButton from '@material-ui/core/IconButton';
-import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
+import IconButton from '@mui/material/IconButton';
+import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import { genAndDisplayNewPuzzler } from '../store/thunks';
-import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
+import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import React from 'react';
 import { globalEscapedRe } from './escapeRe';
 import { allTopics } from '../model/topic';
 import { PuzzlerView } from '../store/State';
+import { useTheme } from '@mui/styles';
 
 const useStyles = makeStyles(theme => ({
     puzzleContainer: {
@@ -43,21 +42,21 @@ export function PuzzlerRendered() {
     const theme = useTheme();
     const classes = useStyles();
 
-    return <Grid container justify='center' alignItems='center' className={ classes.puzzleContainer }>
-        <Grid item>
+    return <Grid2 container sx={{justify: 'center', alignItems: 'center'}} className={ classes.puzzleContainer }>
+        <div>
             <PrevButton/>
-        </Grid>
-        <Grid item>
+        </div>
+        <div>
             <Paper className={classes.layoutSize}>
                 <iframe className={ `${classes.layoutSize} ${classes.iframe}` } srcDoc={
                     insertColors(source, vars, theme)
                 }/>
             </Paper>
-        </Grid>
-        <Grid item>
+        </div>
+        <div>
             <NextButton/>
-        </Grid>
-    </Grid>;
+        </div>
+    </Grid2>;
 }
 
 function insertColors(src: string, vars: PuzzlerView['vars'] | undefined, theme: Theme): string {
@@ -69,7 +68,7 @@ function insertColors(src: string, vars: PuzzlerView['vars'] | undefined, theme:
         .reduceRight(
             (t, assignedCol) => t.replace(
                 globalEscapedRe(assignedCol.id),
-                resolveColor(assignedCol, theme.palette.type),
+                resolveColor(assignedCol, theme.palette.mode),
             ),
             src
         );
@@ -133,7 +132,7 @@ function NextButton() {
                    badge: styles.badge,
                }}
                color='secondary'
-               overlap='rectangle'>
+               overlap='rectangular'>
             <KeyboardArrowRight titleAccess='next puzzler'/>
         </Badge>
     </IconButton>

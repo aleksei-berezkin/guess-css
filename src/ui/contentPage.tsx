@@ -1,10 +1,10 @@
 import React, { ReactElement, ReactFragment } from 'react';
-import Box from '@material-ui/core/Box';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Button from '@material-ui/core/Button';
+import Box from '@mui/material/Box';
+import makeStyles from '@mui/styles/makeStyles';
+import Button from '@mui/material/Button';
 import { routes } from './routes';
 import { Link as RouterLink } from 'react-router-dom';
-import Container from '@material-ui/core/Container';
+import Container from '@mui/material/Container';
 import { Footer } from './footer';
 
 const useStyles = makeStyles(theme => ({

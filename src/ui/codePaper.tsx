@@ -1,15 +1,16 @@
 import React, { ReactElement, useState } from 'react';
 import { Region } from '../model/region';
-import makeStyles from '@material-ui/core/styles/makeStyles';
-import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
-import Collapse from '@material-ui/core/Collapse';
-import IconButton from '@material-ui/core/IconButton';
-import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import makeStyles from '@mui/styles/makeStyles';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import Collapse from '@mui/material/Collapse';
+import IconButton from '@mui/material/IconButton';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { ofCurrentView, useSelector } from '../store/store';
 import { CodeBody } from './codeBody';
 import { spacing } from './theme';
-import SwipeableViews from 'react-swipeable-views';
+//@ts-ignore
+import SwipeableViews from 'react-swipeable-views-react-18-fix';
 
 const makeRootStyles = makeStyles(theme => ({
     root: (p: {hasSideMargins: boolean, isTabs: boolean}) => ({

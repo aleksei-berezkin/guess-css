@@ -1,11 +1,11 @@
-import Typography from '@material-ui/core/Typography';
-import Link from '@material-ui/core/Link';
-import FacebookIcon from '@material-ui/icons/Facebook';
-import LinkedInIcon from '@material-ui/icons/LinkedIn';
-import TwitterIcon from '@material-ui/icons/Twitter';
-import GitHubIcon from '@material-ui/icons/GitHub';
+import Typography from '@mui/material/Typography';
+import Link from '@mui/material/Link';
+import FacebookIcon from '@mui/icons-material/Facebook';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import TwitterIcon from '@mui/icons-material/Twitter';
+import GitHubIcon from '@mui/icons-material/GitHub';
 import React from 'react';
-import makeStyles from '@material-ui/core/styles/makeStyles';
+import makeStyles from '@mui/styles/makeStyles';
 
 const useStyles = makeStyles(theme => ({
     root: (p: {large?: boolean, paragraph?: boolean}) => ({
@@ -36,7 +36,7 @@ const useStyles = makeStyles(theme => ({
 
 export function Contacts(p: {large?: boolean, paragraph?: boolean}) {
     const classes = useStyles(p);
-    const fontSize = p.large ? 'large' : 'default';
+    const fontSize = p.large ? 'large' : 'medium';
 
     return <Typography color='textSecondary' className={ classes.root } paragraph={ p.paragraph }>
         <Link target='_blank' color='inherit' href='https://www.linkedin.com/in/a-v-berezkin'>

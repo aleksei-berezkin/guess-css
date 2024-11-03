@@ -1,8 +1,8 @@
 import React, { ReactElement, useEffect, useMemo, useState } from 'react';
 import { genAndDisplayNewPuzzler, restoreAndDisplay } from '../store/thunks';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import { PaletteType } from '@material-ui/core';
-import { ThemeProvider } from '@material-ui/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import { PaletteMode } from '@mui/material';
+import { ThemeProvider } from '@mui/material/styles';
 import { createTheme } from './theme';
 import { BrowserRouter } from 'react-router-dom';
 import { MyAppBar } from './myAppBar';
@@ -12,7 +12,7 @@ import { readFromLocalStorage } from '../store/myLocalStorage';
 import { gaInit } from './ga';
 
 export function PuzzlerApp(p: {basename: string | undefined}): ReactElement {
-    const [paletteType, setPaletteType] = useState<PaletteType>('light');
+    const [paletteMode, setPaletteType] = useState<PaletteMode>('light');
 
     useEffect(() => {
         gaInit();
@@ -25,12 +25,12 @@ export function PuzzlerApp(p: {basename: string | undefined}): ReactElement {
         document.getElementById('loading-screen-style')!.remove();
     }, []);
 
-    const theme = useMemo(() => createTheme(paletteType), [paletteType]);
+    const theme = useMemo(() => createTheme(paletteMode), [paletteMode]);
 
     return <ThemeProvider theme={ theme }>
         <CssBaseline/>
             <BrowserRouter>
-                <MyAppBar paletteType={ paletteType } setPaletteType={ setPaletteType }/>
+                <MyAppBar paletteMode={ paletteMode } setPaletteMode={ setPaletteType }/>
                 <MyAppBody basename={ p.basename }/>
             </BrowserRouter>
     </ThemeProvider>;

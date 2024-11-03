@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { store, useSelector } from '../store/store';
 import { ContentPage } from './contentPage';
-import Alert from '@material-ui/lab/Alert';
-import Typography from '@material-ui/core/Typography';
-import Table from '@material-ui/core/Table';
-import { TableBody, TableCell, TableContainer, TableHead, TableRow } from '@material-ui/core';
-import CheckIcon from '@material-ui/icons/Check';
-import CloseIcon from '@material-ui/icons/Close';
-import Button from "@material-ui/core/Button";
-import makeStyles from "@material-ui/core/styles/makeStyles";
+import Alert from '@mui/material/Alert';
+import Typography from '@mui/material/Typography';
+import Table from '@mui/material/Table';
+import { TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material'; // TODO default import
+import CheckIcon from '@mui/icons-material/Check';
+import CloseIcon from '@mui/icons-material/Close';
+import Button from "@mui/material/Button";
+import makeStyles from "@mui/styles/makeStyles";
 import { genAndDisplayNewPuzzler } from '../store/thunks';
 import { Contacts } from './contacts';
 import { leadingZeros3 } from '../util/leadingZeros3';

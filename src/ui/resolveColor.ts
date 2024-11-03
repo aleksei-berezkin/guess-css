@@ -1,16 +1,16 @@
-import { PaletteType } from '@material-ui/core';
-import red from '@material-ui/core/colors/red';
-import blue from '@material-ui/core/colors/blue';
-import blueGrey from '@material-ui/core/colors/blueGrey';
-import amber from '@material-ui/core/colors/amber';
-import orange from '@material-ui/core/colors/orange';
-import brown from '@material-ui/core/colors/brown';
+import { PaletteMode } from '@mui/material';
+import { red } from '@mui/material/colors';
+import { blue } from '@mui/material/colors';
+import { blueGrey } from '@mui/material/colors';
+import { amber } from '@mui/material/colors';
+import { orange } from '@mui/material/colors';
+import { brown } from '@mui/material/colors';
 import { AssignedColorVar, Hue } from '../store/assignColorVar';
 import { ColorVarType } from '../model/gen/vars';
 
 const colors: {
     [hue in Hue]: {
-        [paletteType in PaletteType]: {
+        [paletteType in PaletteMode]: {
             [colorType in ColorVarType]: string;
         }
     }
@@ -67,6 +67,6 @@ const colors: {
     },
 };
 
-export function resolveColor(assignedColorVar: AssignedColorVar, paletteType: PaletteType): string {
-    return colors[assignedColorVar.hue][paletteType][assignedColorVar.type];
+export function resolveColor(assignedColorVar: AssignedColorVar, paletteMode: PaletteMode): string {
+    return colors[assignedColorVar.hue][paletteMode][assignedColorVar.type];
 }

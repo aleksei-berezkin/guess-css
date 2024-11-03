@@ -1,14 +1,19 @@
-import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
-import { PaletteType } from '@material-ui/core';
+import { createTheme as createMuiTheme } from '@mui/material/styles';
+import { PaletteMode } from '@mui/material/styles';
+import { Theme } from '@mui/material/styles';
 
-declare module '@material-ui/core/styles/createBreakpoints' {
-    // noinspection JSUnusedGlobalSymbols
+declare module '@mui/material/styles' {
     interface BreakpointOverrides {
         narrow: true;
     }
 }
 
-export const createTheme = (paletteType: PaletteType) => createMuiTheme({
+// https://mui.com/material-ui/migration/troubleshooting/#types-property-quot-palette-quot-quot-spacing-quot-does-not-exist-on-type-defaulttheme
+declare module '@mui/styles/defaultTheme' {
+    interface DefaultTheme extends Theme {}
+}
+
+export const createTheme = (mode: PaletteMode) => createMuiTheme({
     breakpoints: {
         values: {
             xs: 0,
@@ -20,8 +25,8 @@ export const createTheme = (paletteType: PaletteType) => createMuiTheme({
         },
     },
     palette: {
-        type: paletteType,
-        ...(paletteType === 'dark' ? {
+        mode,
+        ...(mode === 'dark' ? {
             primary: {
                 main: '#90caf9',
             },
@@ -36,34 +41,40 @@ export const createTheme = (paletteType: PaletteType) => createMuiTheme({
             },
         }),
     },
-    props: {
+    components: {
         MuiPaper: {
-            square: true,
+            defaultProps: {
+                square: true,
+            }
         },
-    },
-    overrides: {
         MuiTabs: {
-            root: {
-                minHeight: undefined,
-            },
-        },
-        MuiTab: {
-            root: {
-                padding: 6,
-                minHeight: undefined,
-                '@media (min-width: 600px)': {
-                    minWidth: 'unset',
+            styleOverrides: {
+                root: {
+                    minHeight: undefined,
                 }
             },
         },
-        ...(paletteType === 'dark' ? {
-            MuiAppBar: {
-                colorDefault: {
-                    backgroundColor: '#424242',
+        MuiTab: {
+            styleOverrides: {
+                root: {
+                    padding: 6,
+                    minHeight: undefined,
+                    '@media (min-width: 600px)': {
+                        minWidth: 'unset',
+                    }
                 },
+            }
+        },
+        ...(mode === 'dark' ? {
+            MuiAppBar: {
+                styleOverrides: {
+                    colorDefault: {
+                        backgroundColor: '#424242',
+                    },
+                }
             },
         } : {})
-    }
+    },
 });
 
 // TODO more on desktop

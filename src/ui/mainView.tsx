@@ -1,12 +1,12 @@
 import { PuzzlerRendered } from './puzzlerRendered';
 import { Choices } from './choices';
-import Grid from '@material-ui/core/Grid';
+import Grid from '@mui/material/Grid';
 import { CodePaper } from './codePaper';
 import { Footer } from './footer';
 import React from 'react';
 import { ofCurrentView, useSelector } from '../store/store';
-import { CircularProgress } from '@material-ui/core';
-import makeStyles from '@material-ui/core/styles/makeStyles';
+import { CircularProgress, Grid2 } from '@mui/material';
+import makeStyles from '@mui/styles/makeStyles';
 import { ProgressDialog } from './progressDialog';
 import { FeedbackToast } from './feedbackToast';
 
@@ -57,11 +57,11 @@ export function MainView() {
     return <>
         <PuzzlerRendered/>
         <Choices/>
-        <Grid item>
+        <div>
             <CodePaper body={{
                 code: htmlCode,
             }} />
-        </Grid>
+        </div>
         <Grid item>
             <Footer/>
         </Grid>

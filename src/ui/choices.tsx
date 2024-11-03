@@ -1,23 +1,24 @@
 import React, { ReactElement, useEffect, useRef } from 'react';
 import { ofCurrentView, ofCurrentViewOrUndefined, store, useSelector } from '../store/store';
 import { setUserChoice } from '../store/thunks';
-import Grid from '@material-ui/core/Grid';
+import Grid from '@mui/material/Grid';
 import { CodePaper } from './codePaper';
 import { CodeHeader } from './codeHeader';
-import Button from '@material-ui/core/Button';
-import CheckCircleOutlineIcon from '@material-ui/icons/CheckCircleOutline';
-import CheckIcon from '@material-ui/icons/Check';
-import ErrorOutlineIcon from '@material-ui/icons/ErrorOutline';
-import makeStyles from '@material-ui/core/styles/makeStyles';
+import Button from '@mui/material/Button';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import CheckIcon from '@mui/icons-material/Check';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import makeStyles from '@mui/styles/makeStyles';
 import { ChoiceStatus, getChoiceStatus, makeChoiceStyles } from './choiceStatus';
-import { useTheme } from '@material-ui/core/styles';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import AppBar from '@material-ui/core/AppBar';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import AppBar from '@mui/material/AppBar';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 import { spacing } from './theme';
 import { abc } from '../util/abc';
 import { PuzzlerView, State } from '../store/State';
+import { useTheme } from '@mui/styles';
+import { Grid2 } from '@mui/material';
 
 
 export function Choices(): ReactElement {
@@ -47,10 +48,10 @@ function WideChoices() {
     const status = useSelector(statusSelector);
     const classes = makeChoiceStyles();
 
-    return <Grid container justify='center'>{
+    return <Grid2 container sx={{ justify: 'center' }}>{
         abc(choices.length)
             .map((letter, i) =>
-                <Grid item key={ current + letter }>
+                <div key={ current + letter }>
                     <CodePaper
                         header={
                             <CodeHeader title={`CSS ${letter.toUpperCase()}`} className={ classes[getChoiceStatus(i, status)] }/>
@@ -62,9 +63,9 @@ function WideChoices() {
                         }}
                         sideMargins={ i === 1 }
                     />
-                </Grid>
+                </div>
             )
-    }</Grid>    
+    }</Grid2>
 }
 
 function NarrowChoices() {
@@ -139,7 +140,7 @@ function FooterButton(p: {status: ChoiceStatus, checkChoice: () => void}) {
 
     const classes = useFooterStyles();
 
-    return <Grid container justify='center' className={ classes.footer }>
+    return <Grid container sx={{ justify: 'center' }} className={ classes.footer }>
         <Grid item ref={ btnBoxRef } style={ footerStyle }>
             {
                 p.status === 'notAnswered' &&
