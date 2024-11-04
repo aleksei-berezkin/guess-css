@@ -7,7 +7,7 @@ import {
     useSelector
 } from '../store/store';
 import Paper from '@mui/material/Paper';
-import { Badge, Grid2, Theme } from '@mui/material';
+import { Badge, Box, Grid2, Theme } from '@mui/material';
 import { resolveColor } from './resolveColor';
 import { getContrastColorValue } from './contrastColorValue';
 import IconButton from '@mui/material/IconButton';
@@ -96,18 +96,10 @@ function PrevButton() {
     </IconButton>;
 }
 
-const useNextButtonStyles = makeStyles({
-    badge: {
-        transform: 'scale(1) translate(70%, -50%)',
-    },
-});
-
 function NextButton() {
     const hasNext = useSelector(state => state.current < state.persistent.puzzlerViews.length - 1);
     const isAnswered = useSelector(mapCurrentView(v => v.status.userChoice != null, false));
     const isVeryFirst = useSelector(state => state.current === 0 && state.persistent.puzzlerViews.length === 1);
-
-    const styles = useNextButtonStyles();
 
     function handleNext() {
         if (hasNext) {
@@ -128,11 +120,8 @@ function NextButton() {
                        disabled={ !hasNext && !isAnswered }
                        color={ isAnswered && !hasNext ? 'primary' : 'default' }>
         <Badge badgeContent={ isVeryFirst && isAnswered ? 'next' : undefined }
-               classes={{
-                   badge: styles.badge,
-               }}
-               color='secondary'
-               overlap='rectangular'>
+            color='secondary'
+            overlap='rectangular'>
             <KeyboardArrowRight titleAccess='next puzzler'/>
         </Badge>
     </IconButton>
