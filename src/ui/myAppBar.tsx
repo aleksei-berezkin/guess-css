@@ -76,12 +76,9 @@ export function MyAppBar(p: {paletteMode: PaletteMode, setPaletteMode: (paletteM
         navigate(routes.about);
     }
 
-    const [darkTheme, setDarkTheme] = useState(p.paletteMode === 'dark');
-
-    function handleThemeChanged() {
-        setDarkTheme(!darkTheme);
-        setTimeout(() => {
-            if (darkTheme) {
+    function togglePaletteMode() {
+        setTimeout(function() {
+            if (p.paletteMode === 'dark') {
                 p.setPaletteMode('light');
             } else {
                 p.setPaletteMode('dark');
@@ -123,11 +120,13 @@ export function MyAppBar(p: {paletteMode: PaletteMode, setPaletteMode: (paletteM
                                   transformOrigin={{ vertical: 'top', horizontal: 'right'}}
                                   onClose={ closeMenu }
                             >
-                                <MenuItem onClick={ handleThemeChanged }>Dark theme <Switch
-                                    checked={ darkTheme }
-                                    onChange={ handleThemeChanged }
-                                    color='secondary'
-                                /></MenuItem>
+                                <MenuItem onClick={ togglePaletteMode }>Dark theme
+                                    <Switch
+                                        checked={ p.paletteMode === 'dark' }
+                                        onChange={ togglePaletteMode }
+                                        color='secondary'
+                                    />
+                                </MenuItem>
                                 <MenuItem onClick={ handleSelectPuzzlers }>Select puzzlers...</MenuItem>
                                 <MenuItem onClick={ handleRestart }>Restart...</MenuItem>
                                 <MenuItem onClick={ handleAbout }>About...</MenuItem>

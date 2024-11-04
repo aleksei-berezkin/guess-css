@@ -12,8 +12,13 @@ import { readFromLocalStorage } from '../store/myLocalStorage';
 import { gaInit } from './ga';
 
 export function PuzzlerApp(p: {basename: string | undefined}): ReactElement {
-    const [paletteMode, setPaletteType] = useState<PaletteMode>('light');
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const [paletteMode, setPaletteMode] = useState<PaletteMode>(mediaQuery.matches ? 'dark' : 'light');
 
+    mediaQuery.addEventListener('change', function(event) {
+        setPaletteMode(event.matches ? 'dark' : 'light');
+    });
+    
     useEffect(() => {
         gaInit();
         const storedPersistent = readFromLocalStorage(store.persistent._version);
@@ -30,7 +35,7 @@ export function PuzzlerApp(p: {basename: string | undefined}): ReactElement {
     return <ThemeProvider theme={ theme }>
         <CssBaseline/>
             <BrowserRouter>
-                <MyAppBar paletteMode={ paletteMode } setPaletteMode={ setPaletteType }/>
+                <MyAppBar paletteMode={ paletteMode } setPaletteMode={ setPaletteMode }/>
                 <MyAppBody basename={ p.basename }/>
             </BrowserRouter>
     </ThemeProvider>;
