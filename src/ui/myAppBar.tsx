@@ -36,11 +36,6 @@ const useStyles = makeStyles({
         gridTemplateColumns: '1fr max-content 1fr',
         alignItems: 'center',
     },
-
-    appMenuBtn: {
-        float: 'right',
-        color: 'currentColor',
-    },
 });
 
 export function MyAppBar(p: {paletteMode: PaletteMode, setPaletteMode: (paletteMode: PaletteMode) => void}) {
@@ -118,7 +113,7 @@ export function MyAppBar(p: {paletteMode: PaletteMode, setPaletteMode: (paletteM
                         </div>
 
                         <div>
-                            <IconButton onClick={ handleAppMenuButtonClick } className={ styles.appMenuBtn }>
+                            <IconButton onClick={ handleAppMenuButtonClick } sx={{ float: 'right', color: 'unset' }}>
                                 <MenuIcon titleAccess='App menu'/>
                             </IconButton>
 

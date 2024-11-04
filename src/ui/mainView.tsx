@@ -1,11 +1,10 @@
 import { PuzzlerRendered } from './puzzlerRendered';
 import { Choices } from './choices';
-import Grid from '@mui/material/Grid';
 import { CodePaper } from './codePaper';
 import { Footer } from './footer';
 import React from 'react';
 import { ofCurrentView, useSelector } from '../store/store';
-import { CircularProgress, Grid2 } from '@mui/material';
+import { CircularProgress } from '@mui/material';
 import makeStyles from '@mui/styles/makeStyles';
 import { ProgressDialog } from './progressDialog';
 import { FeedbackToast } from './feedbackToast';
@@ -62,9 +61,7 @@ export function MainView() {
                 code: htmlCode,
             }} />
         </div>
-        <Grid item>
-            <Footer/>
-        </Grid>
+        <Footer/>
         {
             firstStatus &&
             <FeedbackToast correct={ firstStatus === 'firstCorrect' }/>

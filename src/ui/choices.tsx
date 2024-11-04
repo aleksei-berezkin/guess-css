@@ -1,7 +1,6 @@
 import React, { ReactElement, useEffect, useRef } from 'react';
 import { ofCurrentView, ofCurrentViewOrUndefined, store, useSelector } from '../store/store';
 import { setUserChoice } from '../store/thunks';
-import Grid from '@mui/material/Grid';
 import { CodePaper } from './codePaper';
 import { CodeHeader } from './codeHeader';
 import Button from '@mui/material/Button';
@@ -9,7 +8,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CheckIcon from '@mui/icons-material/Check';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import makeStyles from '@mui/styles/makeStyles';
-import { ChoiceStatus, getChoiceStatus, makeChoiceStyles } from './choiceStatus';
+import { choiceBgColor, ChoiceStatus, getChoiceStatus } from './choiceStatus';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import AppBar from '@mui/material/AppBar';
 import Tabs from '@mui/material/Tabs';
@@ -18,7 +17,7 @@ import { spacing } from './theme';
 import { abc } from '../util/abc';
 import { PuzzlerView, State } from '../store/State';
 import { useTheme } from '@mui/styles';
-import { Grid2 } from '@mui/material';
+import { Box, Grid2 } from '@mui/material';
 
 
 export function Choices(): ReactElement {
@@ -46,7 +45,7 @@ function WideChoices() {
     const choices = useSelector(choicesSelector);
     const common = useSelector(commonSelector);
     const status = useSelector(statusSelector);
-    const classes = makeChoiceStyles();
+    const theme = useTheme();
 
     return <Grid2 container sx={{ justify: 'center' }}>{
         abc(choices.length)
@@ -54,7 +53,7 @@ function WideChoices() {
                 <div key={ current + letter }>
                     <CodePaper
                         header={
-                            <CodeHeader title={`CSS ${letter.toUpperCase()}`} className={ classes[getChoiceStatus(i, status)] }/>
+                            <CodeHeader title={`CSS ${letter.toUpperCase()}`} backgroundColor={ choiceBgColor[getChoiceStatus(i, status)][theme.palette.mode] }/>
                         }
                         body={{
                             code: choices[i] || [],
@@ -74,7 +73,7 @@ function NarrowChoices() {
     const common = useSelector(commonSelector);
     const status = useSelector(statusSelector);
     const currentTab = useSelector(ofCurrentView('currentTab', 0));
-    const classes = makeChoiceStyles();
+    const theme = useTheme()
 
     function handleChangeIndex(currentTab: number) {
         store.setCurrentTab(currentTab)
@@ -94,7 +93,7 @@ function NarrowChoices() {
                         .map((letter, i) =>
                             <Tab label={ `CSS ${ letter.toUpperCase() }` }
                                  key={ currentPuzzler + letter }
-                                 className={ classes[getChoiceStatus(i, status)]}
+                                 sx={{ backgroundColor: choiceBgColor[getChoiceStatus(i, status)][theme.palette.mode] }}
                             />
                         )
                 }</Tabs>
@@ -115,6 +114,7 @@ function NarrowChoices() {
 
 const useFooterStyles = makeStyles(theme => ({
     footer: {
+        justifyContent: 'center',
         paddingTop: theme.spacing(spacing / 2),
         paddingBottom: theme.spacing(spacing),
     }
@@ -140,8 +140,8 @@ function FooterButton(p: {status: ChoiceStatus, checkChoice: () => void}) {
 
     const classes = useFooterStyles();
 
-    return <Grid container sx={{ justify: 'center' }} className={ classes.footer }>
-        <Grid item ref={ btnBoxRef } style={ footerStyle }>
+    return <Grid2 container className={ classes.footer }>
+        <Box ref={ btnBoxRef } style={ footerStyle }>
             {
                 p.status === 'notAnswered' &&
                 <Button onClick={() => p.checkChoice() } variant='outlined'
@@ -159,6 +159,6 @@ function FooterButton(p: {status: ChoiceStatus, checkChoice: () => void}) {
                 p.status === 'incorrect' &&
                 <ErrorOutlineIcon titleAccess='incorrect user answer'/>
             }
-        </Grid>
-    </Grid>
+        </Box>
+    </Grid2>
 }

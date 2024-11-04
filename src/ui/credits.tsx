@@ -10,10 +10,10 @@ import { monospaceFonts } from '../monospaceFonts';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import CircularProgress from '@mui/material/CircularProgress';
-import Grid from '@mui/material/Grid';
 import { ContentPage } from './contentPage';
 import { routes } from './routes';
 import { gaPageview } from './ga';
+import { Grid2 } from '@mui/material';
 
 const useStyles = makeStyles(theme => ({
     accDetails: {
@@ -114,9 +114,9 @@ function License(p: {name: string}) {
 
 
 function CenteredSpinner() {
-    return <Grid container sx={{justify: 'center'}}>
-        <Grid item>
+    return <Grid2 container sx={{justify: 'center'}}>
+        <div>
             <CircularProgress color='inherit'/>
-        </Grid>
-    </Grid>
+        </div>
+    </Grid2>
 }
