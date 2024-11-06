@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { routes } from '../src/ui/routes';
+import { routes } from '../app/routes';
 
 const distPath = path.join(__dirname, '..', 'dist');
 const indexHtmlStr = fs.readFileSync(path.join(distPath, 'index.html'));

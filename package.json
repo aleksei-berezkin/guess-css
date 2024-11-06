@@ -7,12 +7,14 @@
     "clean": "rm -rf ./dist",
     "clean-generated": "rm -rf ./generated",
     "generate": "ts-node --project tsconfig.build.json ./scripts/generate.ts",
-    "start": "NODE_ENV=development webpack serve --port 3000",
-    "webpack": "NODE_ENV=production webpack",
     "copy-logo": "cp css-logo.png dist/",
-    "copy-index-to-paths": "ts-node --project tsconfig.build.json ./scripts/copyIndexToPaths.ts",
-    "build": "npm-run-all clean clean-generated generate webpack copy-logo copy-index-to-paths",
-    "analyze": "NODE_ENV=production webpack --config webpack.analyze.js"
+    "dev": "next dev",
+    "build": "npm-run-all clean clean-generated generate build@next copy-logo",
+    "build@next": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "--copy-index-to-paths": "ts-node --project tsconfig.build.json ./scripts/copyIndexToPaths.ts",
+    "--analyze": "NODE_ENV=production webpack --config webpack.analyze.js"
   },
   "author": "Aleksei Berezkin",
   "license": "ISC",
@@ -21,16 +23,11 @@
     "@types/node": "^20.17.3",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
-    "clean-webpack-plugin": "^4.0.0",
-    "html-webpack-plugin": "^5.6.3",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "15.0.2",
     "npm-run-all": "^4.1.5",
-    "ts-loader": "^9.5.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.6.3",
-    "webpack": "^5.95.0",
-    "webpack-bundle-analyzer": "^4.10.2",
-    "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^5.1.0"
+    "typescript": "^5.6.3"
   },
   "dependencies": {
     "@emotion/react": "^11.13.3",
@@ -39,11 +36,10 @@
     "@mui/material": "^6.1.6",
     "@mui/material-pigment-css": "^6.1.6",
     "@mui/styles": "^6.1.6",
+    "next": "^15.0.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-ga": "^3.3.1",
-    "react-router": "^6.27.0",
-    "react-router-dom": "^6.27.0",
     "react-swipeable-views-react-18-fix": "^0.14.1"
   }
 }

@@ -34,7 +34,7 @@ export const readModules: Promise<DepFullData[]> = Promise.all(
         ...Object.entries(localPackageJson.dependencies),
         ...Object.entries(localPackageJson.devDependencies)
     ]
-        .map(([name, _]) => [name, path.resolve(__dirname, '..', 'node_modules', name)])
+        .map(([name]) => [name, path.resolve(__dirname, '..', 'node_modules', name)])
         .flatMap<PackageJsonFile | LicenseFile>(([name, dir]) => [
             {
                 type: 'package.json',
@@ -75,6 +75,7 @@ export const readModules: Promise<DepFullData[]> = Promise.all(
                     } else {
                         resolve(null);
                     }
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 } catch (_) {
                     resolve(null);
                 }
@@ -84,7 +85,7 @@ export const readModules: Promise<DepFullData[]> = Promise.all(
         const packageJsonOrLicenseData = datas.filter(data => !!data) as (PackageJsonData | LicenseData)[];
 
         return groupBy(packageJsonOrLicenseData, data => data.name)
-            .map(([_, data]): readonly [PackageJsonData, { licenseText: string }] => {
+            .map(([, data]): readonly [PackageJsonData, { licenseText: string }] => {
                 if (data.length === 1 && data[0].type === 'package.json' && data[0].name === 'npm-run-parallel') {
                     // Lacks homepage and license file
                     return [
@@ -96,6 +97,38 @@ export const readModules: Promise<DepFullData[]> = Promise.all(
                             licenseText: `License: ${data[0].license}`
                         }
                     ];
+                }
+                if (data.length === 1 && data[0].type === 'package.json' && data[0].name === 'react-swipeable-views-react-18-fix') {
+                    // Lacks homepage and license text
+                    return [
+                        {
+                            ...data[0],
+                            homepage: 'https://github.com/oliviertassinari/react-swipeable-views.git',
+                        },
+                        {
+                            licenseText: `License: ${data[0].license}`
+                        },
+                    ]
+                }
+                if (data.length === 1 && data[0].type === 'package.json' && data[0].name === 'eslint-config-next') {
+                    // Lacks license text
+                    return [
+                        data[0],
+                        {
+                            licenseText: `License: ${data[0].license}`
+                        },
+                    ]
+                }
+                if (data.length === 2 && data[0].type === 'package.json' && data[0].name === '@emotion/react') {
+                    return [
+                        {
+                            ...data[0],
+                            description: data[0].name
+                        },
+                        {
+                            licenseText: (data[1] as LicenseData).text
+                        }
+                    ]
                 }
                 if (data.length === 2) {
                     if (data[0].type === 'package.json' && data[1].type === 'LICENSE') {
@@ -109,17 +142,17 @@ export const readModules: Promise<DepFullData[]> = Promise.all(
             })
             .map(([p, l]) => ({
                 name: p.name,
-                description: assertNotNull(p.description),
+                description: assertNotNull(p.description, p.name),
                 link: getLink(p),
-                license: assertNotNull(p.license),
-                licenseText: assertNotNull(l.licenseText),
+                license: assertNotNull(p.license, p.name),
+                licenseText: assertNotNull(l.licenseText, p.name),
             }));
         }
     );
 
-function assertNotNull<T>(value: T | null | undefined): T {
+function assertNotNull<T>(value: T | null | undefined, message = ''): T {
     if (value == null)
-        throw Error('value is null')
+        throw Error(`value is null${message ? ': ' + message : ''}`)
     return value
 }
 
