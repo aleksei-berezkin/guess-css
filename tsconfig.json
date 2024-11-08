@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "esModuleInterop": true,
-    "experimentalDecorators": true,
     "jsx": "preserve",
     "lib": [
       "dom",

@@ -15,7 +15,6 @@ export class Store implements State {
         footerBtnHeight: undefined,
     }
 
-    @action()
     reset(topics: Topic[]) {
         this.persistent = {
             topics,
@@ -23,90 +22,82 @@ export class Store implements State {
             correctAnswers: 0,
             _version: this.persistent._version,
         }
+        this.#notifyListeners()
     }
 
-    @action()
     restoreAndDisplayLast(persistent: PersistentState) {
         this.persistent = persistent;
         this.current = persistent.puzzlerViews.length - 1;
         this.showProgressDialog = false;
+        this.#notifyListeners()
     }
 
-    @action()
     appendAndDisplayPuzzler(puzzlerView: PuzzlerView) {
         const newCount = this.persistent.puzzlerViews.push(puzzlerView);
         this.current = newCount - 1;
         this.showProgressDialog = false;
+        this.#notifyListeners()
     }
 
-    @action()
     setCurrentTab(tab: number) {
         this.persistent.puzzlerViews[this.current].currentTab = tab;
+        this.#notifyListeners()
     }
 
-    @action()
     setUserChoice(userChoice: number) {
         this.persistent.puzzlerViews[this.current].status = {
             ...this.persistent.puzzlerViews[this.current].status,
             userChoice,
         }
+        this.#notifyListeners()
     }
 
-    @action()
     displayNextPuzzler() {
         this.current++;
+        this.#notifyListeners()
     }
 
-    @action()
     displayPrevPuzzler() {
         this.current--;
+        this.#notifyListeners()
     }
 
-    @action()
     displayPuzzler(index: number) {
         this.current = index;
+        this.#notifyListeners()
     }
 
-    @action()
     displayProgressDialog() {
         this.showProgressDialog = true;
+        this.#notifyListeners()
     }
 
-    @action()
     incCorrectAnswers() {
         this.persistent.correctAnswers++;
+        this.#notifyListeners()
     }
 
-    @action()
     setFooterBtnHeight(footerBtnHeight: number) {
         this.layoutConstants.footerBtnHeight = footerBtnHeight;
+        this.#notifyListeners()
+    }
+
+    #notifyQueued = false;
+    #notifyListeners() {
+        if (!this.#notifyQueued) {
+            queueMicrotask(() => {
+                this.#notifyQueued = false;
+                listeners.forEach(l => l(this));
+            });
+            this.#notifyQueued = true;
+        }
     }
 }
 
 export const store = new Store();
 
 const listeners: Set<(st: State) => void> = new Set();
-let updateQueued = false;
 
-function action(): MethodDecorator {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return function(targetProto, methodName, descriptor: TypedPropertyDescriptor<any>) {
-        const origMethod = descriptor.value;
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        descriptor.value = function(this: State, ...args: any[]) {
-            const returnValue = origMethod.apply(this, args);
-            if (!updateQueued) {
-                queueMicrotask(() => {
-                    updateQueued = false;
-                    listeners.forEach(l => l(this));
-                });
-                updateQueued = true;
-            }
-            return returnValue;
-        }
-    }
-}
 
 export function useSelector<T>(
     selector: (st: State) => T,
