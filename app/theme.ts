@@ -1,5 +1,4 @@
-import { createTheme as createMuiTheme } from '@mui/material/styles';
-import { PaletteMode } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 import { Theme } from '@mui/material/styles';
 
 declare module '@mui/material/styles' {
@@ -14,7 +13,7 @@ declare module '@mui/styles/defaultTheme' {
     interface DefaultTheme extends Theme {}
 }
 
-export const createTheme = (mode: PaletteMode) => createMuiTheme({
+export const theme = createTheme({
     breakpoints: {
         values: {
             xs: 0,
@@ -25,22 +24,26 @@ export const createTheme = (mode: PaletteMode) => createMuiTheme({
             xl: 1920,
         },
     },
-    palette: {
-        mode,
-        ...(mode === 'dark' ? {
-            primary: {
-                main: '#90caf9',
+    colorSchemes: {
+        light: {
+            palette: {
+                background: {
+                    paper: '#ffffff',
+                    default: '#f6f6f6',
+                },
             },
-            background: {
-                paper: '#1e1e1e',
-                default: '#000000',
+        },
+        dark: {
+            palette: {
+                primary: {
+                    main: '#90caf9',
+                },
+                background: {
+                    paper: '#1e1e1e',
+                    default: '#000000',
+                },
             },
-        } : {
-            background: {
-                paper: '#ffffff',
-                default: '#f6f6f6',
-            },
-        }),
+        },
     },
     components: {
         MuiPaper: {
@@ -66,15 +69,6 @@ export const createTheme = (mode: PaletteMode) => createMuiTheme({
                 },
             }
         },
-        ...(mode === 'dark' ? {
-            MuiAppBar: {
-                styleOverrides: {
-                    colorDefault: {
-                        backgroundColor: '#424242',
-                    },
-                }
-            },
-        } : {})
     },
 });
 

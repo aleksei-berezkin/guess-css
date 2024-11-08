@@ -12,17 +12,17 @@ import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import Switch from '@mui/material/Switch';
 import { lastOrUndefined } from './util/lastOrUndefined';
 import { State } from './store/State';
 import { allTopics } from './model/topic';
 import { genAndDisplayNewPuzzler } from './store/thunks';
 import { leadingZeros3 } from './util/leadingZeros3';
 import { gaEvent } from './ga';
-import { Box, PaletteMode } from '@mui/material';
+import { Box, useColorScheme } from '@mui/material';
+import { DarkModeOutlined, LightModeOutlined, SettingsBrightnessOutlined } from '@mui/icons-material';
 
 
-export function PuzzlerAppBar(p: {paletteMode: PaletteMode, setPaletteMode: (paletteMode: PaletteMode) => void}) {
+export function PuzzlerAppBar() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
 
@@ -60,23 +60,13 @@ export function PuzzlerAppBar(p: {paletteMode: PaletteMode, setPaletteMode: (pal
         router.push(routes.about);
     }
 
-    function togglePaletteMode() {
-        setTimeout(function() {
-            if (p.paletteMode === 'dark') {
-                p.setPaletteMode('light');
-            } else {
-                p.setPaletteMode('dark');
-            }
-        });
-    }
-
     function closeMenu() {
         setMenuOpen(false);
         setAnchorEl(null);
     }
 
     return <>
-        <AppBar color={ p.paletteMode === 'light' ? 'primary' : 'default' } position='sticky'>
+        <AppBar position='sticky'>
             <Toolbar variant='dense'>
                 <Container maxWidth='sm' disableGutters>
                     <Box sx={{ display: 'grid', gridTemplateColumns: '1fr max-content 1fr', alignItems: 'center'}}>
@@ -102,13 +92,7 @@ export function PuzzlerAppBar(p: {paletteMode: PaletteMode, setPaletteMode: (pal
                                   transformOrigin={{ vertical: 'top', horizontal: 'right'}}
                                   onClose={ closeMenu }
                             >
-                                <MenuItem onClick={ togglePaletteMode }>Dark theme
-                                    <Switch
-                                        checked={ p.paletteMode === 'dark' }
-                                        onChange={ togglePaletteMode }
-                                        color='secondary'
-                                    />
-                                </MenuItem>
+                                <ThemeMenuItem/>
                                 <MenuItem onClick={ handleSelectPuzzlers }>Select puzzlers...</MenuItem>
                                 <MenuItem onClick={ handleRestart }>Restart...</MenuItem>
                                 <MenuItem onClick={ handleAbout }>About...</MenuItem>
@@ -153,4 +137,26 @@ function getDonePuzzlersNum(state: State) {
         return state.persistent.puzzlerViews.length;
     }
     return state.persistent.puzzlerViews.length - 1;
+}
+
+function ThemeMenuItem() {
+    const {mode, setMode} = useColorScheme()
+
+    const ml = 1, mr = 1;
+
+    return <MenuItem onClick={() => {
+        if (mode === 'system')
+            setMode('light')
+        else if (mode === 'light')
+            setMode('dark')
+        else
+            setMode('system')
+    }}>
+        Theme: <>{
+            mode === 'system' ? <><SettingsBrightnessOutlined sx={{ml, mr}}/> System</>
+                : mode === 'light' ? <><LightModeOutlined sx={{ml, mr}}/> Light</>
+                : mode === 'dark' ? <><DarkModeOutlined sx={{ml, mr}}/> Dark</>
+                : null
+        }</>
+    </MenuItem>
 }
