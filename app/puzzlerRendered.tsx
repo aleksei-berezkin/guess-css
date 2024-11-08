@@ -47,7 +47,7 @@ export function PuzzlerRendered() {
             <PrevButton/>
         </div>
         <div>
-            <Paper className={classes.layoutSize}>
+            <Paper className={ classes.layoutSize } square={ true }>
                 <iframe className={ `${classes.layoutSize} ${classes.iframe}` } srcDoc={
                     insertColors(source, vars, theme)
                 }/>

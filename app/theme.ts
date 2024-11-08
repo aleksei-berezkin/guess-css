@@ -46,11 +46,6 @@ export const theme = createTheme({
         },
     },
     components: {
-        MuiPaper: {
-            defaultProps: {
-                square: true,
-            }
-        },
         MuiTabs: {
             styleOverrides: {
                 root: {

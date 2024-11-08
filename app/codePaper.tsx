@@ -49,7 +49,7 @@ export function CodePaper(
     const body = p.body;
     const classes = makeRootStyles({hasSideMargins: !!p.sideMargins, isTabs: isTabs(body)});
 
-    return <Paper className={ classes.root }>
+    return <Paper className={ classes.root } square={ true }>
         {
             p.header
         }
