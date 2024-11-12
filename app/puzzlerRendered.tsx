@@ -1,4 +1,3 @@
-import makeStyles from '@mui/styles/makeStyles';
 import {
     mapCurrentView,
     ofCurrentView,
@@ -7,7 +6,7 @@ import {
     useSelector
 } from './store/store';
 import Paper from '@mui/material/Paper';
-import { Badge, Grid2, Theme } from '@mui/material';
+import { Badge, Grid2, SxProps, Theme } from '@mui/material';
 import { resolveColor } from './resolveColor';
 import { getContrastColorValue } from './contrastColorValue';
 import IconButton from '@mui/material/IconButton';
@@ -18,37 +17,39 @@ import React from 'react';
 import { globalEscapedRe } from './escapeRe';
 import { allTopics } from './model/topic';
 import { PuzzlerView } from './store/State';
-import { useTheme } from '@mui/styles';
+import { css, useTheme } from '@mui/material-pigment-css';
 
-const useStyles = makeStyles(theme => ({
-    puzzleContainer: {
-        paddingTop: theme.spacing(1),
-    },
-    layoutSize: {
-        height: 130,
-        width: 190,
-        [theme.breakpoints.up('narrow')]: {
-            width: 240,
-        },
-    },
-    iframe: {
-        border: 'none',
-    },
-}));
+const layoutSizeClass = css({
+    height: 130,
+    width: 'calc(max(190px, min(65vw, 240px)))',
+})
 
-export function PuzzlerRendered() {
+declare global {
+    // eslint-disable-next-line @typescript-eslint/no-namespace
+    namespace React {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      interface HTMLAttributes<T> {
+        sx?: SxProps<Theme>;
+      }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      interface SVGProps<T> {
+        sx?: SxProps<Theme>;
+      }
+    }
+  }
+  
+  export function PuzzlerRendered() {
     const source = useSelector(ofCurrentView('source', ''));
     const vars = useSelector(ofCurrentViewOrUndefined('vars'));
     const theme = useTheme();
-    const classes = useStyles();
 
-    return <Grid2 container sx={{justify: 'center', alignItems: 'center'}} className={ classes.puzzleContainer }>
+    return <Grid2 container sx={{ justify: 'center', alignItems: 'center', pt: 1 }} >
         <div>
             <PrevButton/>
         </div>
         <div>
-            <Paper className={ classes.layoutSize } square={ true }>
-                <iframe className={ `${classes.layoutSize} ${classes.iframe}` } srcDoc={
+            <Paper className={ layoutSizeClass } square={ true }>
+                <iframe className={ layoutSizeClass } sx={{ border: 'none' }} srcDoc={
                     insertColors(source, vars, theme)
                 }/>
             </Paper>

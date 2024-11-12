@@ -2,7 +2,7 @@ import { routes } from './routes';
 import { useRouter } from 'next/navigation';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
-import Container from '@mui/material/Container';
+import Container from '@mui/material-pigment-css/Container';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -18,8 +18,9 @@ import { allTopics } from './model/topic';
 import { genAndDisplayNewPuzzler } from './store/thunks';
 import { leadingZeros3 } from './util/leadingZeros3';
 import { gaEvent } from './ga';
-import { Box, useColorScheme } from '@mui/material';
+import Box from '@mui/material-pigment-css/Box';
 import { DarkModeOutlined, LightModeOutlined, SettingsBrightnessOutlined } from '@mui/icons-material';
+import { css } from '@mui/material-pigment-css';
 
 
 export function PuzzlerAppBar() {
@@ -110,11 +111,10 @@ function Score() {
     const correctAnswers = useSelector(state => state.persistent.correctAnswers);
     const incorrectAnswers = useSelector(state => getDonePuzzlersNum(state) - state.persistent.correctAnswers);
 
-    const marginBottom = '-.18em'
-
+    // TODO repetitive code
     return <>{
         isLast &&
-        <Typography><CheckIcon fontSize='small' sx={{ marginBottom }}/> {correctAnswers} : {incorrectAnswers} <CloseIcon fontSize='small' sx={{ marginBottom }}/></Typography>
+        <Typography><CheckIcon fontSize='small' sx={{ mb: '-.18em' }}/> {correctAnswers} : {incorrectAnswers} <CloseIcon fontSize='small' sx={{ mb: '-.18em' }}/></Typography>
     }</>;
 }
 
@@ -139,23 +139,36 @@ function getDonePuzzlersNum(state: State) {
     return state.persistent.puzzlerViews.length - 1;
 }
 
+
+const schemeIconClass = css(({ theme}) => ({
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(1),
+}))
+
 function ThemeMenuItem() {
-    const {mode, setMode} = useColorScheme()
+    const [mode, setMode] = useState<'system' | 'light' | 'dark'>('system')
 
-    const ml = 1, mr = 1;
-
-    return <MenuItem onClick={() => {
-        if (mode === 'system')
+    function toggleColorScheme() {
+        if (mode === 'system') {
             setMode('light')
-        else if (mode === 'light')
+            document.documentElement.classList.add('theme-light')
+            document.documentElement.classList.remove('theme-dark')
+        } else if (mode === 'light') {
             setMode('dark')
-        else
+            document.documentElement.classList.remove('theme-light')
+            document.documentElement.classList.add('theme-dark')
+        } else if (mode === 'dark') {
             setMode('system')
-    }}>
+            document.documentElement.classList.remove('theme-light')
+            document.documentElement.classList.remove('theme-dark')
+        }
+    }
+
+    return <MenuItem onClick={ toggleColorScheme }>
         Theme: <>{
-            mode === 'system' ? <><SettingsBrightnessOutlined sx={{ml, mr}}/> System</>
-                : mode === 'light' ? <><LightModeOutlined sx={{ml, mr}}/> Light</>
-                : mode === 'dark' ? <><DarkModeOutlined sx={{ml, mr}}/> Dark</>
+            mode === 'system' ? <><SettingsBrightnessOutlined className={ schemeIconClass }/> System</>
+                : mode === 'light' ? <><LightModeOutlined className={ schemeIconClass }/> Light</>
+                : mode === 'dark' ? <><DarkModeOutlined className={ schemeIconClass }/> Dark</>
                 : null
         }</>
     </MenuItem>

@@ -4,7 +4,8 @@ import { CodePaper } from './codePaper';
 import { Footer } from './footer';
 import React from 'react';
 import { ofCurrentView, useSelector } from './store/store';
-import { Box, CircularProgress } from '@mui/material';
+import Box from '@mui/material-pigment-css/Box';
+import { CircularProgress } from '@mui/material';
 import { ProgressDialog } from './progressDialog';
 import { FeedbackToast } from './feedbackToast';
 

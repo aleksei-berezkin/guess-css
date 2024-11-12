@@ -1,35 +1,20 @@
-import makeStyles from '@mui/styles/makeStyles';
 import { Region, regionKind } from './model/region';
-import Box from '@mui/material/Box';
+import Box from '@mui/material-pigment-css/Box'
 import React, { ReactElement } from 'react';
 import { ofCurrentViewOrUndefined, useSelector } from './store/store';
 import { monospaceFonts } from './monospaceFonts';
 import { getContrastColorValue } from './contrastColorValue';
 import { resolveColor } from './resolveColor';
 import { hasVars } from './model/gen/vars';
-import { spacing } from './theme';
 import { escapeRe, globalEscapedRe } from './escapeRe';
 import { Theme } from '@mui/material';
-import { DefaultTheme, useTheme } from '@mui/styles';
-
-const useStyles = makeStyles(theme => ({
-    root: {
-        padding: theme.spacing(spacing),
-    },
-    pre: {
-        margin: 0,
-        fontFamily: monospaceFonts,
-        fontSize: 12,
-        lineHeight: 1.18,
-        letterSpacing: 0.0,
-    },
-}));
+import { useTheme } from '@mui/material-pigment-css'
+import { css } from '@pigment-css/react';
 
 export function CodeBody(p: { lines: Region[][], noBottomPadding?: boolean }) {
-    const classes = useStyles();
     const inlineStyle = p.noBottomPadding ? { paddingBottom: 0 } : undefined;
 
-    return <Box className={ classes.root } style={ inlineStyle }>{
+    return <Box sx={{ p: 1 }} style={ inlineStyle }>{
         p.lines &&
         p.lines.map(
             (regions, i) => <Line key={ i } regions={ regions }/>
@@ -37,68 +22,71 @@ export function CodeBody(p: { lines: Region[][], noBottomPadding?: boolean }) {
     }</Box>;
 }
 
-function Line(p: {regions: Region[]}) {
-    const classes = useStyles();
+const lineClass = css({
+    margin: 0,
+    fontFamily: monospaceFonts,
+    fontSize: 12,
+    lineHeight: 1.18,
+    letterSpacing: 0.0,
+})
 
-    return <pre className={ classes.pre }>{
+function Line(p: {regions: Region[]}) {
+    return <pre className={ lineClass }>{
         p.regions.map(
             (reg, i) => <RegionCode key={ i } region={ reg } />
         )
     }</pre>
 }
 
-const regionStylesObj = (theme: DefaultTheme) => ({
-    [regionKind.default]: {
+const regionClasses = {
+    [regionKind.default]: css(({ theme }) => ({
         color: ld('#505050', '#c8c8c8', theme),
-    },
-    [regionKind.text]: {
+    })),
+    [regionKind.text]: css(({ theme }) => ({
         color: ld('black', 'white', theme),
         backgroundColor: ld('#ececec', '#676767', theme),
-    },
-    [regionKind.tag]: {
+    })),
+    [regionKind.tag]: css(({ theme }) => ({
         color: ld('#4b69c6', '#559cd6', theme),
-    },
-    [regionKind.tagBracket]: {
+    })),
+    [regionKind.tagBracket]: css(({ theme }) => ({
         color: ld('#91b3e0', '#808080', theme),
-    },
-    [regionKind.attrName]: {
+    })),
+    [regionKind.attrName]: css(({ theme }) => ({
         color: ld('#9b5d27', '#9cdcff', theme),
-    },
-    [regionKind.attrValue]: {
+    })),
+    [regionKind.attrValue]: css(({ theme }) => ({
         color: ld('#438b27', '#ce9178', theme),
-    },
-    [regionKind.operator]: {
+    })),
+    [regionKind.operator]: css(({ theme }) => ({
         color: ld('#777777', '#d4d4d4', theme),
-    },
-    [regionKind.selector]: {
+    })),
+    [regionKind.selector]: css(({ theme }) => ({
         color: ld('#793e9d', '#d7bb7d', theme),
-    },
-    [regionKind.declarationName]: {
+    })),
+    [regionKind.declarationName]: css(({ theme }) => ({
         color: ld('#9b5d27', '#9cdcff', theme),
-    },
-    [regionKind.declarationValue]: {
+    })),
+    [regionKind.declarationValue]: css(({ theme }) => ({
         color: ld('black', 'white', theme),
-    },
-    [regionKind.comment]: {
+    })),
+    [regionKind.comment]: css(({ theme }) => ({
         color: ld('#438b27', '#6a9954', theme),
         fontStyle: 'italic',
-    },
-    differing: {
+    })),
+    differing: css({
         fontWeight: 'bold',
-    },
-});
+    }),
+};
 
 function ld(light: string, dark: string, theme: Theme) {
     return theme.palette.mode === 'light' ? light : dark;
 }
 
 
-const useRegionStyles = makeStyles(regionStylesObj);
-
 function RegionCode(p: {region: Region}): ReactElement {
     const [regionText, regionKind, differing] = p.region;
     const vars = useSelector(ofCurrentViewOrUndefined('vars'));
-    const regionClasses = useRegionStyles();
     const theme = useTheme();
 
     if (!vars) {
@@ -113,7 +101,7 @@ function RegionCode(p: {region: Region}): ReactElement {
     }
 
     const { contrastColor, colors } = vars;
-    const { palette: { mode, getContrastText }} = theme;
+    const { palette: { mode /*, getContrastText */ }} = theme;
     const text = regionText.replace(globalEscapedRe(contrastColor), getContrastColorValue(theme));
 
     return <>{
@@ -131,7 +119,7 @@ function RegionCode(p: {region: Region}): ReactElement {
                         className={ `${ differingClass }` }
                         style={{
                             backgroundColor: resolvedCol,
-                            color: getContrastText(resolvedCol),
+                            color: 'white', // TODOgetContrastText(resolvedCol),
                         }}
                     >{ resolvedCol }</span>;
 
