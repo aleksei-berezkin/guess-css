@@ -1,22 +1,29 @@
 import React, { ReactElement, ReactFragment } from 'react';
 import Box from '@mui/material/Box';
+import makeStyles from '@mui/styles/makeStyles';
 import Button from '@mui/material/Button';
 import { routes } from './routes';
 import RouterLink from 'next/link';
 import Container from '@mui/material/Container';
 import { Footer } from './footer';
 
+const useStyles = makeStyles(theme => ({
+    root: (p: {margins?: boolean}) => ({
+        marginBottom: p.margins ? theme.spacing(2) : undefined,
+        marginTop: p.margins ? theme.spacing(2) : undefined,
+        textAlign: 'left',
+    }),
+    backMargins: {
+        marginTop: theme.spacing(1),
+        marginBottom: theme.spacing(1),
+    },
+}));
+
 export function ContentPage(p: {noButtons?: boolean, footer?: boolean, children: ReactElement | ReactFragment}) {
+    const classes = useStyles({margins: !!p.noButtons});
+
     return <Container maxWidth='sm'>
-        <Box
-            sx={{
-                textAlign: 'left',
-                '&.with-margins': {
-                    mb: 2, mt: 2
-                }
-            }}
-            className={ p.noButtons ? 'with-margins' : '' }
-        >
+        <Box className={ classes.root }>
             { !p.noButtons && <Back/> }
             {
                 p.children
@@ -28,10 +35,11 @@ export function ContentPage(p: {noButtons?: boolean, footer?: boolean, children:
 }
 
 function Back({ margins = false }) {
-    return <Button
-                href={ routes.root }
-                component={ RouterLink }
-                size='small' fullWidth color='primary'
-                sx={{'&.with-margins': { mt: 1, mb: 1 }}}
-                className={ margins ? 'with-margins' : '' }>Back to puzzler</Button>;
+    const classes = useStyles({});
+    const className = margins ? classes.backMargins : undefined;
+
+    return <Button href={ routes.root } component={ RouterLink }
+                   size='small' fullWidth color='primary'
+                   className={ className }>
+        Back to puzzler</Button>;
 }

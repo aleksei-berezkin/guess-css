@@ -1,9 +1,7 @@
-/** @jsxImportSource @emotion/react */
-
 import makeStyles from '@mui/styles/makeStyles';
 import { Region, regionKind } from './model/region';
 import Box from '@mui/material/Box';
-import { ReactElement } from 'react';
+import React, { ReactElement } from 'react';
 import { ofCurrentViewOrUndefined, useSelector } from './store/store';
 import { monospaceFonts } from './monospaceFonts';
 import { getContrastColorValue } from './contrastColorValue';
@@ -13,15 +11,25 @@ import { spacing } from './theme';
 import { escapeRe, globalEscapedRe } from './escapeRe';
 import { Theme } from '@mui/material';
 import { DefaultTheme, useTheme } from '@mui/styles';
-import { css } from '@emotion/react';
 
-
+const useStyles = makeStyles(theme => ({
+    root: {
+        padding: theme.spacing(spacing),
+    },
+    pre: {
+        margin: 0,
+        fontFamily: monospaceFonts,
+        fontSize: 12,
+        lineHeight: 1.18,
+        letterSpacing: 0.0,
+    },
+}));
 
 export function CodeBody(p: { lines: Region[][], noBottomPadding?: boolean }) {
-    return <Box sx={{
-        padding: spacing,
-        paddingBottom: p.noBottomPadding ? 0 : undefined
-    }}>{
+    const classes = useStyles();
+    const inlineStyle = p.noBottomPadding ? { paddingBottom: 0 } : undefined;
+
+    return <Box className={ classes.root } style={ inlineStyle }>{
         p.lines &&
         p.lines.map(
             (regions, i) => <Line key={ i } regions={ regions }/>
@@ -30,13 +38,9 @@ export function CodeBody(p: { lines: Region[][], noBottomPadding?: boolean }) {
 }
 
 function Line(p: {regions: Region[]}) {
-    return <pre css={ css({
-        margin: 0,
-        fontFamily: monospaceFonts,
-        fontSize: 12,
-        lineHeight: 1.18,
-        letterSpacing: 0.0,
-    }) }>{
+    const classes = useStyles();
+
+    return <pre className={ classes.pre }>{
         p.regions.map(
             (reg, i) => <RegionCode key={ i } region={ reg } />
         )
