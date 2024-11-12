@@ -1,5 +1,6 @@
 import React, { ReactElement, useState } from 'react';
 import { Region } from './model/region';
+import makeStyles from '@mui/styles/makeStyles';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Collapse from '@mui/material/Collapse';
@@ -7,9 +8,20 @@ import IconButton from '@mui/material/IconButton';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { ofCurrentView, useSelector } from './store/store';
 import { CodeBody } from './codeBody';
-import { css } from '@pigment-css/react';
+import { spacing } from './theme';
 //@ts-expect-error No typedefs for this module
 import SwipeableViews from 'react-swipeable-views-react-18-fix';
+
+const makeRootStyles = makeStyles(theme => ({
+    root: (p: {hasSideMargins: boolean, isTabs: boolean}) => ({
+        marginTop: theme.spacing(spacing),
+        marginLeft: theme.spacing(p.hasSideMargins && spacing || 0),
+        marginRight: theme.spacing(p.hasSideMargins && spacing || 0),
+        width: p.isTabs ? '70%' : 'inherit',
+        minWidth: p.isTabs ? 270 : 'inherit',
+        maxWidth: p.isTabs ? 400 : 'inherit',
+    }),
+}));
 
 export type CodeTabs = {
     tabs: CodePaperBody[],
@@ -27,21 +39,6 @@ function isTabs(b: CodeTabs | CodePaperBody): b is CodeTabs {
     return 'tabs' in b;
 }
 
-const paperClass = css({
-    marginTop: 1
-})
-
-const paperWithSideMarginsClass = css({
-    marginLeft: 1,
-    marginRight: 1,
-})
-
-const paperTabsClass = css({
-    width: '70%',
-    minWidth: 270,
-    maxWidth: 400
-})
-
 export function CodePaper(
     p: {
         header?: ReactElement,
@@ -50,9 +47,9 @@ export function CodePaper(
     }
 ) {
     const body = p.body;
-    const classes = `${ paperClass } ${ p.sideMargins ? paperWithSideMarginsClass : '' } ${ isTabs(body) ? paperTabsClass : '' }`
+    const classes = makeRootStyles({hasSideMargins: !!p.sideMargins, isTabs: isTabs(body)});
 
-    return <Paper className={ classes } square={ true }>
+    return <Paper className={ classes.root } square={ true }>
         {
             p.header
         }
@@ -91,21 +88,28 @@ function Body(p: CodePaperBody) {
     </>
 }
 
-const expandIconClass = css(({ theme }) => ({
-    transform: 'rotate(0deg)',
-    transition: theme.transitions.create('transform', {
-        duration: theme.transitions.duration.shortest,
-    }),
-}))
-const expandIconOpenClass = css({
-    transform: 'rotate(90deg)',
-})
+const makeCollapsedStyles = makeStyles(theme => ({
+    summary: {
+        cursor: 'pointer',
+        paddingRight: theme.spacing(1),
+    },
+    expandIcon: {
+        transform: 'rotate(0deg)',
+        transition: theme.transitions.create('transform', {
+            duration: theme.transitions.duration.shortest,
+        }),
+    },
+    expandIconOpen: {
+        transform: 'rotate(90deg)',
+    },
+}));
 
 const summarySep = ', ';
 const summaryEllipsis = '...';
 
 function SimpleCollapsed(p: { summary: string[], children: ReactElement }) {
     const [collapsedOpen, setCollapsedOpen] = useState(false);
+    const classes = makeCollapsedStyles();
 
     function toggleCollapsed(e: React.MouseEvent) {
         setCollapsedOpen(!collapsedOpen);
@@ -116,14 +120,14 @@ function SimpleCollapsed(p: { summary: string[], children: ReactElement }) {
 
         <Typography
             variant='caption'
+            className={ `${classes.summary}` }
             color='textSecondary'
             component='label'
-            sx={{ cursor: 'pointer', pr: 1 }}
         >
             <IconButton size='small' onClick={ toggleCollapsed } color='inherit'>
                 <ChevronRightIcon
                     fontSize='small'
-                    className={ `${ expandIconClass } ${ collapsedOpen ? expandIconOpenClass : '' }` }
+                    className={ `${classes.expandIcon} ${collapsedOpen ? classes.expandIconOpen : ''}` }
                     titleAccess={ collapsedOpen ? 'collapse' : 'expand'}
                 />
             </IconButton>

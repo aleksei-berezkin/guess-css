@@ -1,5 +1,4 @@
 import { PuzzlerApp } from './puzzlerApp'
-import '@mui/material-pigment-css/styles.css'
 
 export default function RootLayout(p: {children: React.ReactNode}) {
     return <html lang="en">

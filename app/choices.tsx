@@ -7,6 +7,7 @@ import Button from '@mui/material/Button';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CheckIcon from '@mui/icons-material/Check';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import makeStyles from '@mui/styles/makeStyles';
 import { choiceBgColor, ChoiceStatus, getChoiceStatus } from './choiceStatus';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import AppBar from '@mui/material/AppBar';
@@ -15,10 +16,8 @@ import Tab from '@mui/material/Tab';
 import { spacing } from './theme';
 import { abc } from './util/abc';
 import { PuzzlerView, State } from './store/State';
-import { useTheme } from '@mui/material-pigment-css';
-import Box from '@mui/material-pigment-css/Box'
-import { Grid2, Theme } from '@mui/material';
-import { css } from '@pigment-css/react'
+import { useTheme } from '@mui/styles';
+import { Box, Grid2 } from '@mui/material';
 
 
 export function Choices(): ReactElement {
@@ -46,7 +45,7 @@ function WideChoices() {
     const choices = useSelector(choicesSelector);
     const common = useSelector(commonSelector);
     const status = useSelector(statusSelector);
-    const theme: Theme = useTheme();
+    const theme = useTheme();
 
     return <Grid2 container sx={{ justify: 'center' }}>{
         abc(choices.length)
@@ -74,7 +73,7 @@ function NarrowChoices() {
     const common = useSelector(commonSelector);
     const status = useSelector(statusSelector);
     const currentTab = useSelector(ofCurrentView('currentTab', 0));
-    const theme: Theme = useTheme()
+    const theme = useTheme()
 
     function handleChangeIndex(currentTab: number) {
         store.setCurrentTab(currentTab)
@@ -113,11 +112,13 @@ function NarrowChoices() {
     />;    
 }
 
-const footerClass = css(({ theme }) => ({
-    justifyContent: 'center',
-    paddingTop: theme.spacing(spacing / 2),
-    paddingBottom: theme.spacing(spacing),
-}))
+const useFooterStyles = makeStyles(theme => ({
+    footer: {
+        justifyContent: 'center',
+        paddingTop: theme.spacing(spacing / 2),
+        paddingBottom: theme.spacing(spacing),
+    }
+}));
 
 
 function FooterButton(p: {status: ChoiceStatus, checkChoice: () => void}) {
@@ -137,7 +138,9 @@ function FooterButton(p: {status: ChoiceStatus, checkChoice: () => void}) {
         }
     }, []);
 
-    return <Grid2 container className={ footerClass }>
+    const classes = useFooterStyles();
+
+    return <Grid2 container className={ classes.footer }>
         <Box ref={ btnBoxRef } style={ footerStyle }>
             {
                 p.status === 'notAnswered' &&

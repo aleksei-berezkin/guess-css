@@ -8,12 +8,12 @@ import { TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import Button from "@mui/material/Button";
+import makeStyles from "@mui/styles/makeStyles";
 import { genAndDisplayNewPuzzler } from './store/thunks';
 import { Contacts } from './contacts';
 import { leadingZeros3 } from './util/leadingZeros3';
 import { countScorePerTopic } from './scorePerTopic';
 import { gaEvent } from './ga';
-import { css } from '@mui/material-pigment-css';
 
 const great = [
     'Great!',
@@ -45,9 +45,14 @@ const  moreCorrect = [
     'Well done! Your answers are mainly correct!',
 ];
 
-const alertClass = css({
-    marginBottom: 2,
-})
+const useStyles = makeStyles(theme => ({
+    tableCont: {
+        marginBottom: theme.spacing(2),
+    },
+    alert: {
+        marginBottom: theme.spacing(2),
+    },
+}));
 
 export function ProgressDialog() {
     useEffect(() => gaEvent('ProgressDialog', leadingZeros3(store.current + 1)), []);
@@ -71,6 +76,8 @@ export function ProgressDialog() {
         window.scrollTo(0, 0);
     }
 
+    const styles = useStyles();
+
     return <ContentPage noButtons footer={ round !== 1 }>
         <Typography variant='h5' gutterBottom>You made {store.current + 1} puzzlers!</Typography>
 
@@ -79,7 +86,7 @@ export function ProgressDialog() {
             {usersPercent[Math.min(round, usersPercent.length - 1)]} of users get there. Here&apos;s your current score per each topic:
         </Typography>
 
-        <TableContainer sx= {{ mb: 2 }}>
+        <TableContainer className={ styles.tableCont }>
             <Table size='small'>
                 <TableHead>
                     <TableRow>
@@ -109,13 +116,13 @@ export function ProgressDialog() {
 
         {
             allAnswersAreCorrect &&
-            <Alert severity='success' className={ alertClass }>
+            <Alert severity='success' className={ styles.alert }>
                 <Typography variant='body1'>{ allCorrect[round % allCorrect.length] }</Typography>
             </Alert>
         }
         {
             !allAnswersAreCorrect && moreCorrectAnswers &&
-            <Alert severity='success' className={ alertClass }>
+            <Alert severity='success' className={ styles.alert }>
                 <Typography variant='body1'>{ moreCorrect[round % moreCorrect.length] }</Typography>
             </Alert>
         }

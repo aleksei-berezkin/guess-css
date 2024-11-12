@@ -7,14 +7,13 @@ declare module '@mui/material/styles' {
     }
 }
 
-declare module '@mui/material-pigment-css' {
-    interface ThemeArgs {
-        theme: Theme;
-    }
+// https://mui.com/material-ui/migration/troubleshooting/#types-property-quot-palette-quot-quot-spacing-quot-does-not-exist-on-type-defaulttheme
+declare module '@mui/styles/defaultTheme' {
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    interface DefaultTheme extends Theme {}
 }
 
 export const theme = createTheme({
-    cssVariables: true,
     breakpoints: {
         values: {
             xs: 0,
@@ -46,7 +45,6 @@ export const theme = createTheme({
             },
         },
     },
-    // getSelector: (colorScheme) => colorScheme ? `.theme-${colorScheme}` : ':root',
     components: {
         MuiTabs: {
             styleOverrides: {

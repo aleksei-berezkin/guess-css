@@ -1,37 +1,29 @@
 import React, { ReactElement, ReactFragment } from 'react';
-import Box from '@mui/material-pigment-css/Box';
+import Box from '@mui/material/Box';
+import makeStyles from '@mui/styles/makeStyles';
 import Button from '@mui/material/Button';
 import { routes } from './routes';
 import RouterLink from 'next/link';
-import Container from '@mui/material-pigment-css/Container';
+import Container from '@mui/material/Container';
 import { Footer } from './footer';
-import { css, styled } from '@mui/material-pigment-css';
 
-export const ContentPage = styled(ContentPageImpl)(({ theme }) => ({
-    [`& > ${Box}`]: {
-        textAlign: 'center',
-        variants: [
-            {
-                props: (p: ContentPageProps) => !!p.noButtons,
-                marginBottom: theme.spacing(2),
-                marginTop: theme.spacing(2),
-            },
-            {
-                props: (p: ContentPageProps) => !p.noButtons,
-            },
-        ]
-    }
-}))
+const useStyles = makeStyles(theme => ({
+    root: (p: {margins?: boolean}) => ({
+        marginBottom: p.margins ? theme.spacing(2) : undefined,
+        marginTop: p.margins ? theme.spacing(2) : undefined,
+        textAlign: 'left',
+    }),
+    backMargins: {
+        marginTop: theme.spacing(1),
+        marginBottom: theme.spacing(1),
+    },
+}));
 
-type ContentPageProps = Parameters<typeof ContentPageImpl>[0]
+export function ContentPage(p: {noButtons?: boolean, footer?: boolean, children: ReactElement | ReactFragment}) {
+    const classes = useStyles({margins: !!p.noButtons});
 
-function ContentPageImpl(p: {
-    noButtons?: boolean,
-    footer?: boolean,
-    children: ReactElement | ReactFragment
-}) {
     return <Container maxWidth='sm'>
-        <Box>
+        <Box className={ classes.root }>
             { !p.noButtons && <Back/> }
             {
                 p.children
@@ -42,13 +34,9 @@ function ContentPageImpl(p: {
     </Container>;
 }
 
-const backMarginsClass = css(({ theme }) => ({
-    marginTop: theme.spacing(1),
-    marginBottom: theme.spacing(1),
-}))
-
 function Back({ margins = false }) {
-    const className = margins ? backMarginsClass : undefined;
+    const classes = useStyles({});
+    const className = margins ? classes.backMargins : undefined;
 
     return <Button href={ routes.root } component={ RouterLink }
                    size='small' fullWidth color='primary'

@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
+import makeStyles from '@mui/styles/makeStyles';
 import Accordion, { AccordionProps } from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -15,22 +16,30 @@ import { ContentPage } from '../contentPage';
 import { routes } from '../routes';
 import { gaPageview } from '../ga';
 import { Grid2 } from '@mui/material';
-import { css } from '@mui/material-pigment-css';
 
-const accDetailsClass = css(({ theme }) => ({
-    display: 'block',
-    overflow: 'hidden',
-    '&>*': {
-        marginBottom: theme.spacing(1),
+const useStyles = makeStyles(theme => ({
+    accDetails: {
+        display: 'block',
+        overflow: 'hidden',
+        '&>*': {
+            marginBottom: theme.spacing(1),
+        },
+        '& *:last-child': {
+            marginBottom: 0,
+        },
     },
-    '& *:last-child': {
-        marginBottom: 0,
+    licenseText: {
+        overflow: 'scroll',
+        maxHeight: 240,
+        fontFamily: monospaceFonts,
+        fontSize: 12,
     },
-}))
+}));
 
 type Awaited<T> = T extends PromiseLike<infer U> ? Awaited<U> : T;
 
 export default function Credits() {
+    const classes = useStyles();
     const [visible, setVisible] = useState<{[k: string]: boolean}>({});
 
     useEffect(() => gaPageview(routes.credits), []);
@@ -76,7 +85,7 @@ export default function Credits() {
                             expandIcon={ <ExpandMoreIcon/> }>
                             <Typography variant='body2'>{ dep.name }</Typography>
                         </AccordionSummary>
-                        <AccordionDetails className={ accDetailsClass }>
+                        <AccordionDetails className={ classes.accDetails }>
                             <Typography variant='body2'>{ dep.description }</Typography>
                             <Typography variant='body2'><Link target='_blank' href={ dep.link }>{ dep.link }</Link></Typography>
                             {
@@ -90,14 +99,8 @@ export default function Credits() {
     </ContentPage>
 }
 
-const licenseTextClass = css({
-    overflow: 'scroll',
-    maxHeight: 240,
-    fontFamily: monospaceFonts,
-    fontSize: 12,
-})
-
 function License(p: {name: string}) {
+    const classes = useStyles();
     const licensesPromise = import('../../generated/licenses.json').then(res => res.default as {[k: string]: string});
     const [licenseText, setLicenseText] = useState('');
     useEffect(() => void licensesPromise.then(l => setLicenseText(l[p.name])), []);
@@ -106,7 +109,7 @@ function License(p: {name: string}) {
         return <CenteredSpinner/>
     }
 
-    return <Typography component='pre' className={ licenseTextClass }>
+    return <Typography component='pre' className={ classes.licenseText }>
         { licenseText }
     </Typography>
 }

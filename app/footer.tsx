@@ -1,7 +1,7 @@
 import React from 'react';
 import { spacing } from './theme';
 import Link from '@mui/material/Link';
-import Box from '@mui/material-pigment-css/Box';
+import Box from '@mui/material/Box';
 import RouterLink from 'next/link';
 import { Contacts } from './contacts';
 

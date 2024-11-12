@@ -4,7 +4,7 @@
   "description": "HTML & CSS puzzler game",
   "main": "src/index.tsx",
   "scripts": {
-    "clean": "rm -rf ./dist ; rm -rf ./.next ; rm -rf ./out",
+    "clean": "rm -rf ./dist",
     "clean-generated": "rm -rf ./generated",
     "generate": "ts-node --project tsconfig.build.json ./scripts/generate.ts",
     "copy-logo": "cp css-logo.png dist/",
@@ -20,7 +20,6 @@
   "license": "ISC",
   "repository": "https://github.com/aleksei-berezkin/guess-css",
   "devDependencies": {
-    "@pigment-css/nextjs-plugin": "^0.0.26",
     "@types/node": "^20.17.3",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
@@ -36,6 +35,7 @@
     "@mui/icons-material": "^6.1.6",
     "@mui/material": "^6.1.6",
     "@mui/material-pigment-css": "^6.1.6",
+    "@mui/styles": "^6.1.6",
     "next": "^15.0.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

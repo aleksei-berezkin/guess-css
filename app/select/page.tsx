@@ -4,6 +4,7 @@ import FormGroup from "@mui/material/FormGroup";
 import React, { useEffect, useState } from 'react';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from "@mui/material/Checkbox";
+import makeStyles from '@mui/styles/makeStyles';
 import { Topic, allTopics } from '../model/topic';
 import { store, useSelector } from '../store/store';
 import Button from "@mui/material/Button";
@@ -13,7 +14,27 @@ import Typography from '@mui/material/Typography';
 import { gaEvent, gaPageview } from '../ga';
 import { useRouter } from 'next/navigation';
 
+const useStyles = makeStyles(theme => ({
+    selectPuzzlersRoot: {
+        display: 'flex',
+        justifyContent: 'center',
+        marginTop: theme.spacing(2),
+    },
+
+    checkboxesGroup: {
+        paddingLeft: theme.spacing(3),
+    },
+
+    buttonsGroup: {
+        paddingTop: theme.spacing(1),
+        '&>*:not(:last-child)': {
+            marginRight: theme.spacing(2),
+        },
+    },
+}));
+
 export default function SelectPuzzlers() {
+    const styles = useStyles();
     const initialTopics = useSelector(state => state.persistent.topics);
     const [selectedTopics, setSelectedTopics] = useState(initialTopics);
     useEffect(() => gaPageview(routes.select), []);
@@ -42,10 +63,10 @@ export default function SelectPuzzlers() {
         router.push(routes.root)
     }
 
-    return <div sx={{ display: 'flex', justifyContent: 'center', marginTop: 2 }}>
+    return <div className={ styles.selectPuzzlersRoot }>
         <div>
             <Typography variant='h6'>Select puzzlers:</Typography>
-            <FormGroup sx={{ pl: 3 }}>
+            <FormGroup className={ styles.checkboxesGroup }>
                 {
                     allTopics.map(t =>
                         <FormControlLabel key={ t } control={
@@ -54,8 +75,8 @@ export default function SelectPuzzlers() {
                     )
                 }
             </FormGroup>
-            <div sx={{ pt: 1 }}>
-                <Button variant='contained' color='primary' onClick={ handleApply } disabled={ !selectedTopics.length } sx={{ mr: 2 }}>
+            <div className={ styles.buttonsGroup }>
+                <Button variant='contained' color='primary' onClick={ handleApply } disabled={ !selectedTopics.length }>
                     Apply and restart
                 </Button>
                 <Button variant='contained' onClick={ handleBack }>
