@@ -25,9 +25,9 @@ export function PuzzlerApp(p: { children: React.ReactNode }): ReactElement {
 
     return <ThemeProvider theme={ theme } defaultMode='system'>
         <CssBaseline/>
-            <PuzzlerAppBar/>
-            <PuzzlerAppBody>
-                { p.children }
-            </PuzzlerAppBody>
+        <PuzzlerAppBar/>
+        <PuzzlerAppBody>
+            { p.children }
+        </PuzzlerAppBody>
     </ThemeProvider>;
 }
