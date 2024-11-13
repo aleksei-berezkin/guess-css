@@ -1,19 +1,19 @@
 'use client'
 
-import React, {useEffect} from 'react';
+import {useEffect} from 'react';
 import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import { ContentPage } from '../contentPage';
 import CodeIcon from '@mui/icons-material/Code';
 import { Contacts } from '../contacts';
-import RouterLink from 'next/link';
+import { Link as RouterLink } from 'react-router-dom';
 import { allTopics } from '../model/topic';
 import { routes } from '../routes';
 import { gaPageview } from '../ga';
 import { Link } from '@mui/material';
 
-export default function About() {
+export default function AboutPage() {
     useEffect(() => gaPageview(routes.about), []);
 
     const mb = 1
@@ -48,7 +48,7 @@ export default function About() {
 
         <Typography variant='h4'>Credits</Typography>
         <Typography>Like any modern software, “Guess CSS!” is built with the usage of many awesome tools, libs
-            and assets. <Link href={ routes.credits } component={ RouterLink }>Here</Link> is the full list.</Typography>
+            and assets. <Link to={ routes.credits } component={ RouterLink }>Here</Link> is the full list.</Typography>
 
         <Typography variant='h4' style={{textAlign: 'center'}}>Have a nice play!</Typography>
     </ContentPage>;

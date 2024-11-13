@@ -1,9 +1,9 @@
-import React, { ReactElement, ReactFragment } from 'react';
+import { ReactElement, ReactFragment } from 'react';
 import Box from '@mui/material/Box';
 import makeStyles from '@mui/styles/makeStyles';
 import Button from '@mui/material/Button';
 import { routes } from './routes';
-import RouterLink from 'next/link';
+import { Link as RouterLink } from 'react-router-dom';
 import Container from '@mui/material/Container';
 import { Footer } from './footer';
 
@@ -38,7 +38,7 @@ function Back({ margins = false }) {
     const classes = useStyles({});
     const className = margins ? classes.backMargins : undefined;
 
-    return <Button href={ routes.root } component={ RouterLink }
+    return <Button to={ routes.root } component={ RouterLink }
                    size='small' fullWidth color='primary'
                    className={ className }>
         Back to puzzler</Button>;

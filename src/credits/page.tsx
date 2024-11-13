@@ -38,7 +38,7 @@ const useStyles = makeStyles(theme => ({
 
 type Awaited<T> = T extends PromiseLike<infer U> ? Awaited<U> : T;
 
-export default function Credits() {
+export default function CreditsPage() {
     const classes = useStyles();
     const [visible, setVisible] = useState<{[k: string]: boolean}>({});
 

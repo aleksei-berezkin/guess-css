@@ -1,7 +1,7 @@
 'use client'
 
 import FormGroup from "@mui/material/FormGroup";
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from "@mui/material/Checkbox";
 import makeStyles from '@mui/styles/makeStyles';
@@ -12,7 +12,7 @@ import { genAndDisplayNewPuzzler } from '../store/thunks';
 import { routes } from '../routes';
 import Typography from '@mui/material/Typography';
 import { gaEvent, gaPageview } from '../ga';
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router';
 
 const useStyles = makeStyles(theme => ({
     selectPuzzlersRoot: {
@@ -33,7 +33,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-export default function SelectPuzzlers() {
+export default function SelectPage() {
     const styles = useStyles();
     const initialTopics = useSelector(state => state.persistent.topics);
     const [selectedTopics, setSelectedTopics] = useState(initialTopics);
@@ -49,18 +49,18 @@ export default function SelectPuzzlers() {
         }
     }
 
-    const router = useRouter()
+    const navigate = useNavigate()
 
     function handleApply() {
         const filteredTopics = allTopics.filter(t => selectedTopics.includes(t));
         store.reset(filteredTopics);
         gaEvent('SelectPuzzlers', String(filteredTopics.length));
         genAndDisplayNewPuzzler();
-        router.push(routes.root)
+        navigate(routes.root)
     }
 
     function handleBack() {
-        router.push(routes.root)
+        navigate(routes.root)
     }
 
     return <div className={ styles.selectPuzzlersRoot }>

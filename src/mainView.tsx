@@ -2,7 +2,6 @@ import { PuzzlerRendered } from './puzzlerRendered';
 import { Choices } from './choices';
 import { CodePaper } from './codePaper';
 import { Footer } from './footer';
-import React from 'react';
 import { ofCurrentView, useSelector } from './store/store';
 import { Box, CircularProgress } from '@mui/material';
 import { ProgressDialog } from './progressDialog';
