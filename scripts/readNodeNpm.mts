@@ -2,44 +2,41 @@ import path from 'path';
 import fs from 'fs';
 import { DepFullData } from './depFullData.mts';
 
-export const readNode = readLicense('node', 'JavaScript runtime built on Chrome\'s V8 JavaScript engine', process.argv0, 'https://nodejs.org/', '');
-export const readNpm = which('npm')
-    .then(ex => readLicense('npm', 'Package manager for Node.js', ex, 'https://www.npmjs.com/', 'Artistic License 2.0'));
-
-function readLicense(name: string, description: string, executable: string, link: string, license: string): Promise<DepFullData> {
-    return new Promise(resolve => {
-        function _readLicense(dir: string) {
-            fs.promises.readFile(path.resolve(dir, 'LICENSE'))
-                .then(buf => resolve({
-                    name,
-                    description,
-                    link,
-                    license,
-                    licenseText: String(buf),
-                }))
-                .catch(_ => {
-                    const parentDir = path.dirname(dir);
-                    if (parentDir === dir) {
-                        throw new Error('LICENSE not found. Started from ' + executable);
-                    }
-                    _readLicense(path.dirname(dir));
-                });
-        }
-        _readLicense(path.dirname(executable));
-    })
+export async function readNode() {
+    const nodeExecutable = await fs.promises.realpath(process.execPath)
+    return {
+        name: 'node',
+        description: 'JavaScript runtime built on Chrome\'s V8 JavaScript engine',
+        link: 'https://nodejs.org/',
+        licenseText: await readLicense(nodeExecutable),
+    }
 }
 
-function which(name: string): Promise<string> {
-    return Promise.all(
-        process.env.PATH!.split(path.delimiter)
-            .map(dir =>
-                fs.promises.realpath(path.resolve(dir, name))
-                    .then(
-                        realpath => realpath,
-                        () => null
-                    )
-            )
-    ).then(executables =>
-        executables.filter(ex => ex)[0]!
-    )
+export async function readNpm(): Promise<DepFullData> {
+    const npmExecutable = await which('npm')
+    return {
+        name: 'npm',
+        description: 'Package manager for Node.js',
+        link: 'https://www.npmjs.com/',
+        licenseText: await readLicense(npmExecutable),
+    }
+}
+
+async function readLicense(executable: string): Promise<string> {
+    const fileName = path.resolve(path.dirname(executable), '..', 'LICENSE')
+    return String(await fs.promises.readFile(fileName))
+}
+
+async function which(name: string): Promise<string> {
+    const pathItems = process.env.PATH!.split(path.delimiter)
+    for (const dir of pathItems) {
+        try {
+            return await fs.promises.realpath(path.resolve(dir, name))
+        }
+        catch (e) {
+            continue
+        }
+    }
+
+    throw new Error(name + ' is not found in PATH=' + process.env.PATH!)
 }

@@ -28,12 +28,6 @@ const useStyles = makeStyles(theme => ({
             marginBottom: 0,
         },
     },
-    licenseText: {
-        overflow: 'scroll',
-        maxHeight: 240,
-        fontFamily: monospaceFonts,
-        fontSize: 12,
-    },
 }));
 
 type Awaited<T> = T extends PromiseLike<infer U> ? Awaited<U> : T;
@@ -100,7 +94,6 @@ export default function CreditsPage() {
 }
 
 function License(p: {name: string}) {
-    const classes = useStyles();
     const licensesPromise = import('../../generated/licenses.json').then(res => res.default as {[k: string]: string});
     const [licenseText, setLicenseText] = useState('');
     useEffect(() => void licensesPromise.then(l => setLicenseText(l[p.name])), []);
@@ -109,7 +102,12 @@ function License(p: {name: string}) {
         return <CenteredSpinner/>
     }
 
-    return <Typography component='pre' className={ classes.licenseText }>
+    return <Typography component='pre' sx={{
+        overflow: 'scroll',
+        maxHeight: 240,
+        fontFamily: monospaceFonts,
+        fontSize: 12,
+    }}>
         { licenseText }
     </Typography>
 }
