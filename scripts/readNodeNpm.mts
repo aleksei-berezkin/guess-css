@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs';
-import { DepFullData } from './depFullData';
+import { DepFullData } from './depFullData.mts';
 
 export const readNode = readLicense('node', 'JavaScript runtime built on Chrome\'s V8 JavaScript engine', process.argv0, 'https://nodejs.org/', '');
 export const readNpm = which('npm')

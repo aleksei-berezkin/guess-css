@@ -6,20 +6,21 @@
   "scripts": {
     "clean": "rm -rf ./dist",
     "clean-generated": "rm -rf ./generated",
-    "generate": "ts-node --project tsconfig.build.json ./scripts/generate.ts",
+    "generate": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' ./scripts/generate.mts",
     "copy-logo": "cp css-logo.png dist/",
     "dev": "vite --port 3000",
     "build@vite": "tsc -b && vite build",
     "build": "npm-run-all clean clean-generated generate build@vite copy-logo",
     "preview": "vite preview",
     "--copy-index-to-paths": "ts-node --project tsconfig.build.json ./scripts/copyIndexToPaths.ts",
-    "--analyze": "NODE_ENV=production webpack --config webpack.analyze.js"
+    "analyze": "npx vite-bundle-visualizer"
   },
   "author": "Aleksei Berezkin",
   "license": "ISC",
   "repository": "https://github.com/aleksei-berezkin/guess-css",
   "devDependencies": {
     "@eslint/js": "^9.13.0",
+    "@originjs/vite-plugin-commonjs": "^1.0.3",
     "@types/node": "^20.17.3",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
@@ -46,6 +47,7 @@
     "react-ga": "^3.3.1",
     "react-router": "^6.28.0",
     "react-router-dom": "^6.28.0",
-    "react-swipeable-views-react-18-fix": "^0.14.1"
+    "react-scroll-snapper": "^0.1.0",
+    "vite-bundle-visualizer": "^1.2.1"
   }
 }

@@ -103,12 +103,14 @@ export class Rule {
 
 export abstract class Selector {
     // noinspection JSUnusedLocalSymbols
+    // @ts-expect-error Nominal
     private readonly _nominal: unknown;
     abstract toString(): string;
 }
 
 export class TypeSelector extends Selector {
     // noinspection JSUnusedLocalSymbols
+    // @ts-expect-error Nominal
     private readonly _n_ts: unknown;
     constructor(public readonly type: string) {
         super();
@@ -120,6 +122,7 @@ export class TypeSelector extends Selector {
 
 export class ClassSelector extends Selector {
     // noinspection JSUnusedLocalSymbols
+    // @ts-expect-error Nominal
     private readonly _n_cs: unknown;
     constructor(public readonly clazz: string) {
         super();
@@ -131,6 +134,7 @@ export class ClassSelector extends Selector {
 
 export class PseudoClassSelector extends Selector {
     // noinspection JSUnusedLocalSymbols
+    // @ts-expect-error Nominal
     private readonly _n_pcs: unknown;
     constructor(public readonly base: TypeSelector | ClassSelector, public readonly pseudoClass: string) {
         super();

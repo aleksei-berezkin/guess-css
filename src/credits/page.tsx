@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import makeStyles from '@mui/styles/makeStyles';
@@ -73,7 +73,7 @@ export default function CreditsPage() {
         {
             deps
                 ? deps.map(dep => {
-                    const onChange: AccordionProps['onChange'] = (e, expanded) => {
+                    const onChange: AccordionProps['onChange'] = (_e, expanded) => {
                         setVisible({
                             ...visible,
                             [dep.name]: expanded,

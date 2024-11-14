@@ -1,9 +1,9 @@
-import fs from 'fs';
-import path from 'path';
-import { readModules } from './readModules';
-import { readNode, readNpm } from './readNodeNpm';
+import fs from 'node:fs';
+import path from 'node:path';
+import { readModules } from './readModules.mts';
+import { readNode, readNpm } from './readNodeNpm.mts';
 
-const generatedDir = path.resolve(__dirname, '..', 'generated');
+const generatedDir = path.resolve(import.meta.dirname, '..', 'generated');
 
 Promise.all([readModules, readNode, readNpm, fs.promises.mkdir(generatedDir, { recursive: true })])
     .then(([modules, node, npm]) => {
@@ -25,3 +25,4 @@ Promise.all([readModules, readNode, readNpm, fs.promises.mkdir(generatedDir, { r
             ]);
         }
     );
+

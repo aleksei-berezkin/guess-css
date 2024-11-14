@@ -65,7 +65,7 @@ class StylesNode implements Node {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    copyWithSingleChild(child: Node): Node {
+    copyWithSingleChild(_child: Node): Node {
         throw new Error('Unsupported');
     }
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { store, useSelector } from './store/store';
 import { ContentPage } from './contentPage';
 import Alert from '@mui/material/Alert';

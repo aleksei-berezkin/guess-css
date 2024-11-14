@@ -1,3 +1,4 @@
+/** @jsxImportSource @emotion/react */
 import React, { ReactElement, useState } from 'react';
 import { Region } from './model/region';
 import makeStyles from '@mui/styles/makeStyles';
@@ -9,8 +10,10 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { ofCurrentView, useSelector } from './store/store';
 import { CodeBody } from './codeBody';
 import { spacing } from './theme';
-//@ts-expect-error No typedefs for this module
-import SwipeableViews from 'react-swipeable-views-react-18-fix';
+import { ScrollSnapper } from 'react-scroll-snapper';
+import 'react-scroll-snapper/dist/index.css';
+import { css } from '@emotion/react';
+
 
 const makeRootStyles = makeStyles(theme => ({
     root: (p: {hasSideMargins: boolean, isTabs: boolean}) => ({
@@ -55,12 +58,22 @@ export function CodePaper(
         }
         {
             isTabs(body) &&
-            <SwipeableViews index={ body.currentIndex } onChangeIndex={ body.handleChangeIndex }>{
+            <ScrollSnapper
+                index={ body.currentIndex }
+                onIndexChange={ body.handleChangeIndex }
+                css={css({
+                    scrollbarWidth: 'none',
+                    '&::-webkit-scrollbar': {
+                        width: 0,
+                        height: 0,
+                    },
+                })}
+            >{
                 body.tabs
                     .map((tab, index) =>
-                        <Body key={ index } code={ tab.code } collapsedCode={ tab.collapsedCode } footer={ tab.footer }/>
+                        <div><Body key={ index } code={ tab.code } collapsedCode={ tab.collapsedCode } footer={ tab.footer }/></div>
                     )
-            }</SwipeableViews>
+            }</ScrollSnapper>
         }
         {
             !isTabs(body) &&

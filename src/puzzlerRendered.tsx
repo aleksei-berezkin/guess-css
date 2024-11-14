@@ -14,7 +14,6 @@ import IconButton from '@mui/material/IconButton';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import { genAndDisplayNewPuzzler } from './store/thunks';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
-import React from 'react';
 import { globalEscapedRe } from './escapeRe';
 import { allTopics } from './model/topic';
 import { PuzzlerView } from './store/State';

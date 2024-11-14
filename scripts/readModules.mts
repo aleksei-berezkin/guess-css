@@ -1,8 +1,8 @@
-import * as localPackageJson from '../package.json';
+import localPackageJson from '../package.json' with {type: 'json'};
 import path from 'path';
 import fs from 'fs';
-import { DepFullData } from './depFullData';
-import { groupBy } from './groupBy';
+import { DepFullData } from './depFullData.mts';
+import { groupBy } from './groupBy.mts';
 
 type PackageJsonFile = {
     type: 'package.json',
@@ -34,7 +34,7 @@ export const readModules: Promise<DepFullData[]> = Promise.all(
         ...Object.entries(localPackageJson.dependencies),
         ...Object.entries(localPackageJson.devDependencies)
     ]
-        .map(([name]) => [name, path.resolve(__dirname, '..', 'node_modules', name)])
+        .map(([name]) => [name, path.resolve(import.meta.dirname, '..', 'node_modules', name)])
         .flatMap<PackageJsonFile | LicenseFile>(([name, dir]) => [
             {
                 type: 'package.json',
@@ -98,25 +98,37 @@ export const readModules: Promise<DepFullData[]> = Promise.all(
                         }
                     ];
                 }
-                if (data.length === 1 && data[0].type === 'package.json' && data[0].name === 'react-swipeable-views-react-18-fix') {
+                if (data.length === 1 && data[0].type === 'package.json' && data[0].name === 'react-scroll-snapper') {
                     // Lacks homepage and license text
                     return [
                         {
                             ...data[0],
-                            homepage: 'https://github.com/oliviertassinari/react-swipeable-views.git',
+                            homepage: 'https://github.com/phaux/react-scroll-snapper',
                         },
                         {
                             licenseText: `License: ${data[0].license}`
                         },
                     ]
                 }
-                if (data.length === 1 && data[0].type === 'package.json' && data[0].name === 'eslint-config-next') {
+                if (data.length === 1 && data[0].type === 'package.json' && data[0].name === 'globals') {
                     // Lacks license text
                     return [
                         data[0],
                         {
                             licenseText: `License: ${data[0].license}`
                         },
+                    ]
+                }
+                if (data[0].type === 'package.json' && data[0].name === '@vitejs/plugin-react') {
+                    // Lacks description
+                    return [
+                        {
+                            ...data[0],
+                            description: data[0].name
+                        },
+                        {
+                            licenseText: (data[1] as LicenseData).text
+                        }
                     ]
                 }
                 if (data.length === 2 && data[0].type === 'package.json' && data[0].name === '@emotion/react') {

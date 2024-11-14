@@ -22,7 +22,7 @@ export function genGridTemplatesCss(body: TagNode, rowNum: number, colNum: numbe
     }
 }
 
-function createChoices(body: TagNode, rowNum: number, colNum: number): Rule[][] {
+function createChoices(_body: TagNode, rowNum: number, colNum: number): Rule[][] {
     const dim = rowNum < 3 ? 'col'
         : Math.random() < .5 ? 'row' : 'col';
 

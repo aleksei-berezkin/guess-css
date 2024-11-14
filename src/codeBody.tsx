@@ -1,7 +1,7 @@
 import makeStyles from '@mui/styles/makeStyles';
 import { Region, regionKind } from './model/region';
 import Box from '@mui/material/Box';
-import React, { ReactElement } from 'react';
+import { ReactElement } from 'react';
 import { ofCurrentViewOrUndefined, useSelector } from './store/store';
 import { monospaceFonts } from './monospaceFonts';
 import { getContrastColorValue } from './contrastColorValue';

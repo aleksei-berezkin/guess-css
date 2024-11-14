@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useRef } from 'react';
+import { ReactElement, useEffect, useRef } from 'react';
 import { ofCurrentView, ofCurrentViewOrUndefined, store, useSelector } from './store/store';
 import { setUserChoice } from './store/thunks';
 import { CodePaper } from './codePaper';
@@ -84,7 +84,7 @@ function NarrowChoices() {
             <AppBar position='static' color='default'>
                 <Tabs
                     value={ currentTab }
-                    onChange={ (e, newTabIndex) => handleChangeIndex(newTabIndex) }
+                    onChange={ (_e, newTabIndex) => handleChangeIndex(newTabIndex) }
                     indicatorColor='primary'
                     textColor='primary'
                     variant='fullWidth'
