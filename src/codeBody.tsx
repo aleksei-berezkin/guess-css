@@ -1,35 +1,18 @@
-import makeStyles from '@mui/styles/makeStyles';
-import { Region, regionKind } from './model/region';
+import { Region, regionKind, RegionKindLabel } from './model/region';
 import Box from '@mui/material/Box';
 import { ReactElement } from 'react';
 import { ofCurrentViewOrUndefined, useSelector } from './store/store';
-import { monospaceFonts } from './monospaceFonts';
 import { getContrastColorValue } from './contrastColorValue';
 import { resolveColor } from './resolveColor';
 import { hasVars } from './model/gen/vars';
-import { spacing } from './theme';
 import { escapeRe, globalEscapedRe } from './escapeRe';
-import { Theme } from '@mui/material';
-import { DefaultTheme, useTheme } from '@mui/styles';
-
-const useStyles = makeStyles(theme => ({
-    root: {
-        padding: theme.spacing(spacing),
-    },
-    pre: {
-        margin: 0,
-        fontFamily: monospaceFonts,
-        fontSize: 12,
-        lineHeight: 1.18,
-        letterSpacing: 0.0,
-    },
-}));
+import { Theme, useTheme } from '@mui/material';
+import { monospaceFonts } from './monospaceFonts';
 
 export function CodeBody(p: { lines: Region[][], noBottomPadding?: boolean }) {
-    const classes = useStyles();
     const inlineStyle = p.noBottomPadding ? { paddingBottom: 0 } : undefined;
 
-    return <Box className={ classes.root } style={ inlineStyle }>{
+    return <Box sx={{ p: 1 }} style={ inlineStyle }>{
         p.lines &&
         p.lines.map(
             (regions, i) => <Line key={ i } regions={ regions }/>
@@ -38,16 +21,20 @@ export function CodeBody(p: { lines: Region[][], noBottomPadding?: boolean }) {
 }
 
 function Line(p: {regions: Region[]}) {
-    const classes = useStyles();
-
-    return <pre className={ classes.pre }>{
+    return <Box sx={{
+        margin: 0,
+        fontFamily: monospaceFonts,
+        fontSize: 12,
+        lineHeight: 1.18,
+        letterSpacing: 0.0,
+    }} component='pre'>{
         p.regions.map(
             (reg, i) => <RegionCode key={ i } region={ reg } />
         )
-    }</pre>
+    }</Box>
 }
 
-const regionStylesObj = (theme: DefaultTheme) => ({
+const regionStylesObj = (theme: Theme) => ({
     [regionKind.default]: {
         color: ld('#505050', '#c8c8c8', theme),
     },
@@ -93,23 +80,17 @@ function ld(light: string, dark: string, theme: Theme) {
 }
 
 
-const useRegionStyles = makeStyles(regionStylesObj);
-
 function RegionCode(p: {region: Region}): ReactElement {
     const [regionText, regionKind, differing] = p.region;
     const vars = useSelector(ofCurrentViewOrUndefined('vars'));
-    const regionClasses = useRegionStyles();
     const theme = useTheme();
 
     if (!vars) {
         return <></>;
     }
 
-    const differingClass = differing && regionClasses.differing || '';
     if (!hasVars(regionText)) {
-        return <span className={
-            `${ regionClasses[regionKind] } ${ differingClass }`
-        }>{ regionText }</span>;
+        return <SimpleRegion text={ regionText } regionKind={ regionKind } differing={ !!differing } />
     }
 
     const { contrastColor, colors } = vars;
@@ -126,14 +107,15 @@ function RegionCode(p: {region: Region}): ReactElement {
                     } 
 
                     const resolvedCol = resolveColor(assignedCol, mode);
-                    yield <span
+                    yield <Box
                         key={ key + 'b'}
-                        className={ `${ differingClass }` }
-                        style={{
+                        sx={{
                             backgroundColor: resolvedCol,
                             color: getContrastText(resolvedCol),
+                            ...differing ? regionStylesObj(theme).differing : {},
                         }}
-                    >{ resolvedCol }</span>;
+                        component='span'
+                    >{ resolvedCol }</Box>;
 
                     if (match[3]) {
                         yield* toSpans(match[3], key + 'c');
@@ -143,9 +125,17 @@ function RegionCode(p: {region: Region}): ReactElement {
                 }
             }
 
-            yield <span key={ key } className={
-                `${ regionClasses[regionKind] } ${ differingClass }`
-            }>{ text }</span>;
+            yield <SimpleRegion key={ key } text={ text } regionKind={ regionKind } differing={ !!differing } />
         }(text, '')]
     }</>;
+}
+
+function SimpleRegion(p: {text: string, regionKind: RegionKindLabel, differing: boolean}) {
+    return <Box
+                sx={ theme => ({
+                    ...regionStylesObj(theme)[p.regionKind],
+                    ...p.differing ? regionStylesObj(theme).differing : {}
+                })}
+                component='span'
+            >{ p.text }</Box>
 }

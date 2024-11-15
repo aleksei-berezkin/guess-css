@@ -7,21 +7,18 @@ import Button from '@mui/material/Button';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CheckIcon from '@mui/icons-material/Check';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import makeStyles from '@mui/styles/makeStyles';
 import { choiceBgColor, ChoiceStatus, getChoiceStatus } from './choiceStatus';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import AppBar from '@mui/material/AppBar';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import { spacing } from './theme';
 import { abc } from './util/abc';
 import { PuzzlerView, State } from './store/State';
-import { useTheme } from '@mui/styles';
-import { Box, Grid2 } from '@mui/material';
+import { Box, Grid2, useTheme } from '@mui/material';
 
 
 export function Choices(): ReactElement {
-    const theme = useTheme();
+    const theme = useTheme()
     const isWide = useMediaQuery(theme.breakpoints.up('md'));
 
     return isWide && <WideChoices/> || <NarrowChoices/>;
@@ -112,14 +109,6 @@ function NarrowChoices() {
     />;    
 }
 
-const useFooterStyles = makeStyles(theme => ({
-    footer: {
-        justifyContent: 'center',
-        paddingTop: theme.spacing(spacing / 2),
-        paddingBottom: theme.spacing(spacing),
-    }
-}));
-
 
 function FooterButton(p: {status: ChoiceStatus, checkChoice: () => void}) {
     const footerStyle = useSelector(state => {
@@ -138,9 +127,11 @@ function FooterButton(p: {status: ChoiceStatus, checkChoice: () => void}) {
         }
     }, []);
 
-    const classes = useFooterStyles();
-
-    return <Grid2 container className={ classes.footer }>
+    return <Grid2 container sx={{
+        justifyContent: 'center',
+        paddingTop: .5,
+        paddingBottom: 1,
+    }}>
         <Box ref={ btnBoxRef } style={ footerStyle }>
             {
                 p.status === 'notAnswered' &&

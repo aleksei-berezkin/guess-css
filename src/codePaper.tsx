@@ -1,7 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import React, { ReactElement, useState } from 'react';
 import { Region } from './model/region';
-import makeStyles from '@mui/styles/makeStyles';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 import Collapse from '@mui/material/Collapse';
@@ -9,22 +8,10 @@ import IconButton from '@mui/material/IconButton';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { ofCurrentView, useSelector } from './store/store';
 import { CodeBody } from './codeBody';
-import { spacing } from './theme';
 import { ScrollSnapper } from 'react-scroll-snapper';
 import 'react-scroll-snapper/dist/index.css';
 import { css } from '@emotion/react';
 
-
-const makeRootStyles = makeStyles(theme => ({
-    root: (p: {hasSideMargins: boolean, isTabs: boolean}) => ({
-        marginTop: theme.spacing(spacing),
-        marginLeft: theme.spacing(p.hasSideMargins && spacing || 0),
-        marginRight: theme.spacing(p.hasSideMargins && spacing || 0),
-        width: p.isTabs ? '70%' : 'inherit',
-        minWidth: p.isTabs ? 270 : 'inherit',
-        maxWidth: p.isTabs ? 400 : 'inherit',
-    }),
-}));
 
 export type CodeTabs = {
     tabs: CodePaperBody[],
@@ -50,9 +37,15 @@ export function CodePaper(
     }
 ) {
     const body = p.body;
-    const classes = makeRootStyles({hasSideMargins: !!p.sideMargins, isTabs: isTabs(body)});
 
-    return <Paper className={ classes.root } square={ true }>
+    return <Paper square={ true } sx={{
+        mt: 1,
+        ml: p.sideMargins ? 1 : 0,
+        mr: p.sideMargins ? 1 : 0,
+        width: isTabs(body) ? '70%' : 'inherit',
+        minWidth: isTabs(body) ? 270 : 'inherit',
+        maxWidth: isTabs(body) ? 400 : 'inherit',
+    }}>
         {
             p.header
         }
@@ -71,7 +64,7 @@ export function CodePaper(
             >{
                 body.tabs
                     .map((tab, index) =>
-                        <div><Body key={ index } code={ tab.code } collapsedCode={ tab.collapsedCode } footer={ tab.footer }/></div>
+                        <div key={ index }><Body code={ tab.code } collapsedCode={ tab.collapsedCode } footer={ tab.footer }/></div>
                     )
             }</ScrollSnapper>
         }
@@ -101,28 +94,11 @@ function Body(p: CodePaperBody) {
     </>
 }
 
-const makeCollapsedStyles = makeStyles(theme => ({
-    summary: {
-        cursor: 'pointer',
-        paddingRight: theme.spacing(1),
-    },
-    expandIcon: {
-        transform: 'rotate(0deg)',
-        transition: theme.transitions.create('transform', {
-            duration: theme.transitions.duration.shortest,
-        }),
-    },
-    expandIconOpen: {
-        transform: 'rotate(90deg)',
-    },
-}));
-
 const summarySep = ', ';
 const summaryEllipsis = '...';
 
 function SimpleCollapsed(p: { summary: string[], children: ReactElement }) {
     const [collapsedOpen, setCollapsedOpen] = useState(false);
-    const classes = makeCollapsedStyles();
 
     function toggleCollapsed(e: React.MouseEvent) {
         setCollapsedOpen(!collapsedOpen);
@@ -133,15 +109,20 @@ function SimpleCollapsed(p: { summary: string[], children: ReactElement }) {
 
         <Typography
             variant='caption'
-            className={ `${classes.summary}` }
             color='textSecondary'
             component='label'
+            sx={{ cursor: 'pointer', pr: 1 }}
         >
             <IconButton size='small' onClick={ toggleCollapsed } color='inherit'>
                 <ChevronRightIcon
                     fontSize='small'
-                    className={ `${classes.expandIcon} ${collapsedOpen ? classes.expandIconOpen : ''}` }
                     titleAccess={ collapsedOpen ? 'collapse' : 'expand'}
+                    sx={ theme => ({
+                        transform: collapsedOpen ? 'rotate(90deg)' : undefined,
+                        transition: theme.transitions.create('transform', {
+                            duration: theme.transitions.duration.shortest,
+                        }),
+                    })}
                 />
             </IconButton>
             {

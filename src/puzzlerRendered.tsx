@@ -1,4 +1,3 @@
-import makeStyles from '@mui/styles/makeStyles';
 import {
     mapCurrentView,
     ofCurrentView,
@@ -7,7 +6,7 @@ import {
     useSelector
 } from './store/store';
 import Paper from '@mui/material/Paper';
-import { Badge, Grid2, Theme } from '@mui/material';
+import { Badge, Box, Grid2, Theme, useTheme } from '@mui/material';
 import { resolveColor } from './resolveColor';
 import { getContrastColorValue } from './contrastColorValue';
 import IconButton from '@mui/material/IconButton';
@@ -17,39 +16,31 @@ import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import { globalEscapedRe } from './escapeRe';
 import { allTopics } from './model/topic';
 import { PuzzlerView } from './store/State';
-import { useTheme } from '@mui/styles';
-
-const useStyles = makeStyles(theme => ({
-    puzzleContainer: {
-        paddingTop: theme.spacing(1),
-    },
-    layoutSize: {
-        height: 130,
-        width: 190,
-        [theme.breakpoints.up('narrow')]: {
-            width: 240,
-        },
-    },
-    iframe: {
-        border: 'none',
-    },
-}));
 
 export function PuzzlerRendered() {
     const source = useSelector(ofCurrentView('source', ''));
     const vars = useSelector(ofCurrentViewOrUndefined('vars'));
     const theme = useTheme();
-    const classes = useStyles();
 
-    return <Grid2 container sx={{justify: 'center', alignItems: 'center'}} className={ classes.puzzleContainer }>
+    const layoutSizeSx = {
+        height: 130,
+        width: 'calc(max(190px, min(45vw, 240px)))',
+    }
+
+return <Grid2 container sx={{justify: 'center', alignItems: 'center', pt: 1}}>
         <div>
             <PrevButton/>
         </div>
         <div>
-            <Paper className={ classes.layoutSize } square={ true }>
-                <iframe className={ `${classes.layoutSize} ${classes.iframe}` } srcDoc={
-                    insertColors(source, vars, theme)
-                }/>
+            <Paper square={ true } sx={ layoutSizeSx }>
+                <Box
+                    sx={{
+                        ...layoutSizeSx,
+                        border: 'none',
+                    }}
+                    srcDoc={ insertColors(source, vars, theme) }
+                    component='iframe'
+                />
             </Paper>
         </div>
         <div>

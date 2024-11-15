@@ -1,45 +1,30 @@
-import { ReactElement, ReactFragment } from 'react';
+import { ReactElement, ReactNode } from 'react';
 import Box from '@mui/material/Box';
-import makeStyles from '@mui/styles/makeStyles';
 import Button from '@mui/material/Button';
 import { routes } from './routes';
 import { Link as RouterLink } from 'react-router-dom';
 import Container from '@mui/material/Container';
 import { Footer } from './footer';
 
-const useStyles = makeStyles(theme => ({
-    root: (p: {margins?: boolean}) => ({
-        marginBottom: p.margins ? theme.spacing(2) : undefined,
-        marginTop: p.margins ? theme.spacing(2) : undefined,
-        textAlign: 'left',
-    }),
-    backMargins: {
-        marginTop: theme.spacing(1),
-        marginBottom: theme.spacing(1),
-    },
-}));
-
-export function ContentPage(p: {noButtons?: boolean, footer?: boolean, children: ReactElement | ReactFragment}) {
-    const classes = useStyles({margins: !!p.noButtons});
-
+export function ContentPage(p: {noButtons?: boolean, footer?: boolean, children: ReactElement | Iterable<ReactNode>}) {
     return <Container maxWidth='sm'>
-        <Box className={ classes.root }>
+        <Box sx={{
+            mb: p.noButtons ? undefined : 2,
+            mt: p.noButtons ? undefined : 2,
+            textAlign: 'left',
+        }}>
             { !p.noButtons && <Back/> }
             {
                 p.children
             }
-            { !p.noButtons && <Back margins/> }
+            { !p.noButtons && <Back/> }
         </Box>
         { p.footer && <Footer/> }
     </Container>;
 }
 
-function Back({ margins = false }) {
-    const classes = useStyles({});
-    const className = margins ? classes.backMargins : undefined;
-
+function Back() {
     return <Button to={ routes.root } component={ RouterLink }
                    size='small' fullWidth color='primary'
-                   className={ className }>
-        Back to puzzler</Button>;
+                   sx={{mt: 1, mb: 1}}>Back to puzzler</Button>;
 }

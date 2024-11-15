@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
-import makeStyles from '@mui/styles/makeStyles';
 import Accordion, { AccordionProps } from '@mui/material/Accordion';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import AccordionSummary from '@mui/material/AccordionSummary';
@@ -17,23 +16,9 @@ import { routes } from '../routes';
 import { gaPageview } from '../ga';
 import { Grid2 } from '@mui/material';
 
-const useStyles = makeStyles(theme => ({
-    accDetails: {
-        display: 'block',
-        overflow: 'hidden',
-        '&>*': {
-            marginBottom: theme.spacing(1),
-        },
-        '& *:last-child': {
-            marginBottom: 0,
-        },
-    },
-}));
-
 type Awaited<T> = T extends PromiseLike<infer U> ? Awaited<U> : T;
 
 export default function CreditsPage() {
-    const classes = useStyles();
     const [visible, setVisible] = useState<{[k: string]: boolean}>({});
 
     useEffect(() => gaPageview(routes.credits), []);
@@ -79,7 +64,9 @@ export default function CreditsPage() {
                             expandIcon={ <ExpandMoreIcon/> }>
                             <Typography variant='body2'>{ dep.name }</Typography>
                         </AccordionSummary>
-                        <AccordionDetails className={ classes.accDetails }>
+                        <AccordionDetails sx={{
+                            '& > *:not(:last-child)': { mb: 1 },
+                        }}>
                             <Typography variant='body2'>{ dep.description }</Typography>
                             <Typography variant='body2'><Link target='_blank' href={ dep.link }>{ dep.link }</Link></Typography>
                             {

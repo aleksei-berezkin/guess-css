@@ -46,6 +46,9 @@ function getDescription(packageJson: any, packageInfo: PackageInfo) {
     if (typeof packageJson.description === 'string')
         return packageJson.description as string
 
+    if (typeof packageJson.author === 'string')
+        return 'Author: ' + packageJson.author
+
     return packageInfo.name
 }
 

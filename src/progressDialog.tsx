@@ -8,7 +8,6 @@ import { TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import Button from "@mui/material/Button";
-import makeStyles from "@mui/styles/makeStyles";
 import { genAndDisplayNewPuzzler } from './store/thunks';
 import { Contacts } from './contacts';
 import { leadingZeros3 } from './util/leadingZeros3';
@@ -34,25 +33,20 @@ const usersPercent = [
 ];
 
 const allCorrect = [
-    'Not a single mistake! That\'s indeed impressive!',
+    'Not a single mistake! That\'s truly impressive!',
     'Wow! All answers are correct! You\'re definitely a CSS pro!',
-    'Amazing! Not a single wrong answer! I\'d subscribe to you on Twitter!',
+    'Amazing! Not a single wrong answer — I\'d follow you on Twitter!',
+    'Flawless! You nailed every single answer — CSS mastery unlocked!',
+    'Perfect score! Your CSS skills are on point — keep up the amazing work!'
 ];
 
 const  moreCorrect = [
-    'Nice! Most answers are correct!',
-    'Good! You answered mostly correctly!',
-    'Well done! Your answers are mainly correct!',
+    'Nice! Most of your answers are correct!',
+    'Good job! You answered mostly correctly!',
+    'Well done! Most of your answers are spot on!',
+    'Almost perfect! You got most of them right — keep going!',
+    'Great effort! You\'re almost there with mostly correct answers!',
 ];
-
-const useStyles = makeStyles(theme => ({
-    tableCont: {
-        marginBottom: theme.spacing(2),
-    },
-    alert: {
-        marginBottom: theme.spacing(2),
-    },
-}));
 
 export function ProgressDialog() {
     useEffect(() => gaEvent('ProgressDialog', leadingZeros3(store.current + 1)), []);
@@ -76,8 +70,6 @@ export function ProgressDialog() {
         window.scrollTo(0, 0);
     }
 
-    const styles = useStyles();
-
     return <ContentPage noButtons footer={ round !== 1 }>
         <Typography variant='h5' gutterBottom>You made {store.current + 1} puzzlers!</Typography>
 
@@ -86,7 +78,7 @@ export function ProgressDialog() {
             {usersPercent[Math.min(round, usersPercent.length - 1)]} of users get there. Here&apos;s your current score per each topic:
         </Typography>
 
-        <TableContainer className={ styles.tableCont }>
+        <TableContainer sx={{ mb: 2 }}>
             <Table size='small'>
                 <TableHead>
                     <TableRow>
@@ -115,15 +107,9 @@ export function ProgressDialog() {
         </TableContainer>
 
         {
-            allAnswersAreCorrect &&
-            <Alert severity='success' className={ styles.alert }>
-                <Typography variant='body1'>{ allCorrect[round % allCorrect.length] }</Typography>
-            </Alert>
-        }
-        {
-            !allAnswersAreCorrect && moreCorrectAnswers &&
-            <Alert severity='success' className={ styles.alert }>
-                <Typography variant='body1'>{ moreCorrect[round % moreCorrect.length] }</Typography>
+            (allAnswersAreCorrect || moreCorrectAnswers) &&
+            <Alert severity='success' sx={{ mb: 2 }}>
+                <Typography variant='body1'>{ (allAnswersAreCorrect ? allCorrect : moreCorrect)[round % allCorrect.length] }</Typography>
             </Alert>
         }
 
@@ -131,7 +117,7 @@ export function ProgressDialog() {
             round === 1 &&
             <>
                 <Typography variant='body1' paragraph>
-                    Seems you liked this toy, so I bet you have some feedback. If that&apos;s the case please feel free to share it:
+                    It seems you enjoyed this little game. If you have any feedback, I&apos; love to hear it:
                 </Typography>
                 <Contacts paragraph/>
             </>
@@ -141,10 +127,10 @@ export function ProgressDialog() {
             round === 2 &&
             <>
                 <Typography variant='body1' paragraph>
-                    If you were looking for the game to end it&apos;s a good moment perhaps. Thanks for your interest! And, once again, please feel free to share any feedback.
+                    If you were waiting for a good stopping point, now might be a perfect time. Thanks for playing! And once again, feel free to share any feedback.
                 </Typography>
                 <Typography variant='body1' paragraph>
-                    You may also continue playing if you wish; the game is technically endless. We&apos;ll continue to make pauses after each {store.persistent.topics.length} puzzlers to track your results.
+                    Of course, you can keep playing if you&apos;d like — the game is technically endless. We&apos;ll continue to pause every {store.persistent.topics.length} puzzlers to track your progress.
                 </Typography>
             </>
         }
@@ -152,7 +138,7 @@ export function ProgressDialog() {
         {
             round !== 2 &&
             <Typography variant='body1' paragraph>
-                We&apos;ll meet again after next {store.persistent.topics.length} puzzlers to check your results. See you later!
+                We&apos;ll check your results again after the next {store.persistent.topics.length} puzzlers. See you soon!
             </Typography>
         }
 

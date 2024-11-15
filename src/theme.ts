@@ -1,16 +1,9 @@
 import { createTheme } from '@mui/material/styles';
-import { Theme } from '@mui/material/styles';
 
 declare module '@mui/material/styles' {
     interface BreakpointOverrides {
         narrow: true;
     }
-}
-
-// https://mui.com/material-ui/migration/troubleshooting/#types-property-quot-palette-quot-quot-spacing-quot-does-not-exist-on-type-defaulttheme
-declare module '@mui/styles/defaultTheme' {
-    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-    interface DefaultTheme extends Theme {}
 }
 
 export const theme = createTheme({
