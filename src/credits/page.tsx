@@ -16,16 +16,19 @@ import { routes } from '../routes';
 import { gaPageview } from '../ga';
 import { Grid2 } from '@mui/material';
 
-type Awaited<T> = T extends PromiseLike<infer U> ? Awaited<U> : T;
 
 export default function CreditsPage() {
     const [visible, setVisible] = useState<{[k: string]: boolean}>({});
 
     useEffect(() => gaPageview(routes.credits), []);
 
-    const depsPromise = import('../../generated/deps.json').then(res => res.default);
-    const [deps, setDeps] = useState<Awaited<typeof depsPromise> | undefined>();
-    useEffect(() => void depsPromise.then(d => setDeps(d)), []);
+    const [deps, setDeps] = useState<Awaited<typeof import('../../generated/deps.json')> | undefined>();
+
+    useEffect(() => {
+        (async () => {
+            setDeps((await import('../../generated/deps.json')).default)
+        })()
+     }, [])
 
     return <ContentPage>
         <Typography variant='h4'>Credits</Typography>
@@ -81,9 +84,14 @@ export default function CreditsPage() {
 }
 
 function License(p: {name: string}) {
-    const licensesPromise = import('../../generated/licenses.json').then(res => res.default as {[k: string]: string});
     const [licenseText, setLicenseText] = useState('');
-    useEffect(() => void licensesPromise.then(l => setLicenseText(l[p.name])), []);
+
+    useEffect(() => {
+        (async () => {
+            const licenses: {[l: string]: string} = (await import('../../generated/licenses.json')).default
+            setLicenseText(licenses[p.name])
+        })()
+    }, [p.name])
 
     if (!licenseText) {
         return <CenteredSpinner/>
