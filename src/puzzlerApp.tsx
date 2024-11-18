@@ -11,6 +11,7 @@ import { store } from './store/store';
 import { readFromLocalStorage } from './store/myLocalStorage';
 import { gaInit } from './ga';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { StaticRouter } from 'react-router-dom/server';
 import { routes } from './routes';
 import IndexPage from './page';
 import AboutPage from './about/page';
@@ -18,7 +19,7 @@ import CreditsPage from './credits/page';
 import SelectPage from './select/page';
 
 
-export function PuzzlerApp(): ReactElement {
+export function PuzzlerApp(p: { url?: string}): ReactElement {
     useEffect(() => {
         gaInit();
         const storedPersistent = readFromLocalStorage(store.persistent._version);
@@ -32,16 +33,24 @@ export function PuzzlerApp(): ReactElement {
 
     return <ThemeProvider theme={ theme } defaultMode='system'>
         <CssBaseline/>
-            <BrowserRouter>
-                <PuzzlerAppBar/>
-                <PuzzlerAppBody>
-                    <Routes>
-                        <Route path={ routes.root } element={ <IndexPage/> } />
-                        <Route path={ routes.about } element={ <AboutPage/> } />
-                        <Route path={ routes.credits } element={ <CreditsPage/> } />
-                        <Route path={ routes.select } element={ <SelectPage/> } />
-                    </Routes>
-                </PuzzlerAppBody>
-            </BrowserRouter>
+        {
+            p.url
+                ? <StaticRouter location={ p.url }> <RouterBody/> </StaticRouter>
+                : <BrowserRouter> <RouterBody/> </BrowserRouter>
+        }
     </ThemeProvider>;
+}
+
+function RouterBody() {
+    return <>
+        <PuzzlerAppBar/>
+        <PuzzlerAppBody>
+            <Routes>
+                <Route path={ routes.root } element={ <IndexPage/> } />
+                <Route path={ routes.about } element={ <AboutPage/> } />
+                <Route path={ routes.credits } element={ <CreditsPage/> } />
+                <Route path={ routes.select } element={ <SelectPage/> } />
+            </Routes>
+        </PuzzlerAppBody>
+    </>
 }
