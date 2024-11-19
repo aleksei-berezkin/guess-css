@@ -70,7 +70,7 @@ function childrenToRule(children: TagNode[], width: string | undefined): (displa
         children.map(getClassSelector),
         [
             {property: 'display', value: display, differing: true},
-            ...!!width ? [{property: 'width', value: width!}] : []
+            ...width ? [{property: 'width', value: width!}] : []
         ],
     );
 }

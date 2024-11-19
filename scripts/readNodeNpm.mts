@@ -33,7 +33,7 @@ async function which(name: string): Promise<string> {
         try {
             return await fs.promises.realpath(path.resolve(dir, name))
         }
-        catch (e) {
+        catch {
             continue
         }
     }

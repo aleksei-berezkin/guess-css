@@ -48,7 +48,7 @@ export async function readModules(): Promise<DepFullData[]> {
     })
 }
 
-function getDescription(packageJson: any, packageInfo: PackageInfo) {
+function getDescription(packageJson: Record<string, unknown>, packageInfo: PackageInfo) {
     if (typeof packageJson.description === 'string')
         return packageJson.description as string
 
@@ -58,12 +58,17 @@ function getDescription(packageJson: any, packageInfo: PackageInfo) {
     return packageInfo.name
 }
 
-function getLink(packageJson: any): string {
-    const linkStr =
-        typeof packageJson.homepage === 'string' ? packageJson.homepage as string
-            : typeof packageJson.repository === 'string' ? packageJson.repository as string
-            : typeof packageJson.repository?.url === 'string' ? packageJson.repository.url as string
-            : undefined
+function getLink(packageJson: Record<string, unknown>): string {
+    const linkStr = (() => {
+        const {homepage, repository} = packageJson
+
+        if (typeof homepage === 'string') return homepage
+        if (typeof repository === 'string') return repository
+        if (repository && typeof repository === 'object') {
+            const {url} = repository as Record<string, unknown>
+            if (typeof url === 'string') return url
+        }
+    })()
 
     if (!linkStr)
         throw new Error('No homepage or repository: ' + JSON.stringify(packageJson, null, 2))
@@ -81,7 +86,7 @@ function getLink(packageJson: any): string {
     return 'https://github.com/' + linkStr
 }
 
-function getLicenseText(licenseFileText: string | undefined, packageJson: any) {
+function getLicenseText(licenseFileText: string | undefined, packageJson: Record<string, unknown>) {
     if (licenseFileText)
         return licenseFileText
     if (packageJson.license)

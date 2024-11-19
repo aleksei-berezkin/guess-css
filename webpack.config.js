@@ -45,7 +45,7 @@ module.exports = {
                 },
                 vendors: {
                     chunks: 'all',
-                    test: /[\\/]node_modules[\\/]/,
+                    test: /[\/]node_modules[\/]/,
                     name: 'vendors',
                     filename: '[name]-[contenthash].js',
                     priority: -1,
