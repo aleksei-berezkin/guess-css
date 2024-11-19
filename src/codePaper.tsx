@@ -8,8 +8,10 @@ import IconButton from '@mui/material/IconButton';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { ofCurrentView, useSelector } from './store/store';
 import { CodeBody } from './codeBody';
-import { ScrollSnapper } from 'react-scroll-snapper';
-import 'react-scroll-snapper/dist/index.css';
+// TODO
+// ScrollSnapper doesn't ship ESM, doesn't work in SSR
+// import { ScrollSnapper } from 'react-scroll-snapper';
+// import 'react-scroll-snapper/dist/index.css';
 import { css } from '@emotion/react';
 
 
@@ -51,9 +53,9 @@ export function CodePaper(
         }
         {
             isTabs(body) &&
-            <ScrollSnapper
-                index={ body.currentIndex }
-                onIndexChange={ body.handleChangeIndex }
+            <div
+                // index={ body.currentIndex }
+                // onIndexChange={ body.handleChangeIndex }
                 css={css({
                     scrollbarWidth: 'none',
                     '&::-webkit-scrollbar': {
@@ -66,7 +68,7 @@ export function CodePaper(
                     .map((tab, index) =>
                         <div key={ index }><Body code={ tab.code } collapsedCode={ tab.collapsedCode } footer={ tab.footer }/></div>
                     )
-            }</ScrollSnapper>
+            }</div>
         }
         {
             !isTabs(body) &&
