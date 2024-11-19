@@ -70,7 +70,7 @@ export function ScrollSnapper(props: ScrollSnapperProps & React.HTMLProps<HTMLDi
         const pageWidth = currentTarget.scrollWidth / currentTarget.children.length
         const currentIndex = Math.round(currentTarget.scrollLeft / pageWidth)
         onIndexChange(currentIndex, currentTarget)
-      }, 10)
+      }, 100)
     },
     [onIndexChange, onScroll],
   )
