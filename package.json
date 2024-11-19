@@ -15,6 +15,7 @@
     "preview": "serve ./dist",
     "--copy-index-to-paths": "ts-node --project tsconfig.build.json ./scripts/copyIndexToPaths.ts",
     "ssr": "npx tsc && node ssr.js && rm -r ./out",
+    "ssr@dev": "npx tsc && node ssr.js",
     "analyze": "NODE_ENV=production webpack --config webpack.analyze.js"
   },
   "author": "Aleksei Berezkin",

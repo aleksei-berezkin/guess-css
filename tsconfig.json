@@ -1,14 +1,15 @@
 {
-  "include": ["src/*"],
+  "include": ["src/*", "ssr/*"],
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    "incremental": true,
     "jsx": "react-jsx",
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "target": "ESNext",
     "module": "CommonJS",
     "outDir": "out",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
   },
   "isolatedModules": true
 }
