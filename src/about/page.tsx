@@ -1,6 +1,4 @@
-'use client'
-
-import {useEffect} from 'react';
+import { useEffect } from 'react';
 import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';

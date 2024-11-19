@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { genAndDisplayNewPuzzler, restoreAndDisplay } from './store/thunks';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';

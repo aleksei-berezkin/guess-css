@@ -1,4 +1,3 @@
-import React from 'react'
 import { PuzzlerApp } from './puzzlerApp'
 import { renderToString } from 'react-dom/server'
 

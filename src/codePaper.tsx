@@ -1,5 +1,4 @@
-/** @jsxImportSource @emotion/react */
-import React, { ReactElement, useState } from 'react';
+import { ReactElement, useState } from 'react';
 import { Region } from './model/region';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
@@ -8,11 +7,7 @@ import IconButton from '@mui/material/IconButton';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { ofCurrentView, useSelector } from './store/store';
 import { CodeBody } from './codeBody';
-// TODO
-// ScrollSnapper doesn't ship ESM, doesn't work in SSR
-// import { ScrollSnapper } from 'react-scroll-snapper';
-// import 'react-scroll-snapper/dist/index.css';
-import { css } from '@emotion/react';
+import { ScrollSnapper } from './ScrollSnapper';
 
 
 export type CodeTabs = {
@@ -53,22 +48,15 @@ export function CodePaper(
         }
         {
             isTabs(body) &&
-            <div
-                // index={ body.currentIndex }
-                // onIndexChange={ body.handleChangeIndex }
-                css={css({
-                    scrollbarWidth: 'none',
-                    '&::-webkit-scrollbar': {
-                        width: 0,
-                        height: 0,
-                    },
-                })}
+            <ScrollSnapper
+                index={ body.currentIndex }
+                onIndexChange={ body.handleChangeIndex }
             >{
                 body.tabs
                     .map((tab, index) =>
                         <div key={ index }><Body code={ tab.code } collapsedCode={ tab.collapsedCode } footer={ tab.footer }/></div>
                     )
-            }</div>
+            }</ScrollSnapper>
         }
         {
             !isTabs(body) &&

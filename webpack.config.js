@@ -25,7 +25,8 @@ module.exports = {
                 exclude: /node_modules/,
                 loader: 'esbuild-loader',
                 options: {
-                    target: 'esnext'
+                    target: 'esnext',
+                    jsx: 'automatic',
                 },
                 resolve: {
                     extensions: ['.ts', '.tsx', '.js', '.json']

@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import MenuIcon from '@mui/icons-material/Menu';
 import { store, useSelector } from './store/store';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import Menu from '@mui/material/Menu';
@@ -24,7 +24,7 @@ import { DarkModeOutlined, LightModeOutlined, SettingsBrightnessOutlined } from 
 
 export function PuzzlerAppBar() {
     const [menuOpen, setMenuOpen] = useState(false);
-    const [anchorEl, setAnchorEl] = React.useState<Element | null>(null);
+    const [anchorEl, setAnchorEl] = useState<Element | null>(null);
 
     function handleAppMenuButtonClick(e: React.MouseEvent) {
         setMenuOpen(!menuOpen);

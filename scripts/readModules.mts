@@ -39,7 +39,13 @@ export async function readModules(): Promise<DepFullData[]> {
                 licenseText: getLicenseText(licenseFileText, packageJson),
             } satisfies DepFullData
         })
-    return await Promise.all(fullDataPromises)
+    return (await Promise.all(fullDataPromises)).concat({
+        // The component is copypasted
+        name: 'react-scroll-snapper',
+        description: 'Swipeable views for React using CSS scroll snap',
+        link: 'https://github.com/phaux/react-scroll-snapper',
+        licenseText: 'License: ISC'
+    })
 }
 
 function getDescription(packageJson: any, packageInfo: PackageInfo) {
