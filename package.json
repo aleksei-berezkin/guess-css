@@ -6,15 +6,15 @@
   "scripts": {
     "clean": "rm -rf ./dist",
     "clean-generated": "rm -rf ./generated",
-    "generate": "node --import 'data:text/javascript,import { register } from \"node:module\"; import { pathToFileURL } from \"node:url\"; register(\"ts-node/esm\", pathToFileURL(\"./\"));' ./scripts/generate.mts",
+    "generate": "tsx ./scripts/generate.mts",
     "copy-logo": "cp css-logo.png dist/",
-    "dev": "vite --port 3000",
-    "build@vite": "tsc -b && vite build",
-    "build": "npm-run-all clean clean-generated generate build@vite copy-logo",
-    "preview": "vite preview",
+    "build@webpack": "NODE_ENV=production webpack",
+    "build": "npm-run-all clean clean-generated generate build@webpack copy-logo",
+    "start": "NODE_ENV=development webpack serve --port 3000",
+    "preview": "serve ./dist",
     "--copy-index-to-paths": "ts-node --project tsconfig.build.json ./scripts/copyIndexToPaths.ts",
-    "analyze": "npx vite-bundle-visualizer",
-    "ssr": "npx tsc && node ssr.js && rm -r ./out"
+    "ssr": "npx tsc && node ssr.js && rm -r ./out",
+    "analyze": "NODE_ENV=production webpack --config webpack.analyze.js"
   },
   "author": "Aleksei Berezkin",
   "license": "ISC",
@@ -24,15 +24,20 @@
     "@types/node": "^20.17.3",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
-    "@vitejs/plugin-react": "^4.3.3",
+    "esbuild-loader": "^4.2.2",
     "eslint": "^9.13.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.14",
     "globals": "^15.11.0",
+    "html-webpack-plugin": "^5.6.3",
     "npm-run-all": "^4.1.5",
+    "tsx": "^4.19.2",
     "typescript": "^5.6.3",
     "typescript-eslint": "^8.11.0",
-    "vite": "^5.4.11"
+    "webpack": "^5.96.1",
+    "webpack-bundle-analyzer": "^4.10.2",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.1.0"
   },
   "dependencies": {
     "@emotion/react": "^11.13.3",
@@ -44,7 +49,6 @@
     "react-ga": "^3.3.1",
     "react-router": "^6.28.0",
     "react-router-dom": "^6.28.0",
-    "react-scroll-snapper": "^0.1.0",
-    "vite-bundle-visualizer": "^1.2.1"
+    "react-scroll-snapper": "^0.1.0"
   }
 }
