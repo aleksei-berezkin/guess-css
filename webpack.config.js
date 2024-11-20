@@ -8,11 +8,15 @@ module.exports = {
     mode: process.env.NODE_ENV,
     devtool: process.env.NODE_ENV === 'development' ? 'source-map' : false,
     entry: [
-        './src/main.tsx',
+        './src/entry-client.tsx',
     ],
     plugins: [
         new HtmlWebpackPlugin({
             template: './template.ejs',
+            minify: {
+                collapseWhitespace: process.env.NODE_ENV === 'production',
+                removeComments: false,
+            },
         }),
     ],
     output: {
