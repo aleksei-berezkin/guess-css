@@ -19,7 +19,7 @@ import CreditsPage from './credits/page';
 import SelectPage from './select/page';
 
 
-export function PuzzlerApp(p: {url?: string}) {
+export function PuzzlerApp(p: {location?: string}) {
     useEffect(() => {
         gaInit();
         const storedPersistent = readFromLocalStorage(store.persistent._version);
@@ -34,8 +34,8 @@ export function PuzzlerApp(p: {url?: string}) {
     return <ThemeProvider theme={ theme } defaultMode='system'>
         <CssBaseline/>
         {
-            p.url != null
-                ? <StaticRouter location={ p.url }><RouterBody/></StaticRouter>
+            p.location != null
+                ? <StaticRouter location={ p.location }><RouterBody/></StaticRouter>
                 : <BrowserRouter><RouterBody/></BrowserRouter>
         }
     </ThemeProvider>;
