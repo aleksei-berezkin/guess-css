@@ -2,7 +2,7 @@ import { ReactElement, ReactNode } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import { routes } from './routes';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink } from 'wouter';
 import Container from '@mui/material/Container';
 import { Footer } from './footer';
 

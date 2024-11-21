@@ -4,18 +4,17 @@
   "description": "HTML & CSS puzzler game",
   "main": "src/entry-client.tsx",
   "scripts": {
+    "lint": "npx eslint",
     "clean": "rm -rf ./dist",
     "clean-generated": "rm -rf ./generated",
-    "lint": "npx eslint",
     "generate": "tsx ./scripts/generate.mts",
+    "webpack": "NODE_ENV=production webpack",
     "copy-logo": "cp css-logo.png dist/",
-    "build@webpack": "NODE_ENV=production webpack",
-    "build": "npm-run-all clean clean-generated lint generate build@webpack copy-logo",
-    "start": "NODE_ENV=development webpack serve --port 3000",
+    "ssr": "npx tsc && node --experimental-require-module ssr.js && rm -r ./out",
+    "ssr@dev": "npx tsc && node --experimental-require-module ssr.js",
+    "build": "npm-run-all lint clean clean-generated generate webpack ssr copy-logo",
+    "dev": "NODE_ENV=development webpack serve --port 3000",
     "preview": "serve ./dist",
-    "--copy-index-to-paths": "ts-node --project tsconfig.build.json ./scripts/copyIndexToPaths.ts",
-    "ssr": "npx tsc && node ssr.js && rm -r ./out",
-    "ssr@dev": "npx tsc && node ssr.js",
     "analyze": "NODE_ENV=production webpack --config webpack.analyze.js"
   },
   "author": "Aleksei Berezkin",
@@ -50,7 +49,6 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-ga": "^3.3.1",
-    "react-router": "^6.28.0",
-    "react-router-dom": "^6.28.0"
+    "wouter": "^3.3.5"
   }
 }

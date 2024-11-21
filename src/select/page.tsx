@@ -11,8 +11,8 @@ import { genAndDisplayNewPuzzler } from '../store/thunks';
 import { routes } from '../routes';
 import Typography from '@mui/material/Typography';
 import { gaEvent, gaPageview } from '../ga';
-import { useNavigate } from 'react-router';
 import { Box } from '@mui/material';
+import { useLocation } from 'wouter';
 
 export default function SelectPage() {
     const initialTopics = useSelector(state => state.persistent.topics);
@@ -29,18 +29,18 @@ export default function SelectPage() {
         }
     }
 
-    const navigate = useNavigate()
+    const [, setLocation] = useLocation()
 
     function handleApply() {
         const filteredTopics = allTopics.filter(t => selectedTopics.includes(t));
         store.reset(filteredTopics);
         gaEvent('SelectPuzzlers', String(filteredTopics.length));
         genAndDisplayNewPuzzler();
-        navigate(routes.root)
+        setLocation(routes.root)
     }
 
     function handleBack() {
-        navigate(routes.root)
+        setLocation(routes.root)
     }
 
 

@@ -1,5 +1,5 @@
 import { routes } from './routes';
-import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'wouter';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Container from '@mui/material/Container';
@@ -35,11 +35,11 @@ export function PuzzlerAppBar() {
         }
     }
 
-    const navigate = useNavigate()
+    const [, setLocation] = useLocation()
 
     function handleSelectPuzzlers() {
         closeMenu();
-        navigate(routes.select)
+        setLocation(routes.select)
     }
 
     function handleRestart() {
@@ -57,7 +57,7 @@ export function PuzzlerAppBar() {
 
     function handleAbout() {
         closeMenu();
-        navigate(routes.about);
+        setLocation(routes.about);
     }
 
     function closeMenu() {

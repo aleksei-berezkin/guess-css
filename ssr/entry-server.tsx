@@ -6,6 +6,7 @@ import fs from 'node:fs'
 import { CacheProvider } from '@emotion/react'
 import createEmotionServer from '@emotion/server/create-instance'
 import { routes } from '../src/routes'
+import { Router } from 'wouter'
 
 // https://mui.com/material-ui/guides/server-rendering/
 export async function render(projectRootDir: string) {
@@ -18,7 +19,9 @@ export async function render(projectRootDir: string) {
 
         const html = renderToString(
             <CacheProvider value={ cache }>
-                <PuzzlerApp location={ route }/>
+                <Router ssrPath={ route }>
+                    <PuzzlerApp location={ route }/>
+                </Router>
             </CacheProvider>
         )
     

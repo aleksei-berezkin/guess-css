@@ -5,7 +5,7 @@ import ListItem from '@mui/material/ListItem';
 import { ContentPage } from '../contentPage';
 import CodeIcon from '@mui/icons-material/Code';
 import { Contacts } from '../contacts';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink } from 'wouter';
 import { allTopics } from '../model/topic';
 import { routes } from '../routes';
 import { gaPageview } from '../ga';
