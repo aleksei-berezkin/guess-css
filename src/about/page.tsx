@@ -36,6 +36,14 @@ export default function AboutPage() {
         </List>
         <Typography sx={{ mb }}>If you don’t like them all, use app menu to select only a subset.</Typography>
 
+        <Typography variant='h4'>Privacy policy</Typography>
+        <List dense>
+            <ListItem><Marker/><Typography>The game saves your progress in your browser’s <Link target='_blank' href='https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage'>localStorage</Link>. This data does not include any personally identifiable information.</Typography></ListItem>
+            <ListItem><Marker/><Typography>The app’s hosting provider, GitHub Pages, may <Link target='_blank' href='https://docs.github.com/en/pages/getting-started-with-github-pages/about-github-pages#data-collection'>store your IP Address</Link> in their logs for security purposes.</Typography></ListItem>
+            <ListItem><Marker/><Typography>The app uses Telemetry Deck for analytics. Telemetry Deck <Link target='_blank' href='https://telemetrydeck.com/privacy/'>does not collect</Link> any personally identifiable information.</Typography></ListItem>
+            <ListItem><Marker/><Typography>The app uses Google Fonts to deliver fonts. Google Fonts <Link target='_blank' href='https://developers.google.com/fonts/faq/privacy'>may store your IP address</Link> in their logs.</Typography></ListItem>
+        </List>
+
         <Typography variant='h4'>Have something to say?</Typography>
         <Typography sx={{ mb }}>You are welcome! Use any of links below:</Typography>
         <Contacts large/>
