@@ -12,15 +12,11 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import CircularProgress from '@mui/material/CircularProgress';
 import { ContentPage } from '../contentPage';
-import { routes } from '../routes';
-import { gaPageview } from '../ga';
 import { Grid2 } from '@mui/material';
 
 
 export default function CreditsPage() {
     const [visible, setVisible] = useState<{[k: string]: boolean}>({});
-
-    useEffect(() => gaPageview(routes.credits), []);
 
     const [deps, setDeps] = useState<Awaited<typeof import('../../generated/deps.json')> | undefined>();
 

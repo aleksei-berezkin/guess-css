@@ -10,14 +10,12 @@ import Button from "@mui/material/Button";
 import { genAndDisplayNewPuzzler } from '../store/thunks';
 import { routes } from '../routes';
 import Typography from '@mui/material/Typography';
-import { gaEvent, gaPageview } from '../ga';
 import { Box } from '@mui/material';
 import { useLocation } from 'wouter';
 
 export default function SelectPage() {
     const initialTopics = useSelector(state => state.persistent.topics);
     const [selectedTopics, setSelectedTopics] = useState(initialTopics);
-    useEffect(() => gaPageview(routes.select), []);
 
     useEffect(() => void setSelectedTopics(initialTopics), [initialTopics]);
 
@@ -34,7 +32,6 @@ export default function SelectPage() {
     function handleApply() {
         const filteredTopics = allTopics.filter(t => selectedTopics.includes(t));
         store.reset(filteredTopics);
-        gaEvent('SelectPuzzlers', String(filteredTopics.length));
         genAndDisplayNewPuzzler();
         setLocation(routes.root)
     }

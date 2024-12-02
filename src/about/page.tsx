@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -8,12 +7,9 @@ import { Contacts } from '../contacts';
 import { Link as RouterLink } from 'wouter';
 import { allTopics } from '../model/topic';
 import { routes } from '../routes';
-import { gaPageview } from '../ga';
 import { Link } from '@mui/material';
 
 export default function AboutPage() {
-    useEffect(() => gaPageview(routes.about), []);
-
     const mb = 1
 
     return <ContentPage>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import {useState } from 'react';
 import { store, useSelector } from './store/store';
 import { ContentPage } from './contentPage';
 import Alert from '@mui/material/Alert';
@@ -10,9 +10,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import Button from "@mui/material/Button";
 import { genAndDisplayNewPuzzler } from './store/thunks';
 import { Contacts } from './contacts';
-import { leadingZeros3 } from './util/leadingZeros3';
 import { countScorePerTopic } from './scorePerTopic';
-import { gaEvent } from './ga';
 
 const great = [
     'Great!',
@@ -49,21 +47,11 @@ const  moreCorrect = [
 ];
 
 export function ProgressDialog() {
-    useEffect(() => gaEvent('ProgressDialog', leadingZeros3(store.current + 1)), []);
-
     const round = Math.floor(store.current / store.persistent.topics.length);
     const [scorePerTopic] = useState(countScorePerTopic);
 
     const allAnswersAreCorrect = useSelector(state => state.persistent.correctAnswers === state.persistent.puzzlerViews.length);
     const moreCorrectAnswers = useSelector(state => state.persistent.correctAnswers > state.persistent.puzzlerViews.length / 2);
-
-    useEffect(() => {
-        if (allAnswersAreCorrect) {
-            gaEvent('AllAnswersAreCorrect', leadingZeros3(store.current + 1));
-        } else if (moreCorrectAnswers) {
-            gaEvent('MoreCorrectAnswers', leadingZeros3(store.current + 1));
-        }
-    }, []);
 
     function handleContinue() {
         genAndDisplayNewPuzzler();

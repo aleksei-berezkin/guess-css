@@ -9,7 +9,6 @@ import { PuzzlerAppBar } from './puzzlerAppBar';
 import { PuzzlerAppBody } from './puzzlerAppBody';
 import { store } from './store/store';
 import { readFromLocalStorage } from './store/myLocalStorage';
-import { gaInit } from './ga';
 import { routes } from './routes';
 import IndexPage from './page';
 import AboutPage from './about/page';
@@ -21,7 +20,6 @@ import { Route, Switch } from 'wouter';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function PuzzlerApp(p: {location?: string}) {
     useEffect(() => {
-        gaInit();
         const storedPersistent = readFromLocalStorage(store.persistent._version);
         if (storedPersistent) {
             restoreAndDisplay(storedPersistent);
