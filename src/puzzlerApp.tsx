@@ -1,5 +1,3 @@
-'use client'
-
 import { useEffect } from 'react';
 import { genAndDisplayNewPuzzler, restoreAndDisplay } from './store/thunks';
 import CssBaseline from '@mui/material/CssBaseline';
